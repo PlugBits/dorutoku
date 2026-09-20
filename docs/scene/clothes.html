@@ -7,6 +7,7 @@
 <meta name="description" content="服・くつのお得情報を28件、期限が近い順に並べています。地域と期限で自動的に絞り込んで毎日更新しています。">
 <link rel="canonical" href="https://dorutoku.com/scene/clothes.html">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/app.js" defer></script>
 </head>
 <body data-mode="public">
 <div class="pb-disclosure" role="note">現在、広告リンクはありません。</div>
@@ -15,7 +16,16 @@
 <section class="pb-section scene-page">
   <h1 class="page-title">服・くつのお得</h1>
   <p class="page-date">28件。今週のお得のうち、この場面のものを全部並べています。</p>
-  <div class="cards"><div class="card" data-id="d-20260919-996a" data-scene="服くつ">
+  <div class="zip-filter" id="zip-filter">
+  <label class="zip-label" for="zip-input">お住まいの郵便番号</label>
+  <div class="zip-row">
+    <input class="zip-input" id="zip-input" type="text" inputmode="numeric" autocomplete="postal-code"
+           maxlength="10" placeholder="例: 30097" aria-describedby="zip-note">
+    <button class="zip-clear" id="zip-clear" type="button" hidden>解除</button>
+  </div>
+  <p class="zip-note" id="zip-note">州限定のお得だけを絞り込みます。全米・オンラインのお得は常に出ます。 入力はこの端末のブラウザにだけ残り、どこにも送信しません。</p>
+</div>
+  <div class="cards"><div class="card" data-id="d-20260919-996a" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/adidas.svg);-webkit-mask-image:url(/assets/icons/adidas.svg)"></span></div>
     <div class="card-body">
@@ -40,7 +50,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/adidas-promo-code/" target="_blank" rel="noopener" data-out-slug="adidas">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-2626" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-2626" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/adidas.svg);-webkit-mask-image:url(/assets/icons/adidas.svg)"></span></div>
     <div class="card-body">
@@ -65,7 +75,7 @@
     <p class="sources">情報の出どころ: Offers.com</p>
     <a class="official" href="https://www.offers.com/blog/post/exclusive-adidas-deal/" target="_blank" rel="noopener" data-out-slug="adidas">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-bf38" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-bf38" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/ebay.svg);-webkit-mask-image:url(/assets/icons/ebay.svg)"></span></div>
     <div class="card-body">
@@ -90,7 +100,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/adidas-ebay/" target="_blank" rel="noopener" data-out-slug="ebay">公式ページを見る</a>
   </div>
-</div><div class="card due-soon" data-id="d-20260918-6f27" data-scene="服くつ">
+</div><div class="card due-soon" data-id="d-20260918-6f27" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">Q</div>
     <div class="card-body">
@@ -115,7 +125,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/birkenstock-sale/" target="_blank" rel="noopener" data-out-slug="qvc">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-7ca1" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-7ca1" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">Q</div>
     <div class="card-body">
@@ -140,7 +150,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/nfl-clothing/" target="_blank" rel="noopener" data-out-slug="qvc">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-4a60" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-4a60" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/macys.svg);-webkit-mask-image:url(/assets/icons/macys.svg)"></span></div>
     <div class="card-body">
@@ -165,7 +175,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://www.macys.com" target="_blank" rel="noopener" data-out-slug="macy-s">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-8d60" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-8d60" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">W</div>
     <div class="card-body">
@@ -190,7 +200,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/walmart-scoop/" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-53a2" data-scene="服くつ">
+</div><div class="card" data-id="d-20260919-53a2" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/ebay.svg);-webkit-mask-image:url(/assets/icons/ebay.svg)"></span></div>
     <div class="card-body">
@@ -215,7 +225,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032002-adidas-men-superlite-3-0-6-pack-super-no-show-socks-8-4-free-shipping" target="_blank" rel="noopener" data-out-slug="ebay">公式ページを見る</a>
   </div>
-</div><div class="card due-soon" data-id="d-20260919-50df" data-scene="服くつ">
+</div><div class="card due-soon" data-id="d-20260919-50df" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">K</div>
     <div class="card-body">
@@ -240,7 +250,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/kohls-halloween-earrings/" target="_blank" rel="noopener" data-out-slug="kohl-s">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-f8e9" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-f8e9" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/ebay.svg);-webkit-mask-image:url(/assets/icons/ebay.svg)"></span></div>
     <div class="card-body">
@@ -265,7 +275,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://www.ebay.com/itm/157894702613" target="_blank" rel="noopener" data-out-slug="ebay">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-bfe6" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-bfe6" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/ebay.svg);-webkit-mask-image:url(/assets/icons/ebay.svg)"></span></div>
     <div class="card-body">
@@ -290,7 +300,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20030409-adidas-men-adilette-lite-slides-2-colors-8-40" target="_blank" rel="noopener" data-out-slug="ebay">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-3ada" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-3ada" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/ebay.svg);-webkit-mask-image:url(/assets/icons/ebay.svg)"></span></div>
     <div class="card-body">
@@ -315,7 +325,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20030454-adidas-men-grand-court-2-0-shoes-3-colors-from-18-00" target="_blank" rel="noopener" data-out-slug="ebay">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-d482" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-d482" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -340,7 +350,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/womens-wool-socks/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-8484" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-8484" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -365,7 +375,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032110-camel-crown-women-s-waterproof-winter-ski-jacket-w-hood-black-dark-purple-from-19-99-29-99-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-72e3" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-72e3" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -390,7 +400,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/lillusory-womens-sweater/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-691a" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-691a" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -415,7 +425,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032044-lazysmile-women-s-long-sleeve-off-shoulder-jumpsuit-w-elastic-waist-4-colors-sizes-small-x-large-xx-large-only-10-99-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-19d8" data-scene="服くつ">
+</div><div class="card" data-id="d-20260919-19d8" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -440,7 +450,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20033310-g-gradual-men-s-slim-fit-lightweight-athletic-pullover-hoodie-various-14-99-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-6dd8" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-6dd8" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -465,7 +475,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-60c4" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-60c4" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -490,7 +500,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-53e0" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-53e0" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -515,7 +525,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-e811" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-e811" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">D</div>
     <div class="card-body">
@@ -540,7 +550,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032545-brooks-men-s-ghost-max-3-running-shoes-primer-grey-or-coconut-navy-80-07-free-shipping" target="_blank" rel="noopener" data-out-slug="dick-s-sporting-goods">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-ef9e" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-ef9e" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">F</div>
     <div class="card-body">
@@ -565,7 +575,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.finishline.com/" target="_blank" rel="noopener" data-out-slug="finish-line">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-e198" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-e198" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/nike.svg);-webkit-mask-image:url(/assets/icons/nike.svg)"></span></div>
     <div class="card-body">
@@ -590,7 +600,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://www.nike.com" target="_blank" rel="noopener" data-out-slug="nike">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-ed17" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-ed17" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/samsclub.svg);-webkit-mask-image:url(/assets/icons/samsclub.svg)"></span></div>
     <div class="card-body">
@@ -615,7 +625,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/sams-club-family-pajamas/" target="_blank" rel="noopener" data-out-slug="sam-s-club">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-e0fb" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-e0fb" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/target.svg);-webkit-mask-image:url(/assets/icons/target.svg)"></span></div>
     <div class="card-body">
@@ -640,7 +650,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/target-basic-tees/" target="_blank" rel="noopener" data-out-slug="target">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-a61d" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-a61d" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">W</div>
     <div class="card-body">
@@ -665,7 +675,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20033784-ozark-trail-men-s-relaxed-fit-swim-trunks-various-sizes-and-colors-from-2-48-free-shipping-w-walmart-or-on-35" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-cd94" data-scene="服くつ">
+</div><div class="card" data-id="d-20260918-cd94" data-scene="服くつ" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">W</div>
     <div class="card-body">
@@ -690,7 +700,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/walmart-peanuts-sweatshirt/" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-fd00" data-scene="服くつ">
+</div><div class="card" data-id="d-20260920-fd00" data-scene="服くつ" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/adidas.svg);-webkit-mask-image:url(/assets/icons/adidas.svg)"></span></div>
     <div class="card-body">
@@ -718,6 +728,7 @@
 </div></div>
   <p class="quiet-link"><a href="/">&larr; 今週のお得に戻る</a></p>
 </section>
+<script type="application/json" id="zip-states">{"ranges":[[500,599,"NY"],[600,799,"PR"],[800,899,"VI"],[900,999,"PR"],[1000,2799,"MA"],[2800,2999,"RI"],[3000,3899,"NH"],[3900,4999,"ME"],[5000,5999,"VT"],[6000,6389,"CT"],[6390,6390,"NY"],[6391,6999,"CT"],[7000,8999,"NJ"],[10000,14999,"NY"],[15000,19699,"PA"],[19700,19999,"DE"],[20000,20099,"DC"],[20100,20199,"VA"],[20200,20599,"DC"],[20600,21999,"MD"],[22000,24699,"VA"],[24700,26899,"WV"],[27000,28999,"NC"],[29000,29999,"SC"],[30000,31999,"GA"],[32000,34999,"FL"],[35000,36999,"AL"],[37000,38599,"TN"],[38600,39799,"MS"],[39800,39999,"GA"],[40000,42799,"KY"],[43000,45999,"OH"],[46000,47999,"IN"],[48000,49999,"MI"],[50000,52999,"IA"],[53000,54999,"WI"],[55000,56799,"MN"],[56900,56999,"DC"],[57000,57799,"SD"],[58000,58899,"ND"],[59000,59999,"MT"],[60000,62999,"IL"],[63000,65899,"MO"],[66000,67999,"KS"],[68000,69399,"NE"],[70000,71499,"LA"],[71600,72999,"AR"],[73000,74999,"OK"],[75000,79999,"TX"],[80000,81999,"CO"],[82000,83199,"WY"],[83200,83899,"ID"],[84000,84799,"UT"],[85000,86999,"AZ"],[87000,88499,"NM"],[88500,88599,"TX"],[88900,89899,"NV"],[90000,96199,"CA"],[96700,96899,"HI"],[96910,96932,"GU"],[96950,96952,"MP"],[97000,97999,"OR"],[98000,99499,"WA"],[99500,99999,"AK"]],"labels":{"AL":"アラバマ州","AK":"アラスカ州","AZ":"アリゾナ州","AR":"アーカンソー州","CA":"カリフォルニア州","CO":"コロラド州","CT":"コネチカット州","DE":"デラウェア州","FL":"フロリダ州","GA":"ジョージア州","HI":"ハワイ州","ID":"アイダホ州","IL":"イリノイ州","IN":"インディアナ州","IA":"アイオワ州","KS":"カンザス州","KY":"ケンタッキー州","LA":"ルイジアナ州","ME":"メイン州","MD":"メリーランド州","MA":"マサチューセッツ州","MI":"ミシガン州","MN":"ミネソタ州","MS":"ミシシッピ州","MO":"ミズーリ州","MT":"モンタナ州","NE":"ネブラスカ州","NV":"ネバダ州","NH":"ニューハンプシャー州","NJ":"ニュージャージー州","NM":"ニューメキシコ州","NY":"ニューヨーク州","NC":"ノースカロライナ州","ND":"ノースダコタ州","OH":"オハイオ州","OK":"オクラホマ州","OR":"オレゴン州","PA":"ペンシルベニア州","RI":"ロードアイランド州","SC":"サウスカロライナ州","SD":"サウスダコタ州","TN":"テネシー州","TX":"テキサス州","UT":"ユタ州","VT":"バーモント州","VA":"バージニア州","WA":"ワシントン州","WV":"ウェストバージニア州","WI":"ウィスコンシン州","WY":"ワイオミング州","DC":"ワシントンD.C.","PR":"プエルトリコ","VI":"米領ヴァージン諸島","GU":"グアム","MP":"北マリアナ諸島"}}</script>
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">

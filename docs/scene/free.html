@@ -7,6 +7,7 @@
 <meta name="description" content="無料のお得情報を9件、期限が近い順に並べています。地域と期限で自動的に絞り込んで毎日更新しています。">
 <link rel="canonical" href="https://dorutoku.com/scene/free.html">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/app.js" defer></script>
 </head>
 <body data-mode="public">
 <div class="pb-disclosure" role="note">現在、広告リンクはありません。</div>
@@ -15,7 +16,16 @@
 <section class="pb-section scene-page">
   <h1 class="page-title">無料のお得</h1>
   <p class="page-date">9件。今週のお得のうち、この場面のものを全部並べています。</p>
-  <div class="cards"><div class="card" data-id="d-20260918-3296" data-scene="無料でもらえる">
+  <div class="zip-filter" id="zip-filter">
+  <label class="zip-label" for="zip-input">お住まいの郵便番号</label>
+  <div class="zip-row">
+    <input class="zip-input" id="zip-input" type="text" inputmode="numeric" autocomplete="postal-code"
+           maxlength="10" placeholder="例: 30097" aria-describedby="zip-note">
+    <button class="zip-clear" id="zip-clear" type="button" hidden>解除</button>
+  </div>
+  <p class="zip-note" id="zip-note">州限定のお得だけを絞り込みます。全米・オンラインのお得は常に出ます。 入力はこの端末のブラウザにだけ残り、どこにも送信しません。</p>
+</div>
+  <div class="cards"><div class="card" data-id="d-20260918-3296" data-scene="無料でもらえる" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">L</div>
     <div class="card-body">
@@ -40,7 +50,7 @@
     <p class="sources">情報の出どころ: Freebie Shark・Living on the Cheap</p>
     <a class="official" href="https://www.lowes.com" target="_blank" rel="noopener" data-out-slug="lowe-s">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-7ae0" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260920-7ae0" data-scene="無料でもらえる" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">W</div>
     <div class="card-body">
@@ -65,7 +75,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/nexxus-hairspray/" target="_blank" rel="noopener" data-out-slug="walgreens">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-61f9" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260920-61f9" data-scene="無料でもらえる" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">W</div>
     <div class="card-body">
@@ -90,7 +100,7 @@
     <p class="sources">情報の出どころ: Doctor of Credit・Freebie Shark</p>
     <a class="official" href="https://www.doctorofcredit.com/walgreens-5x7-custom-folded-card-free-with-promo-code-folded5x7/" target="_blank" rel="noopener" data-out-slug="walgreens">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-4f0c" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260918-4f0c" data-scene="無料でもらえる" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">L</div>
     <div class="card-body">
@@ -115,7 +125,7 @@
     <p class="sources">情報の出どころ: Living on the Cheap</p>
     <a class="official" href="https://livingonthecheap.com/free-pumpkin-stencils-for-creative-halloween-carving/" target="_blank" rel="noopener" data-out-slug="living-on-the-cheap">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-f9ec" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260918-f9ec" data-scene="無料でもらえる" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">E</div>
     <div class="card-body">
@@ -140,7 +150,7 @@
     <p class="sources">情報の出どころ: Freebie Shark</p>
     <a class="official" href="https://www.freebieshark.com/2026/09/free-e-l-f-foundation-brush.html" target="_blank" rel="noopener" data-out-slug="e-l-f">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-aaae" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260919-aaae" data-scene="無料でもらえる" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">R</div>
     <div class="card-body">
@@ -165,7 +175,7 @@
     <p class="sources">情報の出どころ: Freebie Shark</p>
     <a class="official" href="https://www.freebieshark.com/2026/09/ripple-street-possible-free-country-crock-party-pack.html" target="_blank" rel="noopener" data-out-slug="ripple-street">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-dd15" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260918-dd15" data-scene="無料でもらえる" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">A</div>
     <div class="card-body">
@@ -190,7 +200,7 @@
     <p class="sources">情報の出どころ: Living on the Cheap</p>
     <a class="official" href="https://livingonthecheap.com/free-gift-box-from-amazon-baby-registry/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-984e" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260918-984e" data-scene="無料でもらえる" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">A</div>
     <div class="card-body">
@@ -215,7 +225,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com" target="_blank" rel="noopener" data-out-slug="amazon-luna">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-e661" data-scene="無料でもらえる">
+</div><div class="card" data-id="d-20260918-e661" data-scene="無料でもらえる" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-free" aria-hidden="true">F</div>
     <div class="card-body">
@@ -243,6 +253,7 @@
 </div></div>
   <p class="quiet-link"><a href="/">&larr; 今週のお得に戻る</a></p>
 </section>
+<script type="application/json" id="zip-states">{"ranges":[[500,599,"NY"],[600,799,"PR"],[800,899,"VI"],[900,999,"PR"],[1000,2799,"MA"],[2800,2999,"RI"],[3000,3899,"NH"],[3900,4999,"ME"],[5000,5999,"VT"],[6000,6389,"CT"],[6390,6390,"NY"],[6391,6999,"CT"],[7000,8999,"NJ"],[10000,14999,"NY"],[15000,19699,"PA"],[19700,19999,"DE"],[20000,20099,"DC"],[20100,20199,"VA"],[20200,20599,"DC"],[20600,21999,"MD"],[22000,24699,"VA"],[24700,26899,"WV"],[27000,28999,"NC"],[29000,29999,"SC"],[30000,31999,"GA"],[32000,34999,"FL"],[35000,36999,"AL"],[37000,38599,"TN"],[38600,39799,"MS"],[39800,39999,"GA"],[40000,42799,"KY"],[43000,45999,"OH"],[46000,47999,"IN"],[48000,49999,"MI"],[50000,52999,"IA"],[53000,54999,"WI"],[55000,56799,"MN"],[56900,56999,"DC"],[57000,57799,"SD"],[58000,58899,"ND"],[59000,59999,"MT"],[60000,62999,"IL"],[63000,65899,"MO"],[66000,67999,"KS"],[68000,69399,"NE"],[70000,71499,"LA"],[71600,72999,"AR"],[73000,74999,"OK"],[75000,79999,"TX"],[80000,81999,"CO"],[82000,83199,"WY"],[83200,83899,"ID"],[84000,84799,"UT"],[85000,86999,"AZ"],[87000,88499,"NM"],[88500,88599,"TX"],[88900,89899,"NV"],[90000,96199,"CA"],[96700,96899,"HI"],[96910,96932,"GU"],[96950,96952,"MP"],[97000,97999,"OR"],[98000,99499,"WA"],[99500,99999,"AK"]],"labels":{"AL":"アラバマ州","AK":"アラスカ州","AZ":"アリゾナ州","AR":"アーカンソー州","CA":"カリフォルニア州","CO":"コロラド州","CT":"コネチカット州","DE":"デラウェア州","FL":"フロリダ州","GA":"ジョージア州","HI":"ハワイ州","ID":"アイダホ州","IL":"イリノイ州","IN":"インディアナ州","IA":"アイオワ州","KS":"カンザス州","KY":"ケンタッキー州","LA":"ルイジアナ州","ME":"メイン州","MD":"メリーランド州","MA":"マサチューセッツ州","MI":"ミシガン州","MN":"ミネソタ州","MS":"ミシシッピ州","MO":"ミズーリ州","MT":"モンタナ州","NE":"ネブラスカ州","NV":"ネバダ州","NH":"ニューハンプシャー州","NJ":"ニュージャージー州","NM":"ニューメキシコ州","NY":"ニューヨーク州","NC":"ノースカロライナ州","ND":"ノースダコタ州","OH":"オハイオ州","OK":"オクラホマ州","OR":"オレゴン州","PA":"ペンシルベニア州","RI":"ロードアイランド州","SC":"サウスカロライナ州","SD":"サウスダコタ州","TN":"テネシー州","TX":"テキサス州","UT":"ユタ州","VT":"バーモント州","VA":"バージニア州","WA":"ワシントン州","WV":"ウェストバージニア州","WI":"ウィスコンシン州","WY":"ワイオミング州","DC":"ワシントンD.C.","PR":"プエルトリコ","VI":"米領ヴァージン諸島","GU":"グアム","MP":"北マリアナ諸島"}}</script>
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">

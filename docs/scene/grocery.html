@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>食料品・日用品のお得 | PlugBits</title>
-<meta name="description" content="食料品・日用品のお得情報を66件、期限が近い順に並べています。地域と期限で自動的に絞り込んで毎日更新しています。">
+<meta name="description" content="食料品・日用品のお得情報を67件、期限が近い順に並べています。地域と期限で自動的に絞り込んで毎日更新しています。">
 <link rel="canonical" href="https://dorutoku.com/scene/grocery.html">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/app.js" defer></script>
 </head>
 <body data-mode="public">
 <div class="pb-disclosure" role="note">現在、広告リンクはありません。</div>
@@ -14,8 +15,17 @@
 <main class="pb-main">
 <section class="pb-section scene-page">
   <h1 class="page-title">食料品・日用品のお得</h1>
-  <p class="page-date">66件。今週のお得のうち、この場面のものを全部並べています。</p>
-  <div class="cards"><div class="card" data-id="d-20260920-dec9" data-scene="食料品日用品">
+  <p class="page-date">67件。今週のお得のうち、この場面のものを全部並べています。</p>
+  <div class="zip-filter" id="zip-filter">
+  <label class="zip-label" for="zip-input">お住まいの郵便番号</label>
+  <div class="zip-row">
+    <input class="zip-input" id="zip-input" type="text" inputmode="numeric" autocomplete="postal-code"
+           maxlength="10" placeholder="例: 30097" aria-describedby="zip-note">
+    <button class="zip-clear" id="zip-clear" type="button" hidden>解除</button>
+  </div>
+  <p class="zip-note" id="zip-note">州限定のお得だけを絞り込みます。全米・オンラインのお得は常に出ます。 入力はこの端末のブラウザにだけ残り、どこにも送信しません。</p>
+</div>
+  <div class="cards"><div class="card" data-id="d-20260920-dec9" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">C</div>
     <div class="card-body">
@@ -40,7 +50,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/cvs-best-digital-coupons/" target="_blank" rel="noopener" data-out-slug="cvs">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-86e7" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-86e7" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">W</div>
     <div class="card-body">
@@ -65,7 +75,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/best-walgreens-digital-coupons/" target="_blank" rel="noopener" data-out-slug="walgreens">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-0f05" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-0f05" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">W</div>
     <div class="card-body">
@@ -90,7 +100,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/walmart-grocery-promo-code/" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-9236" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-9236" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">K</div>
     <div class="card-body">
@@ -115,7 +125,7 @@
     <p class="sources">情報の出どころ: Doctor of Credit・Frequent Miler</p>
     <a class="official" href="https://www.kroger.com/c/get-4x-fuel-points-coupon/800000027782" target="_blank" rel="noopener" data-out-slug="kroger-harris-teeter">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-3637" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-3637" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">K</div>
     <div class="card-body">
@@ -140,7 +150,32 @@
     <p class="sources">情報の出どころ: Doctor of Credit</p>
     <a class="official" href="https://www.doctorofcredit.com/chase-offers-get-10-back-at-kroger-up-to-7-cashback/" target="_blank" rel="noopener" data-out-slug="kroger-harris-teeter">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-4cac" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-242a" data-scene="食料品日用品" data-region="MI,OH,IN,IL,KY,WI">
+  <div class="card-row">
+    <div class="home-store-icon scene-shop" aria-hidden="true">M</div>
+    <div class="card-body">
+      <div class="card-store-line">
+        <p class="card-store">Meijer</p>
+        
+      </div>
+      <p class="card-headline tier-2">ギフトカードが$50で5千ポイント</p>
+      <p class="card-cond">他社ブランドのギフトカードのみ</p>
+      <div class="card-meta">
+        <span class="chip scene-shop">店・EC</span>
+        <button class="detail-link" type="button" data-action="detail" data-id="d-20260918-242a">くわしく<span class="chev">&rsaquo;</span></button>
+      </div>
+    </div>
+    <div class="card-side">
+      <button class="heart-btn" type="button" data-action="heart" data-id="d-20260918-242a" aria-label="気になるに追加">&#9825;</button>
+      <span class="home-due soft">〜9/29</span>
+    </div>
+  </div>
+  <div class="card-detail" data-detail-for="d-20260918-242a" hidden>
+    <dl class="detail-list"><div class="detail-row"><dt>対象</dt><dd>Meijer で買う他社のギフトカード</dd></div><div class="detail-row"><dt>お得の中身</dt><dd>$50ごとに5,000ポイント(上限50,000ポイント＝$500分)</dd></div><div class="detail-row"><dt>使い方</dt><dd>mPerks(無料登録)のポイントとして付く</dd></div><div class="detail-row"><dt>期間</dt><dd>9/29まで</dd></div><div class="detail-row"><dt>対象者</dt><dd>記載なし</dd></div><div class="detail-row"><dt>注意</dt><dd>Visa / Mastercard / Amazon / プリペイドは除外</dd></div></dl>
+    <p class="sources">情報の出どころ: Doctor of Credit</p>
+    <a class="official" href="https://www.meijer.com/shopping/mPerks.html" target="_blank" rel="noopener" data-out-slug="meijer">公式ページを見る</a>
+  </div>
+</div><div class="card" data-id="d-20260918-4cac" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">P</div>
     <div class="card-body">
@@ -165,7 +200,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/grinch-gain/" target="_blank" rel="noopener" data-out-slug="p-g">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-667f" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-667f" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">C</div>
     <div class="card-body">
@@ -190,7 +225,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20008902-upcoming-costco-wholesale-members-in-warehouse-online-savings-see-thread-for-pricing-valid-september-21-october-18-2026" target="_blank" rel="noopener" data-out-slug="costco">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-9712" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-9712" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">C</div>
     <div class="card-body">
@@ -215,7 +250,7 @@
     <p class="sources">情報の出どころ: Doctor of Credit・Frequent Miler</p>
     <a class="official" href="https://ir.doordash.com/news/news-details/2026/DoorDash-and-Costco-Expand-Global-Partnership-with-Nationwide-U-S--Launch/default.aspx" target="_blank" rel="noopener" data-out-slug="costco">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-5d29" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-5d29" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -240,7 +275,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-a002" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-a002" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -265,7 +300,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/winner-disposable-face-towels/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-da67" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-da67" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -290,7 +325,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/dr-pepper-zero-sugar-12-pack/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-cd0b" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-cd0b" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -315,7 +350,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/aloha-bars/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-39be" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-39be" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -340,7 +375,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20031573-sns-ac-32-41-6-6-pack-7-5-oz-softsoap-liquid-hand-soap-fresh-breeze-5-40-each-at-amazon-90-each" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-fc16" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-fc16" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -365,7 +400,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20036187-sns-ac-7-78-180-count-nature-made-vitamin-d3-125-mcg-5000-iu-softgels-180-da" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-a909" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-a909" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -390,7 +425,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/halloween-rice-krispies-treats/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-d09a" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-d09a" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -415,7 +450,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/brawny-paper-towels/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-d506" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-d506" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -440,7 +475,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-welchs-halloween-fruit-snacks/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-5594" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-5594" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -465,7 +500,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/albanese-gummi-bears/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-7a91" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-7a91" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -490,7 +525,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-addc" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-addc" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -515,7 +550,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-e477" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-e477" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -540,7 +575,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-9b26" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-9b26" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -565,7 +600,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/jack-links/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-7d87" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-7d87" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -590,7 +625,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/carote-cast-iron-dutch-oven/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-fd90" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-fd90" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -615,7 +650,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20031720-8-pack-panasonic-eneloop-aaa-nimh-pre-charged-rechargeable-batteries-bk-4mcca8ba-15-99-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-f42c" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-f42c" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -640,7 +675,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032119-sns-ac-5-08-10-oz-kicking-horse-organic-medium-roast-ground-coffee-smart-ass-at-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-cf76" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-cf76" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -665,7 +700,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20021658-sns-ac-2-12-28-oz-method-all-purpose-cleaner-spray-french-lavender-at-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-4440" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-4440" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -690,7 +725,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-old-spice-deodorant/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-99b8" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-99b8" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -715,7 +750,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/happy-belly-coffee/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-2150" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-2150" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -740,7 +775,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-coca-cola/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-d058" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-d058" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -765,7 +800,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/mrs-meyers-hand-soap/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-1b1f" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-1b1f" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -790,7 +825,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/blistex-lip-balm/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-16c0" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-16c0" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -815,7 +850,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/duncan-hines-frosting/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-cd9d" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-cd9d" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -840,7 +875,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20031585-sns-ac-9-62-20-pack-12-oz-spindrift-sparkling-water-4-flavor-original-variety-pack-at-amazon-48-1-each" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-ea91" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-ea91" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -865,7 +900,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20032839-sns-ac-2-18-25oz-stardrops-the-pink-stuff-miracle-toilet-gel-cleaner-at-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-07d1" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-07d1" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -890,7 +925,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/dove-beauty-bars/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-4fd6" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-4fd6" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -915,7 +950,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/seventh-generation-laundry-detergent/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-a4cd" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-a4cd" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -940,7 +975,7 @@
     <p class="sources">情報の出どころ: Hip2Save・Freebie Shark</p>
     <a class="official" href="https://hip2save.com/deals/puffs-tissues/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-9964" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-9964" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -965,7 +1000,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20034771-12-ct-pure-protein-chocolate-salted-caramel-protein-bars-20g-protein-12-82-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-b09c" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-b09c" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -990,7 +1025,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20033106-sns-ac-prime-2-93-4-14-5-oz-amazon-grocery-petite-diced-tomatoes-73-4-each-at-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-d24f" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-d24f" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1015,7 +1050,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/brachs-candy-corn/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-5387" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260918-5387" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1040,7 +1075,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/nestle-toll-house-cocoa-powder/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-cf77" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-cf77" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1065,7 +1100,7 @@
     <p class="sources">情報の出どころ: Freebie Shark</p>
     <a class="official" href="https://www.freebieshark.com/2026/09/amazon-dots-pretzels-only-4-41.html" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-3d87" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-3d87" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1090,7 +1125,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20009529-6-piece-yasonic-shower-caddy-organizers-w-hooks-black-10-19-free-ship-w-prim" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-8bbe" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-8bbe" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1115,7 +1150,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20034507-160l-efluky-3-section-laundry-hamper-w-lid-3x-removable-bags-white-16" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-a3b3" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-a3b3" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1140,7 +1175,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/windex-fast-shine-foam-cleanser/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-62a1" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-62a1" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1165,7 +1200,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/electric-salt-pepper-grinder-set/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-3c82" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-3c82" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1190,7 +1225,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-b700" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-b700" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1215,7 +1250,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-978d" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-978d" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1240,7 +1275,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-a888" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-a888" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1265,7 +1300,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/sour-patch-kids/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-a953" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-a953" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1290,7 +1325,7 @@
     <p class="sources">情報の出どころ: Hip2Save・Freebie Shark</p>
     <a class="official" href="https://hip2save.com/deals/frito-lay-variety-pack/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-2294" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-2294" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1315,7 +1350,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/nutella-biscuit-cookies/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-4ba1" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-4ba1" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1340,7 +1375,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/snack-pack-pudding/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-7819" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-7819" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1365,7 +1400,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/bodyarmor/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-3e77" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-3e77" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1390,7 +1425,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/physicians-choice-fiber-gummies/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-f420" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-f420" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1415,7 +1450,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/slim-jim/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-b743" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-b743" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1440,7 +1475,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-4728" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-4728" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1465,7 +1500,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-f92e" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-f92e" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1490,7 +1525,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-617c" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-617c" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1515,7 +1550,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/hidden-valley-ranch-seasoning/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-055b" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-055b" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1540,7 +1575,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/squirrel-brand-nuts/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-8380" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-8380" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1565,7 +1600,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-arizona-tea/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-9ea9" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-9ea9" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1590,7 +1625,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-nutter-butter/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-a8e6" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-a8e6" data-scene="食料品日用品" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true">A</div>
     <div class="card-body">
@@ -1615,7 +1650,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/progresso-soup/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-04dc" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260919-04dc" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/macys.svg);-webkit-mask-image:url(/assets/icons/macys.svg)"></span></div>
     <div class="card-body">
@@ -1640,7 +1675,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20028966-10-piece-art-cook-plastic-food-storage-container-set-10-76-free-store-pickup-at-macy-s-or-free-shipping-on-39" target="_blank" rel="noopener" data-out-slug="macy-s">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-9c7a" data-scene="食料品日用品">
+</div><div class="card" data-id="d-20260920-9c7a" data-scene="食料品日用品" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-shop" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/samsclub.svg);-webkit-mask-image:url(/assets/icons/samsclub.svg)"></span></div>
     <div class="card-body">
@@ -1668,6 +1703,7 @@
 </div></div>
   <p class="quiet-link"><a href="/">&larr; 今週のお得に戻る</a></p>
 </section>
+<script type="application/json" id="zip-states">{"ranges":[[500,599,"NY"],[600,799,"PR"],[800,899,"VI"],[900,999,"PR"],[1000,2799,"MA"],[2800,2999,"RI"],[3000,3899,"NH"],[3900,4999,"ME"],[5000,5999,"VT"],[6000,6389,"CT"],[6390,6390,"NY"],[6391,6999,"CT"],[7000,8999,"NJ"],[10000,14999,"NY"],[15000,19699,"PA"],[19700,19999,"DE"],[20000,20099,"DC"],[20100,20199,"VA"],[20200,20599,"DC"],[20600,21999,"MD"],[22000,24699,"VA"],[24700,26899,"WV"],[27000,28999,"NC"],[29000,29999,"SC"],[30000,31999,"GA"],[32000,34999,"FL"],[35000,36999,"AL"],[37000,38599,"TN"],[38600,39799,"MS"],[39800,39999,"GA"],[40000,42799,"KY"],[43000,45999,"OH"],[46000,47999,"IN"],[48000,49999,"MI"],[50000,52999,"IA"],[53000,54999,"WI"],[55000,56799,"MN"],[56900,56999,"DC"],[57000,57799,"SD"],[58000,58899,"ND"],[59000,59999,"MT"],[60000,62999,"IL"],[63000,65899,"MO"],[66000,67999,"KS"],[68000,69399,"NE"],[70000,71499,"LA"],[71600,72999,"AR"],[73000,74999,"OK"],[75000,79999,"TX"],[80000,81999,"CO"],[82000,83199,"WY"],[83200,83899,"ID"],[84000,84799,"UT"],[85000,86999,"AZ"],[87000,88499,"NM"],[88500,88599,"TX"],[88900,89899,"NV"],[90000,96199,"CA"],[96700,96899,"HI"],[96910,96932,"GU"],[96950,96952,"MP"],[97000,97999,"OR"],[98000,99499,"WA"],[99500,99999,"AK"]],"labels":{"AL":"アラバマ州","AK":"アラスカ州","AZ":"アリゾナ州","AR":"アーカンソー州","CA":"カリフォルニア州","CO":"コロラド州","CT":"コネチカット州","DE":"デラウェア州","FL":"フロリダ州","GA":"ジョージア州","HI":"ハワイ州","ID":"アイダホ州","IL":"イリノイ州","IN":"インディアナ州","IA":"アイオワ州","KS":"カンザス州","KY":"ケンタッキー州","LA":"ルイジアナ州","ME":"メイン州","MD":"メリーランド州","MA":"マサチューセッツ州","MI":"ミシガン州","MN":"ミネソタ州","MS":"ミシシッピ州","MO":"ミズーリ州","MT":"モンタナ州","NE":"ネブラスカ州","NV":"ネバダ州","NH":"ニューハンプシャー州","NJ":"ニュージャージー州","NM":"ニューメキシコ州","NY":"ニューヨーク州","NC":"ノースカロライナ州","ND":"ノースダコタ州","OH":"オハイオ州","OK":"オクラホマ州","OR":"オレゴン州","PA":"ペンシルベニア州","RI":"ロードアイランド州","SC":"サウスカロライナ州","SD":"サウスダコタ州","TN":"テネシー州","TX":"テキサス州","UT":"ユタ州","VT":"バーモント州","VA":"バージニア州","WA":"ワシントン州","WV":"ウェストバージニア州","WI":"ウィスコンシン州","WY":"ワイオミング州","DC":"ワシントンD.C.","PR":"プエルトリコ","VI":"米領ヴァージン諸島","GU":"グアム","MP":"北マリアナ諸島"}}</script>
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">

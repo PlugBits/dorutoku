@@ -39,14 +39,22 @@
   ];
 
   function initDealsPage() {
+    // /cards や記事のページには一覧が無いので何もしない。場面別ページ(/scene/*.html)は
+    // タブも日付帯も無いが、カードはあるので郵便番号の絞り込みとハートだけ動かす。
     var tabsWrap = document.getElementById('tabs-wrap');
-    if (!tabsWrap) return;   // /cards ページにはこの id が無い。何もしない
+    if (!tabsWrap && !document.querySelector('.card[data-id], .bundle-item[data-id]')) return;
 
     var calendarIndexEl = document.getElementById('deals-calendar-index');
     var calendarIndex = {};
     try { calendarIndex = JSON.parse(calendarIndexEl.textContent) || {}; } catch (e) { calendarIndex = {}; }
 
-    var state = { activeTab: 'all', activeDate: null, saved: personalApi.savedGet() };
+    var state = { activeTab: 'all', activeDate: null, region: null, saved: personalApi.savedGet() };
+
+    function readJSON(id) {
+      var el = document.getElementById(id);
+      if (!el) return null;
+      try { return JSON.parse(el.textContent); } catch (e) { return null; }
+    }
 
     function tabByKey(key) {
       for (var i = 0; i < TABS.length; i++) { if (TABS[i].key === key) return TABS[i]; }
@@ -57,6 +65,98 @@
     // カード単位(.card[data-scene]・.bundle-item[data-scene])で行う。バンドルは中の1件でも
     // 見えていれば表示し、全部隠れたら畳む。セクションはカードが1件も残らなければ丸ごと隠す
     // (ただし「今日やることはありません」等の空文言だけの節=.cards が無い節はそのまま触らない)。
+    // ---------- 郵便番号での絞り込み(公開サイト、2026-09-20) ----------
+    // 台帳の地域は州までしか無いので、郵便番号は州を特定する入口として使う。
+    // 表(郵便番号の帯 → 州)は us_zip.py が唯一の置き場で、ページに埋め込まれたものを読む。
+    var ZIP_KEY = 'pb_deals_zip_v1';
+    var zipTable = readJSON('zip-states') || { ranges: [], labels: {} };
+
+    function stateOfZip(raw) {
+      var m = String(raw || '').match(/^\s*(\d{5})(?:-\d{4})?\s*$/);
+      if (!m) return null;
+      var n = parseInt(m[1], 10);
+      for (var i = 0; i < zipTable.ranges.length; i++) {
+        var r = zipTable.ranges[i];
+        if (n >= r[0] && n <= r[1]) return r[2];
+      }
+      return null;
+    }
+
+    function zipLoad() {
+      try { return JSON.parse(localStorage.getItem(ZIP_KEY) || 'null') || null; } catch (e) { return null; }
+    }
+    function zipSave(v) {
+      try {
+        if (v) localStorage.setItem(ZIP_KEY, JSON.stringify(v));
+        else localStorage.removeItem(ZIP_KEY);
+      } catch (e) { /* プライベートウィンドウ等。絞り込み自体はこのまま動く */ }
+    }
+
+    function regionOk(el) {
+      if (!state.region) return true;
+      var attr = el.getAttribute('data-region') || 'unknown';
+      if (attr === 'all' || attr === 'online' || attr === 'unknown') return true;
+      return attr.split(',').indexOf(state.region) !== -1;
+    }
+
+    function renderZipNote() {
+      var note = document.getElementById('zip-note');
+      var clear = document.getElementById('zip-clear');
+      if (!note) return;
+      // 「どこにも送信しない」は絞り込みの前後どちらでも出しておく(読者が一番気にする点なので、
+      // 絞り込んだ瞬間に消えないようにする)
+      var privacy = ' 入力はこの端末のブラウザにだけ残り、どこにも送信しません。';
+      if (state.region) {
+        var label = zipTable.labels[state.region] || state.region;
+        note.textContent = label + 'のお得に絞り込んでいます。全米・オンラインのお得は常に出ます。' + privacy;
+        note.classList.add('on');
+      } else {
+        note.textContent = '州限定のお得だけを絞り込みます。全米・オンラインのお得は常に出ます。' + privacy;
+        note.classList.remove('on');
+      }
+      if (clear) clear.hidden = !state.region;
+    }
+
+    function setZip(raw, persist) {
+      var st = stateOfZip(raw);
+      var input = document.getElementById('zip-input');
+      // 5桁そろっていないうちは何も変えない(打っている途中で一覧が消えないように)
+      if (!/^\s*\d{5}/.test(String(raw || '')) && String(raw || '').trim() !== '') {
+        return;
+      }
+      state.region = st;
+      if (persist) zipSave(st ? { zip: String(raw).trim(), state: st } : null);
+      if (input && st === null && String(raw || '').trim() !== '') {
+        document.getElementById('zip-note').textContent =
+          'その郵便番号から州を判定できませんでした。5桁で入れてみてください。';
+        return;
+      }
+      renderZipNote();
+      applyFilters();
+    }
+
+    function initZip() {
+      var input = document.getElementById('zip-input');
+      if (!input) return;
+      var saved = zipLoad();
+      if (saved && saved.state) {
+        input.value = saved.zip || '';
+        state.region = saved.state;
+      }
+      renderZipNote();
+      input.addEventListener('input', function () { setZip(input.value, true); });
+      var clear = document.getElementById('zip-clear');
+      if (clear) {
+        clear.addEventListener('click', function () {
+          input.value = '';
+          state.region = null;
+          zipSave(null);
+          renderZipNote();
+          applyFilters();
+        });
+      }
+    }
+
     function applyFilters() {
       var tab = tabByKey(state.activeTab);
       var dateIds = state.activeDate ? (calendarIndex[state.activeDate] || []) : null;
@@ -67,7 +167,7 @@
         var scene = el.getAttribute('data-scene') || '';
         var sceneOk = !tab.scene || scene.indexOf(tab.scene) !== -1;
         var dateOk = !dateSet || !!dateSet[id];
-        el.hidden = !(sceneOk && dateOk);
+        el.hidden = !(sceneOk && dateOk && regionOk(el));
       });
       document.querySelectorAll('.store-bundle').forEach(function (bundle) {
         var anyVisible = false;
@@ -99,6 +199,7 @@
       });
       var chipWrap = document.getElementById('filter-chip-wrap');
       var chip = document.getElementById('filter-chip');
+      if (!chipWrap || !chip) return;                       // 場面別ページには日付帯が無い
       if (!state.activeDate) { chipWrap.hidden = true; return; }
       var btn = document.querySelector('.date-chip[data-date="' + state.activeDate + '"]');
       var md = btn ? btn.querySelector('.md').textContent : state.activeDate;
@@ -226,6 +327,7 @@
 
     state.saved.forEach(function (id) { setHeart(id, true); });
     renderSaved();
+    initZip();
     applyFilters();
     applySinglesPref();
 

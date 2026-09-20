@@ -7,6 +7,7 @@
 <meta name="description" content="子どものお得情報を29件、期限が近い順に並べています。地域と期限で自動的に絞り込んで毎日更新しています。">
 <link rel="canonical" href="https://dorutoku.com/scene/kids.html">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/app.js" defer></script>
 </head>
 <body data-mode="public">
 <div class="pb-disclosure" role="note">現在、広告リンクはありません。</div>
@@ -15,7 +16,16 @@
 <section class="pb-section scene-page">
   <h1 class="page-title">子どものお得</h1>
   <p class="page-date">29件。今週のお得のうち、この場面のものを全部並べています。</p>
-  <div class="cards"><div class="card due-soon" data-id="d-20260919-906c" data-scene="子どもファミリー">
+  <div class="zip-filter" id="zip-filter">
+  <label class="zip-label" for="zip-input">お住まいの郵便番号</label>
+  <div class="zip-row">
+    <input class="zip-input" id="zip-input" type="text" inputmode="numeric" autocomplete="postal-code"
+           maxlength="10" placeholder="例: 30097" aria-describedby="zip-note">
+    <button class="zip-clear" id="zip-clear" type="button" hidden>解除</button>
+  </div>
+  <p class="zip-note" id="zip-note">州限定のお得だけを絞り込みます。全米・オンラインのお得は常に出ます。 入力はこの端末のブラウザにだけ残り、どこにも送信しません。</p>
+</div>
+  <div class="cards"><div class="card due-soon" data-id="d-20260919-906c" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">S</div>
     <div class="card-body">
@@ -40,7 +50,7 @@
     <p class="sources">情報の出どころ: Slickdeals・Hip2Save</p>
     <a class="official" href="https://slickdeals.net/f/20035707-shutterfly-4-x-5-5-photo-magnets-1-free-shipping" target="_blank" rel="noopener" data-out-slug="shutterfly">公式ページを見る</a>
   </div>
-</div><div class="card due-soon" data-id="d-20260918-c6fb" data-scene="子どもファミリー">
+</div><div class="card due-soon" data-id="d-20260918-c6fb" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">Q</div>
     <div class="card-body">
@@ -65,7 +75,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/qvc-lego/" target="_blank" rel="noopener" data-out-slug="qvc">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-96cc" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-96cc" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">W</div>
     <div class="card-body">
@@ -90,7 +100,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/woot-toys/" target="_blank" rel="noopener" data-out-slug="woot">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-2be4" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-2be4" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">D</div>
     <div class="card-body">
@@ -115,7 +125,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/nike-backpacks/" target="_blank" rel="noopener" data-out-slug="dick-s-sporting-goods">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-696f" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-696f" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">W</div>
     <div class="card-body">
@@ -140,7 +150,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/walmart-backpacks/" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-8667" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-8667" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -165,7 +175,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20033751-7-5-tisejoy-halloween-inflatable-blow-up-pumpkin-family-outdoor-decor-19-99-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-7f8d" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-7f8d" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -190,7 +200,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/baby-dove-derma-care-wash/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-153d" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-153d" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -215,7 +225,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amazon-sorry-board-game/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-f6a2" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-f6a2" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -240,7 +250,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/portable-white-noise-sound-machine/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-98f1" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-98f1" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -265,7 +275,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/waterproof-kids-binoculars/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-7201" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-7201" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -290,7 +300,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/little-golden-books-disney-ultimate-princess-boxed-set/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-aaff" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-aaff" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">W</div>
     <div class="card-body">
@@ -315,7 +325,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/kinetic-sand/" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-0c2f" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-0c2f" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -340,7 +350,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20030262-35-00-293-pc-lego-star-wars-advent-calendar-2026-75456-at-amazon" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-7e3d" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-7e3d" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -365,7 +375,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/lego-holiday-ornaments/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-0d85" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-0d85" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -390,7 +400,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20027598-24-piece-bluey-awesome-advent-calendar-book-bundle-14-99-free-shipping" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-277e" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-277e" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -415,7 +425,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20031171-7-8-oz-cetaphil-2-in-1-baby-shampoo-body-wash-w-calendula-2-41-w-s-s-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-bb67" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-bb67" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -440,7 +450,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20031582-select-accounts-704-count-huggies-simply-clean-unscented-baby-wipes-11-pack-12-69-w-s-s-free-shipping-w-prime-or-on-35" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-03c9" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-03c9" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -465,7 +475,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/lego-harry-potter-book/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-749a" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-749a" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -490,7 +500,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20020056-lohas-3d-animal-plug-in-led-night-light-8-color-rgb-3000k-soft-white-1-pack-" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260919-9f39" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260919-9f39" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -515,7 +525,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20034387-amazon-led-gesture-control-light-up-mask-15-99-w-code" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-6d35" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-6d35" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -540,7 +550,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-b8dc" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-b8dc" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -565,7 +575,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/never-touch-books/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-da21" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-da21" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -590,7 +600,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://www.amazon.com/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-d5d9" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-d5d9" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -615,7 +625,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/little-tikes-gingerbread-house/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260920-0640" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260920-0640" data-scene="子どもファミリー" data-region="online">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">A</div>
     <div class="card-body">
@@ -640,7 +650,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/physicians-choice/" target="_blank" rel="noopener" data-out-slug="amazon">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-dae9" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-dae9" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">G</div>
     <div class="card-body">
@@ -665,7 +675,7 @@
     <p class="sources">情報の出どころ: Hip2Save</p>
     <a class="official" href="https://hip2save.com/deals/amc-theatres-family-movie-tickets/" target="_blank" rel="noopener" data-out-slug="giftory">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-c182" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-c182" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true"><span class="icon-logo" style="mask-image:url(/assets/icons/target.svg);-webkit-mask-image:url(/assets/icons/target.svg)"></span></div>
     <div class="card-body">
@@ -690,7 +700,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20033523-16-oz-thermos-pok-mon-funtainer-insulated-stainless-steel-water-bottle-pikachu-12-75-free-s-h-w-target-circle" target="_blank" rel="noopener" data-out-slug="target">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-eb58" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-eb58" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">W</div>
     <div class="card-body">
@@ -715,7 +725,7 @@
     <p class="sources">情報の出どころ: Slickdeals</p>
     <a class="official" href="https://slickdeals.net/f/20033778-star-wars-6-panel-telescopic-auto-open-umbrella-2-48-free-shipping-w-walmart-or-on-35" target="_blank" rel="noopener" data-out-slug="walmart">公式ページを見る</a>
   </div>
-</div><div class="card" data-id="d-20260918-609d" data-scene="子どもファミリー">
+</div><div class="card" data-id="d-20260918-609d" data-scene="子どもファミリー" data-region="all">
   <div class="card-row">
     <div class="home-store-icon scene-kids" aria-hidden="true">W</div>
     <div class="card-body">
@@ -743,6 +753,7 @@
 </div></div>
   <p class="quiet-link"><a href="/">&larr; 今週のお得に戻る</a></p>
 </section>
+<script type="application/json" id="zip-states">{"ranges":[[500,599,"NY"],[600,799,"PR"],[800,899,"VI"],[900,999,"PR"],[1000,2799,"MA"],[2800,2999,"RI"],[3000,3899,"NH"],[3900,4999,"ME"],[5000,5999,"VT"],[6000,6389,"CT"],[6390,6390,"NY"],[6391,6999,"CT"],[7000,8999,"NJ"],[10000,14999,"NY"],[15000,19699,"PA"],[19700,19999,"DE"],[20000,20099,"DC"],[20100,20199,"VA"],[20200,20599,"DC"],[20600,21999,"MD"],[22000,24699,"VA"],[24700,26899,"WV"],[27000,28999,"NC"],[29000,29999,"SC"],[30000,31999,"GA"],[32000,34999,"FL"],[35000,36999,"AL"],[37000,38599,"TN"],[38600,39799,"MS"],[39800,39999,"GA"],[40000,42799,"KY"],[43000,45999,"OH"],[46000,47999,"IN"],[48000,49999,"MI"],[50000,52999,"IA"],[53000,54999,"WI"],[55000,56799,"MN"],[56900,56999,"DC"],[57000,57799,"SD"],[58000,58899,"ND"],[59000,59999,"MT"],[60000,62999,"IL"],[63000,65899,"MO"],[66000,67999,"KS"],[68000,69399,"NE"],[70000,71499,"LA"],[71600,72999,"AR"],[73000,74999,"OK"],[75000,79999,"TX"],[80000,81999,"CO"],[82000,83199,"WY"],[83200,83899,"ID"],[84000,84799,"UT"],[85000,86999,"AZ"],[87000,88499,"NM"],[88500,88599,"TX"],[88900,89899,"NV"],[90000,96199,"CA"],[96700,96899,"HI"],[96910,96932,"GU"],[96950,96952,"MP"],[97000,97999,"OR"],[98000,99499,"WA"],[99500,99999,"AK"]],"labels":{"AL":"アラバマ州","AK":"アラスカ州","AZ":"アリゾナ州","AR":"アーカンソー州","CA":"カリフォルニア州","CO":"コロラド州","CT":"コネチカット州","DE":"デラウェア州","FL":"フロリダ州","GA":"ジョージア州","HI":"ハワイ州","ID":"アイダホ州","IL":"イリノイ州","IN":"インディアナ州","IA":"アイオワ州","KS":"カンザス州","KY":"ケンタッキー州","LA":"ルイジアナ州","ME":"メイン州","MD":"メリーランド州","MA":"マサチューセッツ州","MI":"ミシガン州","MN":"ミネソタ州","MS":"ミシシッピ州","MO":"ミズーリ州","MT":"モンタナ州","NE":"ネブラスカ州","NV":"ネバダ州","NH":"ニューハンプシャー州","NJ":"ニュージャージー州","NM":"ニューメキシコ州","NY":"ニューヨーク州","NC":"ノースカロライナ州","ND":"ノースダコタ州","OH":"オハイオ州","OK":"オクラホマ州","OR":"オレゴン州","PA":"ペンシルベニア州","RI":"ロードアイランド州","SC":"サウスカロライナ州","SD":"サウスダコタ州","TN":"テネシー州","TX":"テキサス州","UT":"ユタ州","VT":"バーモント州","VA":"バージニア州","WA":"ワシントン州","WV":"ウェストバージニア州","WI":"ウィスコンシン州","WY":"ワイオミング州","DC":"ワシントンD.C.","PR":"プエルトリコ","VI":"米領ヴァージン諸島","GU":"グアム","MP":"北マリアナ諸島"}}</script>
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">

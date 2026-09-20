@@ -933,3 +933,13 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .news-body { font-size: 15px; line-height: 1.75; color: var(--text-sub); margin: 0; }
 .news-meta { font-size: 13px; color: var(--muted); margin: 8px 0 0; display: flex; gap: 12px; flex-wrap: wrap; }
 .news-link { color: var(--accent-ink); text-decoration: none; font-weight: 700; }
+
+/* ===== 郵便番号での絞り込み(公開サイト。2026-09-20)===== */
+.zip-filter { padding: 12px 0 4px; }
+.zip-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; }
+.zip-row { display: flex; gap: 8px; align-items: center; }
+.zip-input { flex: 0 1 180px; min-height: 44px; font-size: 16px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.zip-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.zip-clear { min-height: 44px; padding: 0 14px; font-size: 14px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border: 0; border-radius: 10px; cursor: pointer; }
+.zip-note { font-size: 13px; line-height: 1.7; color: var(--muted); margin: 8px 0 0; }
+.zip-note.on { color: var(--accent-ink); font-weight: 700; }
