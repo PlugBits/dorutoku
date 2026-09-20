@@ -1,0 +1,935 @@
+/* PlugBits お得/カード。手元の非公開モード(mode=local)と公開サイト(dorutoku.com,
+   mode=public)が共有する唯一のスタイルシート。ダークトークンは使わない(オーナーの指示:
+   「UIは実際に合わせてほしい」=この明るいトーンを正としてダーク版を廃止する)。
+   タイポグラフィ: 本文18px・見出し22px以上・補助テキスト15px以上・14px未満は使わない・
+   行間1.7・タップ領域48px以上・390px/320pxで横スクロールなし、を全モード共通で守る。
+   例外(オケオ承認 2026-09-20): 図の軸ラベルは13px可。短い語(4文字以内)で、同じ数値が
+   図の下の表に14px以上で出ていることが条件。
+
+   v2シェル(2026-09-20): 配色は DealMate デザイン案 v2
+   (vault/PlugBits/articles/deals/dealmate-ui-design-2026-09-20.html)にあわせて更新。
+   クリーム背景(--bg)に白いカード(--surface)を浮かせ、場面ごとの色(外食=ピーチ/無料=ピンク/
+   店・EC=ブルー/子ども=イエロー/旅行=ティール)をアイコンとチップで揃える。ヒーローは
+   ピンク→ピーチの暖色グラデーション、下タブの選択色はピンク。カードv2(Cardsタブ)の
+   ウォレットタイルは発行会社/提携ブランドごとの色(--wal-*、下のウォレットタイル節を参照)。
+   色は必ずこのトークン集合(:root)経由で使い、このブロックの外にブランド色の16進を直書き
+   しない(状態色=公式/非公式バッジ・処理中/成功/警告メッセージ・FTC開示バナーの黄色は、
+   ブランドの一部ではない意味色のため、こちらもトークン化した上でこのブロックに集約する。
+   ウォレットタイルの発行会社別グラデーションだけは例外で、v2案自体が発行会社ごとに固有の
+   16進を直書きしているため、そのすぐ下の専用ブロックにまとめて書く)。 */
+:root {
+  --ink: #1f2a44; --sub: #5d6a85; --dim: #94a0b8;
+  --bg: #fbf7f3;              /* 温かみのあるクリーム */
+  --surface: #fff; --line: #efe9e3; --border: #efe9e3;
+  --accent: #3b7ded; --accent-soft: #e9f1ff; --accent-ink: #2458b8;
+  --accent-2: #ff6b8f; --accent-2-soft: #ffe9ef; --accent-2-ink: #d33b66;
+  --peach: #ff9a6c; --peach-soft: #fff0e8; --peach-ink: #b5461f;
+  --yellow: #ffc857; --yellow-soft: #fff6dc; --yellow-ink: #8a6410;
+  --green: #3fb98a; --green-soft: #e6f7ef; --green-ink: #1f7d59;
+  --teal: #3fb3c9; --teal-soft: #e6f6f9; --teal-ink: #1c7a8c;
+  --violet: #8b7cf2; --violet-soft: #efecff; --violet-ink: #5747c4;
+  --text: var(--ink);
+  --text-sub: var(--sub);
+  --muted: var(--dim);
+  --band: #f2f0ee;
+  --tier1: var(--accent-2);
+  --tier2: var(--accent);
+  --tier3: var(--muted);
+  --due-soon: var(--accent-2);
+  --r: 18px; --r-lg: 24px;
+  --shadow-soft: 0 1px 2px rgba(31,42,68,.04), 0 6px 20px rgba(31,42,68,.07);
+  --shadow-lg: 0 10px 34px rgba(31,42,68,.16);
+  /* 意味色(ブランドアクセントではない状態表示。値は据え置き、トークン化のみ) */
+  --ok-bg: #e6f4ea; --ok-fg: #1e7a34;
+  --warn-bg: #fdeeee; --warn-fg: #b3261e;
+  --busy-bg: #fff4d6; --busy-fg: #8a6100;
+  --disclosure-bg: #fff7e0; --disclosure-border: #f4e6bd; --disclosure-fg: #7a5f16;
+  --shadow-soft: 0 1px 2px rgba(31,42,68,.04), 0 6px 20px rgba(31,42,68,.07);
+  --overlay: rgba(31,42,68,.45);
+  --tabbar-h: 60px;
+}
+* { box-sizing: border-box; }
+html { overflow-x: hidden; }
+html, body {
+  margin: 0; padding: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 18px; line-height: 1.7; -webkit-text-size-adjust: 100%;
+}
+body { padding-bottom: 56px; }
+a { color: var(--accent); }
+.pb-main { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+
+/* FTC 16 CFR Part 255 開示バナー。ページ先頭・本文より上・クリーム背景(=通知だと分かる配色)で
+   常に表示する。v3b(2026-09-20): オーナー指摘「本文よりデカい」への対応で、文字サイズは本文と
+   同じ18px・左寄せにし、帯の高さは元(12px上下パディング+16px/1.6行間 ≒ 50px)からおよそ半分
+   (4px上下パディング+18px/1.3行間 ≒ 27px)に詰めた。目立たせる役目は背景色とボーダーだけに
+   任せ、文字の大きさでは目立たせない。 */
+.pb-disclosure {
+  background: var(--disclosure-bg);
+  border-bottom: 2px solid var(--disclosure-border);
+  color: var(--disclosure-fg);
+  font-size: 18px;
+  line-height: 1.3;
+  padding: 4px 16px;
+  text-align: left;
+}
+
+.pb-deals-header { border-bottom: 1px solid var(--border); background: var(--bg); }
+.pb-deals-header-inner {
+  max-width: 640px; margin: 0 auto; padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.pb-brand { display: flex; align-items: baseline; gap: 6px; text-decoration: none; color: var(--text); }
+.pb-brand-name { font-weight: 800; font-size: 18px; }
+.pb-brand-sub { font-size: 14px; color: var(--text-sub); }
+.pb-back { font-size: 16px; font-weight: 700; color: var(--accent); text-decoration: none; min-height: 48px; display: flex; align-items: center; }
+.pb-nav { display: flex; gap: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pb-nav-link { font-size: 14px; font-weight: 600; color: var(--text-sub); text-decoration: none; white-space: nowrap; padding: 6px 0; min-height: 48px; display: flex; align-items: center; }
+.pb-nav-link.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+.deals-top { padding: 14px 0 4px; }
+.page-title { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+.page-date { font-size: 15px; color: var(--text-sub); margin: 0; }
+
+/* 絞り込みの道具(日付の帯)は絞り込む対象の上に置く。タブと一緒に上部へ吸着する
+   (2026-09-20 オケオの指摘: 「9/22で絞り込み中」なのに帯が一覧の下にあった) */
+.date-strip-wrap { background: var(--bg); margin: 6px 0 0; padding: 0; }
+.date-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.date-chip {
+  flex: 0 0 auto; min-width: 52px; min-height: 48px; border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 8px 12px; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer;
+  scroll-snap-align: start; -webkit-tap-highlight-color: transparent;
+}
+.date-chip .wd { font-size: 13px; font-weight: 500; color: var(--text-sub); }
+/* 「案件がある日」の点。選択中の塗りと同じ青だと、点の並んだ日が塗られて見える
+   (2026-09-20 オケオの指摘「3つが青塗り」。実際は塗りは1日だけで、残りは点)。
+   彩度を落として、濃い青の塗り=選択中 が一目で1つだと分かるようにする */
+.date-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); margin-top: 2px; }
+.date-chip.today { border-color: var(--accent); border-width: 2px; }
+.date-chip.selected { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.date-chip.selected .wd { color: var(--accent-soft); }
+.date-chip.selected .dot { background: var(--surface); }
+
+/* 吸着する要素なので、iPhoneのステータスバー(時計)に潜り込まないよう safe-area を足す
+   (2026-09-20 オケオの指摘: 「すべて」タブの上に 23:48 が重なっていた。実機だけで出る) */
+.tabs-wrap { position: sticky; top: 0; background: var(--bg); z-index: 5; margin: 0 -16px 14px;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) 16px 8px; border-bottom: 1px solid var(--border); }
+.tabs { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; padding: 2px; }
+.tab-btn {
+  flex: 0 0 auto; min-height: 48px; padding: 0 16px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer;
+  scroll-snap-align: start; -webkit-tap-highlight-color: transparent;
+}
+.tab-btn.active { background: var(--text); border-color: var(--text); color: var(--surface); }
+.filter-chip-wrap { margin-top: 8px; }
+.filter-chip { min-height: 40px; padding: 6px 14px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 700; cursor: pointer; }
+
+.section-title { font-size: 22px; font-weight: 800; margin: 18px 0 10px; background: var(--band); padding: 10px 14px; border-radius: 12px; }
+.cards { display: flex; flex-direction: column; gap: 10px; }
+.card, .bundle-item { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; background: var(--surface); box-shadow: var(--shadow-soft); }
+.card.due-soon { border-left: 4px solid var(--due-soon); padding-left: 11px; }
+
+/* 店バンドル(v2, 2026-09-19): 同じ店に2件以上あるとき店名を1回だけ見出しにして中にまとめる */
+.store-bundle { padding: 12px 14px 6px; }
+.bundle-store-head { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; font-size: 20px; font-weight: 800; line-height: 1.25; color: var(--text); }
+.bundle-count { flex: none; font-size: 12px; font-weight: 700; color: var(--text-sub); background: var(--band); padding: 2px 9px; border-radius: 999px; }
+.bundle-list { display: flex; flex-direction: column; }
+.store-bundle .bundle-item { border: 0; border-radius: 0; padding: 10px 0 6px; margin: 4px 0 0; border-top: 1px dashed var(--border); }
+.store-bundle .bundle-item:first-child { border-top: 0; margin-top: 0; padding-top: 2px; }
+/* バンドル内では店名を隠す(重複表示防止)。「気になる」に複製されバンドルの外に出た時だけ
+   この規則が効かなくなり、標準のカードと同じ見た目(店名あり)に自然に戻る */
+.store-bundle .bundle-item-store { display: none; }
+
+/* v2ui行レイアウト(2026-09-20, 承認済みデザイン案v2の .it 準拠): アイコンタイル(色分けは
+   Homeの .home-store-icon をそのまま使い回す)/本文(店名・見出し・条件・チップ)/右端の
+   ハート・期限の3列。.card 自体はflexにせず、.card-row をこの行専用の横並びラッパにして
+   .card-detail はその外(兄弟)に置く=詳細欄は行の下に全幅で開く。 */
+.card-row { display: flex; gap: 12px; align-items: flex-start; }
+.card-body { min-width: 0; flex: 1 1 auto; }
+/* flex-wrap: wrap(2026-09-20追記): 「おすすめ」ピルが付く行は320px幅だと店名と場所を
+   取り合って店名が極端に省略されてしまうため、入りきらない時はピルを次の行に落とす
+   (店名側は min-width:0 のままいっぱいまで使えるようにする) */
+.card-store-line { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; }
+.card-store { font-size: 13px; font-weight: 700; color: var(--sub); margin: 0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pills { display: flex; gap: 4px; flex: 0 0 auto; }
+.pill { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.recommend { background: var(--accent); color: var(--surface); }
+.card-headline { font-size: 16px; font-weight: 800; letter-spacing: -.01em; margin: 1px 0 0; line-height: 1.3; color: var(--tier3); overflow-wrap: anywhere; }
+.card-headline.tier-1 { color: var(--tier1); }
+.card-headline.tier-2 { color: var(--tier2); }
+.card-headline.tier-3 { color: var(--tier3); }
+.card-cond { font-size: 14px; color: var(--text-sub); margin: 4px 0 0; line-height: 1.45; overflow-wrap: anywhere; }
+.card-side { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.heart-btn {
+  flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface); font-size: 22px; display: flex; align-items: center; justify-content: center;
+  color: var(--accent); cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.heart-btn.on { background: var(--accent-soft); border-color: var(--accent); }
+/* チップと「くわしく」を同じ行に置く(2026-09-20)。別行のフッターにすると
+   min-height:48px ぶんの空の帯がチップの下に必ず残り、1件ごとに無駄な余白ができていた。
+   チップが多くて入りきらないときは折り返し、「くわしく」は常に右端に寄る。 */
+.card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.card-meta .detail-link { margin-left: auto; }
+.detail-link { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 2px; font-size: 15px; font-weight: 700; color: var(--accent); background: transparent; border: none; padding: 0 2px; min-height: 48px; cursor: pointer; }
+.detail-link .chev { font-size: 17px; line-height: 1; }
+.card-detail { margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 15px; }
+.detail-list { margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }
+.detail-row { display: flex; align-items: baseline; gap: 10px; }
+.detail-row dt { flex: 0 0 76px; font-size: 15px; font-weight: 700; color: var(--text-sub); margin: 0; }
+.detail-row dd { flex: 1 1 auto; min-width: 0; font-size: 16px; margin: 0; }
+.card-detail .sources { font-size: 14px; color: var(--text-sub); margin: 0 0 10px; }
+.card-detail a.official { display: inline-block; font-size: 15px; font-weight: 700; color: var(--accent); min-height: 48px; line-height: 48px; }
+.empty-note { font-size: 15px; color: var(--text-sub); padding: 4px 0 8px; }
+
+/* 単品特価(既定で畳む。v2, 2026-09-19): オーナーの指摘「単品の値引きが延々続いて埋もれる」への対応 */
+.singles-section {
+  margin: 28px 0 8px; border: 1px solid var(--accent); border-radius: 14px; background: var(--accent-soft);
+  overflow: hidden;
+}
+.singles-section > summary.singles-toggle {
+  list-style: none; cursor: pointer; padding: 14px 16px; min-height: 48px; display: flex; align-items: center;
+  font-size: 16px; font-weight: 700; color: var(--accent);
+}
+.singles-section > summary.singles-toggle::-webkit-details-marker { display: none; }
+.singles-section .cards { padding: 0 14px; margin-top: 4px; }
+.singles-always { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sub); padding: 10px 16px 14px; min-height: 40px; }
+.singles-always input[type=checkbox] { width: 20px; height: 20px; }
+
+.saved-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 24px; }
+.saved-note { font-size: 14px; color: var(--text-sub); margin: 0 0 12px; }
+
+/* --- legal / article pages (cards, privacy, about, ranking) --- */
+.lead { font-size: 16px; color: var(--text-sub); margin: 8px 0 20px; }
+.legal-section { margin: 0 0 26px; }
+.legal-section h2 { font-size: 18px; font-weight: 800; margin: 0 0 10px; }
+.legal-section p { margin: 0 0 10px; }
+.legal-note { margin-top: 32px; color: var(--text-sub); font-size: 14px; }
+/* v2ui(2026-09-20): /me・/deals/about.html の「使用している画像の出どころ」一覧 */
+.asset-manifest { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; margin: 10px 0; }
+.asset-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 14px; }
+.asset-row:first-child { border-top: 0; }
+.asset-row code { font-size: 14px; color: var(--sub); }
+.asset-row .asset-meta { font-size: 14px; color: var(--dim); white-space: nowrap; }
+
+.concept-card { background: var(--band); border-radius: 14px; padding: 16px; margin: 0 0 24px; }
+.concept-card h2 { font-size: 18px; font-weight: 800; margin: 0 0 10px; }
+
+.rules-grid { display: flex; flex-direction: column; gap: 12px; margin: 0 0 28px; }
+.rule-card { border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+.rule-card h3 { font-size: 16px; font-weight: 800; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rule-card p { margin: 0; font-size: 15px; color: var(--text); }
+
+.badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.badge-official { background: var(--ok-bg); color: var(--ok-fg); }
+.badge-unofficial { background: var(--warn-bg); color: var(--warn-fg); }
+.badge-check { background: var(--busy-bg); color: var(--busy-fg); }
+
+.table-wrap { overflow-x: auto; margin: 0 0 28px; }
+table.catalog-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+table.catalog-table th, table.catalog-table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+table.catalog-table th { background: var(--band); font-weight: 800; white-space: nowrap; }
+
+.pb-deals-footer { border-top: 1px solid var(--border); margin-top: 40px; padding: 20px 16px 40px; }
+.pb-deals-footer-inner { max-width: 640px; margin: 0 auto; }
+.pb-footer-note { font-size: 14px; color: var(--text-sub); margin: 0 0 10px; }
+.pb-footer-links { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; }
+.pb-footer-links a { font-size: 14px; color: var(--text-sub); text-decoration: underline; }
+.pb-deals-footer small { color: var(--text-sub); font-size: 13px; }
+.pb-back-foot { font-size: 15px; font-weight: 700; color: var(--accent); text-decoration: none; }
+
+/* ================= 個人利用の断片(mode=local のみ。/web/personal.js が使う) ================= */
+.personal-section { margin-top: 8px; }
+.p-card { border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; background: var(--surface); margin-bottom: 10px; box-shadow: var(--shadow-soft); }
+.p-subtitle { font-size: 16px; font-weight: 800; margin: 0 0 8px; }
+.p-note { font-size: 14px; color: var(--text-sub); margin: 0 0 10px; }
+.personal-section textarea {
+  width: 100%; box-sizing: border-box; min-height: 80px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-family: inherit;
+  font-size: 16px; line-height: 1.7; resize: vertical;
+}
+/* select も同じ見た目・同じ幅にする(2026-09-20: 入会ボーナスの記録でカード選択の
+   <select> が中身の一番長い項目の幅になり、390pxで157px・320pxで227px はみ出していた。
+   ページ自体は横スクロールしないため、はみ出し検査だけでは見落とす) */
+.personal-section input[type=text], .personal-section input[type=date], .personal-section input[type=number], .personal-section input:not([type]), .personal-section select {
+  box-sizing: border-box; background: var(--surface); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 16px; min-height: 48px; width: 100%;
+  max-width: 100%;
+}
+.personal-section input[type=checkbox] { width: 22px; height: 22px; }
+.p-btn {
+  min-height: 48px; background: var(--accent); color: var(--surface); border: 0; border-radius: 10px;
+  padding: 10px 18px; font-size: 15px; font-family: inherit; font-weight: 700; cursor: pointer;
+}
+.p-btn:disabled { opacity: .5; }
+.p-btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); font-weight: 600; }
+.p-btn.small { padding: 6px 14px; font-size: 14px; min-height: 40px; }
+.p-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+.p-status { font-size: 14px; color: var(--text-sub); margin-top: 10px; line-height: 1.5; }
+.p-status.busy { color: var(--busy-fg); }
+.p-status.ok { color: var(--ok-fg); }
+.p-status.warn { color: var(--warn-fg); }
+.p-attach { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.p-attach .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--band); border-radius: 999px; padding: 6px 10px; font-size: 14px; }
+.p-attach .chip b { cursor: pointer; font-weight: 700; color: var(--text-sub); }
+.p-draft { white-space: pre-wrap; font-size: 15px; line-height: 1.7; background: var(--band); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 10px; }
+.p-none { color: var(--text-sub); font-size: 15px; padding: 10px 2px; line-height: 1.7; }
+.p-form { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.p-form input { flex: 1 1 45%; min-width: 0; }
+.p-form input.wide { flex: 1 1 100%; }
+.p-field-label { font-size: 14px; color: var(--text-sub); margin: 10px 0 4px; }
+.disclaimer { font-size: 14px; color: var(--text-sub); line-height: 1.7; text-align: center; margin: 24px 0 4px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--band); }
+
+.p-row { display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--border); padding: 10px 0; min-height: 48px; box-sizing: border-box; }
+.p-row:last-child { border-bottom: 0; }
+.p-row .p-chk { flex: none; padding-top: 2px; }
+.p-row .p-body { flex: 1; min-width: 0; }
+.p-row .p-t { font-size: 16px; color: var(--text); }
+.p-row .p-m { font-size: 14px; color: var(--text-sub); margin-top: 2px; }
+.p-row .p-amt { font-size: 16px; color: var(--text); flex: none; text-align: right; white-space: nowrap; }
+.p-row .p-days { font-size: 14px; flex: none; text-align: right; white-space: nowrap; color: var(--text-sub); }
+.p-row .p-days.soon { color: var(--warn-fg); font-weight: 700; }
+/* Fix B(2026-09-20): 今月やること行のカード名(小さい添え書き、detail行の頭に置く) */
+.p-row-card { font-weight: 700; color: var(--text); }
+
+/* v2b(2026-09-20): 今月やること(DealMate v2案 .todo/.td)。#pc-month の .p-card は
+   このリストのときだけパディングを0にし(親要素のパディングを打ち消す)、行ごとに
+   自前のパディング+区切り線を持たせる(v2案の白いカード1枚+内部の横線という構造に合わせる)。 */
+#pc-month .p-card { padding: 0; overflow: hidden; }
+.p-todo-row { display: flex; gap: 12px; align-items: center; padding: 12px 14px; min-height: 48px; box-sizing: border-box; }
+.p-todo-row + .p-todo-row { border-top: 1px solid var(--line); }
+.p-todo-ico { flex: none; width: 40px; height: 40px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+/* 絵文字をやめて同梱SVGにした(2026-09-20)。Linux等で絵文字フォントが無いと豆腐になるため */
+.p-todo-ico svg { width: 21px; height: 21px; }
+.p-todo-ico.p svg { color: var(--accent-2-ink); }
+.p-todo-ico.y svg { color: var(--yellow-ink); }
+.p-todo-ico.p { background: var(--accent-2-soft); }
+.p-todo-ico.y { background: var(--yellow-soft); }
+.p-todo-body { flex: 1; min-width: 0; }
+.p-todo-t1 { font-size: 15px; font-weight: 800; line-height: 1.35; }
+.p-todo-t2 { font-size: 14px; color: var(--text-sub); margin-top: 2px; line-height: 1.4; overflow-wrap: anywhere; }
+.p-todo-rt { flex: none; }
+.p-todo-due { display: inline-block; font-size: 14px; font-weight: 800; padding: 4px 9px; border-radius: 999px; background: var(--accent-2-soft); color: var(--accent-2-ink); white-space: nowrap; }
+.p-todo-due.soft { background: var(--band); color: var(--sub); }
+.p-tag-unofficial { display: inline-block; font-size: 12px; border-radius: 999px; padding: 1px 7px; background: transparent; border: 1px solid var(--border); color: var(--text-sub); flex: none; line-height: 1.6; margin-left: 6px; }
+
+.p-holding-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+/* v3c(2026-09-20, Fix A): opened欄が増えたため縦積みに変更(320px幅での横あふれ防止)。 */
+.p-close-form { display: none; flex-direction: column; gap: 8px; margin-top: 8px; align-items: stretch; }
+.p-close-form.open { display: flex; }
+.p-close-field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.p-close-field .p-m { flex: none; }
+.p-close-form input[type=date] { flex: 1 1 160px; min-width: 0; }
+.p-close-form .hd-close-confirm { align-self: flex-start; }
+.p-catalog-pick { max-height: 260px; overflow: auto; margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; }
+.p-catalog-group-head { font-size: 14px; color: var(--text-sub); font-weight: 700; padding: 8px 12px; background: var(--band); border-bottom: 1px solid var(--border); }
+.p-catalog-pick-row { padding: 10px 12px; min-height: 48px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.p-catalog-pick-row:last-child { border-bottom: 0; }
+.p-catalog-pick-row:active { background: var(--band); }
+.p-catalog-pick-row.selected { background: var(--accent-soft); }
+.p-catalog-pick-row .cp-main { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.p-catalog-pick-row .cp-ja { font-size: 16px; color: var(--text); }
+.p-catalog-pick-row .cp-en { font-size: 14px; color: var(--text-sub); overflow-wrap: anywhere; word-break: break-word; }
+.p-catalog-pick-row .cp-fee { flex: none; white-space: nowrap; font-size: 14px; color: var(--text-sub); }
+.p-selected-card { margin-top: 10px; font-size: 16px; padding: 8px 0; }
+.p-month-only-label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sub); margin-top: 8px; }
+.p-yesno-row { display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 16px; color: var(--text); cursor: pointer; }
+.p-yesno-check { width: 22px; height: 22px; flex: none; }
+.p-opened-inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+.p-opened-inline .p-m { flex: none; }
+.p-opened-inline input[type=date] { flex: 1 1 150px; min-width: 150px; width: auto; }
+.p-opened-inline button { flex: none; }
+.holding-row .hd-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.holding-row .hd-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; word-break: break-word; font-size: 16px; color: var(--text); }
+.holding-row .hd-fee { flex: none; white-space: nowrap; font-size: 14px; color: var(--text-sub); }
+.holding-row .hd-note { color: var(--text-sub); overflow-wrap: anywhere; word-break: break-word; }
+[hidden] { display: none !important; }
+
+/* ================= 2026-09-19 IA修正: FAB・ボトムシート・折りたたみ・日課/設定の分離 ================= */
+
+/* 日課性が高いものを上に、たまにしか触らないものは下か畳む、という原則のUI部品 */
+.quiet-link { margin: 28px 0 8px; text-align: center; }
+.quiet-link a { font-size: 15px; font-weight: 700; text-decoration: none; }
+.subpage-back { margin: 4px 0 10px; }
+.subpage-back a { font-size: 15px; font-weight: 700; text-decoration: none; color: var(--accent); }
+
+/* 折りたたみセクション(ルールの状態・次に検討できるカード)。native <details> を使う */
+.collapse-section { border: 1px solid var(--border); border-radius: 16px; padding: 0; margin-bottom: 10px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow-soft); }
+.collapse-summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 14px 16px; min-height: 48px; font-size: 18px; font-weight: 800; background: var(--band);
+}
+.collapse-summary::-webkit-details-marker { display: none; }
+.collapse-summary::after { content: '\203a'; font-size: 20px; color: var(--text-sub); transform: rotate(90deg); transition: transform .15s; flex: none; }
+details[open] > .collapse-summary::after { transform: rotate(-90deg); }
+.collapse-hint { font-size: 14px; font-weight: 700; color: var(--accent); flex: none; }
+.collapse-section > .p-card { border: 0; border-radius: 0; margin: 0; border-top: 1px solid var(--border); }
+.collapse-section .p-subtitle { margin-top: 14px; }
+
+/* 店を聞くコンパクト入力(お得トップ「日課」ゾーン) */
+.ask-compact { margin: 4px 0 18px; }
+.ask-row { display: flex; gap: 8px; align-items: center; }
+.ask-row input[type=text] { flex: 1 1 auto; min-width: 0; }
+.p-btn.icon { flex: none; width: 48px; padding: 0; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.ask-compact .collapse-section, .ask-compact details.collapse-section { border: 0; background: transparent; margin-top: 6px; }
+.ask-compact .collapse-summary { background: transparent; padding: 8px 2px; font-size: 15px; font-weight: 700; color: var(--text-sub); min-height: 40px; }
+
+/* 右下の丸い+ボタン(カード追加)。v3b(2026-09-20): 「+ボタンがタイルの文字に重なる」指摘への
+   対応で、FABのサイズ・余白をトークン化し(--fab-size/--fab-gap)、スクロールする一覧側の
+   下パディングをその2つの式だけから計算する(一覧の最後のタイルの下端が必ずFABの上端と同じ
+   位置か、それより上で終わるようにする=タイル側の右パディングでは絶対に解決しない)。
+   mode=local はボトムタブバー(--tabbar-h)の上に浮かせる(下記「ボトムタブバー」参照)。 */
+:root { --fab-size: 56px; --fab-gap: 18px; }
+body.has-fab { padding-bottom: calc(var(--fab-size) + var(--fab-gap) + env(safe-area-inset-bottom)); }
+body[data-mode="local"].has-fab { padding-bottom: calc(var(--tabbar-h) + var(--fab-size) + var(--fab-gap) + env(safe-area-inset-bottom)); }
+.fab {
+  position: fixed; right: var(--fab-gap); bottom: calc(var(--fab-gap) + env(safe-area-inset-bottom)); z-index: 20;
+  width: var(--fab-size); height: var(--fab-size); border-radius: 50%; border: 0; background: var(--accent); color: var(--surface);
+  font-size: 28px; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(18,35,63,.28); cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+body[data-mode="local"] .fab { bottom: calc(var(--tabbar-h) + var(--fab-gap) + env(safe-area-inset-bottom)); }
+.fab:active { transform: scale(.96); }
+
+/* ================= ボトムタブバー(Home/Deals/Cards/Me、mode=local専用、v3シェル 2026-09-19) =================
+   DealMateモックアップの「下部ナビゲーション(4つ)」。固定・safe-area対応・56px以上の高さ・
+   タップ領域48px以上。旧「お得/カード」2タブ(pb-nav, ヘッダー側)を置き換える唯一のナビゲーション。 */
+body[data-mode="local"] { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+.pb-tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2px 10px rgba(18,35,63,.06);
+}
+.pb-tabbar-inner { max-width: 640px; margin: 0 auto; display: flex; width: 100%; }
+.pb-tab {
+  flex: 1 1 0; min-height: var(--tabbar-h); min-width: 48px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; padding: 6px 4px; text-decoration: none;
+  color: var(--muted); -webkit-tap-highlight-color: transparent;
+}
+.pb-tab svg { width: 23px; height: 23px; display: block; }
+.pb-tab .pb-tab-icon { display: flex; align-items: center; justify-content: center; padding: 3px 14px; border-radius: 12px; }
+.pb-tab .pb-tab-label { font-size: 14px; font-weight: 700; line-height: 1.2; }
+/* v2案「下タブの選択色をピンクに」: アイコンの丸(pill)にもうっすら色を敷く */
+.pb-tab.active { color: var(--accent-2); }
+.pb-tab.active .pb-tab-icon { background: var(--accent-2-soft); }
+.pb-tab:active { opacity: .75; }
+
+/* カードを選ぶ、のボトムシート */
+.sheet-backdrop {
+  position: fixed; inset: 0; background: var(--overlay); z-index: 29;
+}
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface);
+  border-radius: 20px 20px 0 0; max-height: 86vh; display: flex; flex-direction: column;
+  box-shadow: 0 -8px 24px rgba(18,35,63,.16); padding-bottom: env(safe-area-inset-bottom);
+  animation: sheet-up .18s ease-out;
+}
+@keyframes sheet-up { from { transform: translateY(24px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+.sheet-handle { width: 40px; height: 5px; border-radius: 999px; background: var(--border); margin: 10px auto 2px; touch-action: none; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; border-bottom: 1px solid var(--border); }
+.sheet-head h3 { margin: 0; font-size: 19px; font-weight: 800; }
+.sheet-close { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); font-size: 16px; color: var(--text-sub); cursor: pointer; }
+.sheet-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; }
+
+/* ベネフィット行: 金額と残り日数は本文の下に置き、名前と説明の幅を確保する */
+.p-row .p-meta-line { display: flex; gap: 10px; align-items: baseline; margin-top: 2px; }
+.p-row .p-meta-line .p-amt { font-size: 17px; font-weight: 700; }
+.p-row .p-meta-line .p-days { font-size: 14px; }
+/* カタログのシート: 検索欄を横いっぱいに */
+.sheet .sheet-body input[type=text], .sheet .sheet-body input:not([type]) { width: 100%; box-sizing: border-box; min-height: 48px; font-size: 16px; }
+
+/* ================= カードv2(2026-09-20, DealMate デザイン案 v2準拠): ウォレットタイル =================
+   1枚のタイル = 発行会社/提携ブランドごとに色分けしたカード素材(.wal-*、上部に発行会社/
+   提携ブランドのロゴ、右下にネットワーク(Visa/Mastercard/Amex/Discover)のマークを白モノクロ・
+   半透明で載せる)+カード名+ステータスピル、その下に行1(獲得率チップ+Offers件数)・
+   行2(取得日+保有期間)の2行。折りたたみを開くと年会費・ベネフィット進捗などが白地の本文
+   (.card-tile-body)に出る。ロゴが無い発行会社/ブランド(Citi・Capital One・US Bank・IHG・
+   Hyatt・Wyndham・Alaska Airlines)は頭文字の白丸にフォールバックする(web/personal.js参照)。
+   カード実物の券面(card art)は今回は入れない(発行会社の許諾が無い版権素材のため)。
+   card-catalog.json の image キー(assets/cards/<key>.png)が存在すればそちらを最優先で表示し、
+   無ければこの色分けグラデーション+ロゴにフォールバックする。 */
+.card-tile { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); margin-bottom: 11px; overflow: hidden; box-shadow: var(--shadow-soft); }
+.card-tile.urgent { border-left: 4px solid var(--due-soon); }
+.card-tile.is-closed { opacity: .72; }
+.card-tile-summary {
+  list-style: none; cursor: pointer; padding: 15px 16px; min-height: 48px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px; -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(135deg, var(--sub), var(--dim)); color: #fff;
+}
+.card-tile-summary::-webkit-details-marker { display: none; }
+.card-tile-summary::after { content: ''; position: absolute; right: -40px; top: -50px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,.12); pointer-events: none; }
+.card-tile-summary > * { position: relative; }
+.card-tile-name { font-size: 16px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
+.card-tile-body { padding: 4px 16px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+.card-tile-body .p-opened-inline { margin-bottom: 4px; }
+.card-tile-art-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+
+.wallet-top { display: flex; align-items: flex-start; gap: 12px; }
+/* 発行会社/提携ブランドのロゴ(上部左)。web/assets/logos/{issuers,brands}/*.svg を
+   mask-image で白半透明1色に描く(拡大しない=枠に収める。ブランドカラーは使わない)。 */
+.wallet-art {
+  flex: 0 0 auto; width: 44px; height: 30px; border-radius: 7px; background: rgba(255,255,255,.16);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.wallet-art .tile-logo {
+  display: block; width: 26px; height: 18px; background-color: rgba(255,255,255,.92);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.wallet-art .tile-fallback { color: #fff; font-weight: 900; font-size: 15px; opacity: .92; }
+/* ネットワークのマーク(Visa/Mastercard/Amex/Discover、右下)。常にどれかのロゴが載る
+   (4ネットワークとも Simple Icons に存在するため頭文字フォールバックは無い)。 */
+.wallet-net {
+  position: absolute; right: 14px; bottom: 12px; width: 34px; height: 20px; z-index: 1;
+}
+.wallet-net .tile-logo {
+  display: block; width: 100%; height: 100%; background-color: rgba(255,255,255,.85);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center right; mask-position: center right;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.wallet-title { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+/* v2b(2026-09-20): 「アクティブ」バッジ廃止。右上には年会費ピルだけを出す(v2案 .wal .fee)。
+   解約済みはこのピルではなく、タイル全体の .is-closed(opacity .72)+並び順(末尾)で見分ける。 */
+.wallet-fee { align-self: flex-start; font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; background: rgba(255,255,255,.22); color: #fff; flex: none; }
+.wallet-chevron { flex: 0 0 auto; margin-top: 4px; color: rgba(255,255,255,.85); }
+.wallet-chevron::before { content: '\203a'; display: inline-block; font-size: 20px; transform: rotate(90deg); transition: transform .15s; }
+details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-90deg); }
+.wallet-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; }
+.wallet-meta-row-muted { color: rgba(255,255,255,.85); }
+.wallet-meta-row-muted span { white-space: nowrap; }
+.wallet-chip { font-size: 14px; font-weight: 800; color: #fff; background: rgba(255,255,255,.22); border-radius: 9px; padding: 4px 10px; white-space: nowrap; }
+.wallet-offers { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.85); white-space: nowrap; }
+
+/* 発行会社/提携ブランドごとの色(v2案「カードの色は発行会社で分ける」。Chase/Hilton/Deltaは
+   v2案の直書き16進をそのまま使用。他はブランド公式カラーに寄せた色を新規に割り当てた
+   (Simple Iconsにロゴが無いCiti/Capital One/US Bank/IHG/Hyatt/Wyndham/Alaskaを含む)。
+   個々のブランド色はここだけで直書きしてよい例外ブロック(:root冒頭のコメント参照)。 */
+.card-tile.wal-chase { box-shadow: var(--shadow-soft), 0 8px 22px rgba(46,91,216,.3); }
+.card-tile.wal-chase > .card-tile-summary { background: linear-gradient(135deg,#2e5bd8,#5f8dff); box-shadow: none; }
+.card-tile.wal-americanexpress { box-shadow: var(--shadow-soft), 0 8px 22px rgba(10,110,110,.3); }
+.card-tile.wal-americanexpress > .card-tile-summary { background: linear-gradient(135deg,#0a6e6e,#3fb3c9); box-shadow: none; }
+.card-tile.wal-citi { box-shadow: var(--shadow-soft), 0 8px 22px rgba(0,59,112,.3); }
+.card-tile.wal-citi > .card-tile-summary { background: linear-gradient(135deg,#003b70,#3b6ea5); box-shadow: none; }
+.card-tile.wal-capitalone { box-shadow: var(--shadow-soft), 0 8px 22px rgba(162,25,44,.3); }
+.card-tile.wal-capitalone > .card-tile-summary { background: linear-gradient(135deg,#a2192c,#d8455a); box-shadow: none; }
+.card-tile.wal-bankofamerica { box-shadow: var(--shadow-soft), 0 8px 22px rgba(163,18,42,.3); }
+.card-tile.wal-bankofamerica > .card-tile-summary { background: linear-gradient(135deg,#a3122a,#e0455c); box-shadow: none; }
+.card-tile.wal-wellsfargo { box-shadow: var(--shadow-soft), 0 8px 22px rgba(163,18,27,.3); }
+.card-tile.wal-wellsfargo > .card-tile-summary { background: linear-gradient(135deg,#a3121b,#d4a017); box-shadow: none; }
+.card-tile.wal-usbank { box-shadow: var(--shadow-soft), 0 8px 22px rgba(18,35,63,.3); }
+.card-tile.wal-usbank > .card-tile-summary { background: linear-gradient(135deg,#12233f,#3a5170); box-shadow: none; }
+.card-tile.wal-discover { box-shadow: var(--shadow-soft), 0 8px 22px rgba(200,89,10,.3); }
+.card-tile.wal-discover > .card-tile-summary { background: linear-gradient(135deg,#c8590a,#ff8a3d); box-shadow: none; }
+.card-tile.wal-barclays { box-shadow: var(--shadow-soft), 0 8px 22px rgba(0,103,160,.3); }
+.card-tile.wal-barclays > .card-tile-summary { background: linear-gradient(135deg,#0067a0,#3fb3e0); box-shadow: none; }
+.card-tile.wal-hilton { box-shadow: var(--shadow-soft), 0 8px 22px rgba(106,90,205,.3); }
+.card-tile.wal-hilton > .card-tile-summary { background: linear-gradient(135deg,#6a5acd,#9b8cf5); box-shadow: none; }
+.card-tile.wal-marriott { box-shadow: var(--shadow-soft), 0 8px 22px rgba(122,16,48,.3); }
+.card-tile.wal-marriott > .card-tile-summary { background: linear-gradient(135deg,#7a1030,#b23a5a); box-shadow: none; }
+.card-tile.wal-delta { box-shadow: var(--shadow-soft), 0 8px 22px rgba(200,56,107,.3); }
+.card-tile.wal-delta > .card-tile-summary { background: linear-gradient(135deg,#c8386b,#f06a8c); box-shadow: none; }
+.card-tile.wal-ihg { box-shadow: var(--shadow-soft), 0 8px 22px rgba(122,59,18,.3); }
+.card-tile.wal-ihg > .card-tile-summary { background: linear-gradient(135deg,#7a3b12,#c96a2e); box-shadow: none; }
+.card-tile.wal-hyatt { box-shadow: var(--shadow-soft), 0 8px 22px rgba(28,63,82,.3); }
+.card-tile.wal-hyatt > .card-tile-summary { background: linear-gradient(135deg,#1c3f52,#3f7d95); box-shadow: none; }
+.card-tile.wal-wyndham { box-shadow: var(--shadow-soft), 0 8px 22px rgba(18,63,107,.3); }
+.card-tile.wal-wyndham > .card-tile-summary { background: linear-gradient(135deg,#123f6b,#3f7db3); box-shadow: none; }
+.card-tile.wal-united { box-shadow: var(--shadow-soft), 0 8px 22px rgba(5,42,94,.3); }
+.card-tile.wal-united > .card-tile-summary { background: linear-gradient(135deg,#052a5e,#1f57a3); box-shadow: none; }
+.card-tile.wal-southwest { box-shadow: var(--shadow-soft), 0 8px 22px rgba(200,16,46,.3); }
+.card-tile.wal-southwest > .card-tile-summary { background: linear-gradient(135deg,#c8102e,#f2542d); box-shadow: none; }
+.card-tile.wal-jetblue { box-shadow: var(--shadow-soft), 0 8px 22px rgba(0,85,165,.3); }
+.card-tile.wal-jetblue > .card-tile-summary { background: linear-gradient(135deg,#0055a5,#3fa9dc); box-shadow: none; }
+.card-tile.wal-alaska { box-shadow: var(--shadow-soft), 0 8px 22px rgba(0,48,87,.3); }
+.card-tile.wal-alaska > .card-tile-summary { background: linear-gradient(135deg,#003057,#3f7dab); box-shadow: none; }
+.card-tile.wal-americanairlines { box-shadow: var(--shadow-soft), 0 8px 22px rgba(163,18,42,.3); }
+.card-tile.wal-americanairlines > .card-tile-summary { background: linear-gradient(135deg,#a3122a,#0055a5); box-shadow: none; }
+.card-tile.wal-default { box-shadow: var(--shadow-soft), 0 8px 22px rgba(31,42,68,.2); }
+.card-tile.wal-default > .card-tile-summary { background: linear-gradient(135deg,var(--sub),var(--dim)); box-shadow: none; }
+
+/* ================= 次に検討できるカード(v3, 2026-09-20, DealMateモックアップ画面5準拠) =================
+   プライマリ1件を大きく見せ「なぜおすすめ?」のチェックマーク行(最大3)+年会費(カタログに
+   ある時だけ。ボーナス額はcatalogに無いフィールドなので出さない)+詳細を見る。その下に
+   「その他の候補」を2行のコンパクト表示。 */
+.next-primary { padding: 4px 2px 14px; }
+.next-primary-art { width: 64px; height: 44px; border-radius: 10px; margin-bottom: 10px; }
+.next-primary-name { font-size: 20px; font-weight: 800; margin: 0 0 12px; line-height: 1.3; }
+.next-why { margin-bottom: 12px; }
+.next-why-label { font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; }
+.next-reason { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; line-height: 1.5; padding: 3px 0; }
+.next-check { flex: none; color: var(--ok-fg); font-weight: 800; }
+.next-facts { display: flex; gap: 20px; margin-bottom: 14px; }
+.next-fact { display: flex; flex-direction: column; gap: 2px; }
+.next-fact-label { font-size: 14px; color: var(--text-sub); }
+.next-fact-value { font-size: 18px; font-weight: 800; }
+.next-detail-btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; width: 100%; }
+.next-others { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
+.next-others-label { font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+.next-other-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--border); }
+.next-other-row:first-of-type { border-top: 0; }
+.next-other-main { min-width: 0; flex: 1 1 auto; }
+.next-other-name { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.next-other-note { font-size: 14px; color: var(--text-sub); margin-top: 2px; }
+.next-other-fee { flex: none; font-size: 14px; color: var(--text-sub); white-space: nowrap; }
+
+/* v4(2026-09-20): card_next_calc.evaluate() をそのまま描く根拠行・カテゴリ表・0件時の文言。
+   数字・しきい値・理由文はここでは作らない(web/personal.js の renderNextResult 参照)。 */
+.next-basis { font-size: 13px; color: var(--text-sub); line-height: 1.6; padding: 0 2px 8px; }
+.next-rows-table-wrap { overflow-x: auto; margin: 4px 0 14px; -webkit-overflow-scrolling: touch; }
+.next-rows-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.next-rows-table th, .next-rows-table td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); vertical-align: top; white-space: nowrap; }
+.next-rows-table th { color: var(--text-sub); font-weight: 700; font-size: 12px; }
+.next-rows-table td:first-child { white-space: normal; overflow-wrap: anywhere; }
+.next-row-usable td { font-weight: 700; }
+.next-cell-sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-sub); white-space: normal; overflow-wrap: anywhere; }
+/* 狭い幅では4列の表が潰れ、「今」の列でカード名が1文字ずつ折り返されて読めなくなる
+   (2026-09-20 320pxで確認)。380px以下では行を縦積みにし、各セルに見出しを添える。 */
+@media (max-width: 380px) {
+  .next-rows-table thead { display: none; }
+  .next-rows-table, .next-rows-table tbody, .next-rows-table tr, .next-rows-table td { display: block; width: auto; }
+  .next-rows-table tr { padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .next-rows-table td { border: 0; padding: 1px 0; white-space: normal; }
+  .next-rows-table td::before { content: attr(data-label) " "; color: var(--text-sub); font-weight: 700; font-size: 12px; }
+  .next-rows-table td:first-child { font-weight: 700; margin-bottom: 2px; }
+  .next-rows-table td:first-child::before { content: ""; }
+  .next-rows-table .next-cell-sub { display: inline; }
+}
+/* ================= 次に検討できるカード: 目的の切替とレーダー(段階A, 2026-09-20) =================
+   手元(mode=local)専用の画面だが、スタイルは他の機能と同じくこの1枚にまとめる。
+   このファイルは公開ビルドにもコピーされるが、クラス名だけで個人データは含まない
+   (.pay / .next-rows-table など、既に手元専用機能の定義がここに入っているのと同じ扱い)。 */
+.cd-goal-row{margin-bottom:12px}
+.cd-goal-label{font-size:14px;font-weight:700;color:var(--text-sub);margin-bottom:8px}
+.cd-goal-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cd-goal-chip{min-height:40px;padding:6px 14px;border:1px solid var(--accent);border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cd-goal-chip.is-selected{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.cd-goal-notice{margin-bottom:12px}
+.cd-radar-wrap{margin:4px 0 16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.cd-radar-svg{display:block;width:100%;max-width:330px;height:auto;margin:0 auto}
+.cd-radar-ring{fill:none;stroke:var(--border);stroke-width:1}
+.cd-radar-axisline{stroke:var(--border);stroke-width:1}
+.cd-radar-held{fill:var(--accent);fill-opacity:.18;stroke:var(--accent);stroke-width:2}
+.cd-radar-cand{fill:var(--accent-2);fill-opacity:.18;stroke:var(--accent-2);stroke-width:2}
+/* SVGのユーザー単位。viewBox(320)が実幅に縮むぶんを見越して大きめにしてある */
+.cd-radar-axis-label{font-size:16px;font-weight:700;fill:var(--text-sub)}
+/* 軸ラベル2行目の条件(店頭・直接)。1行目より小さく薄く */
+.cd-radar-axis-sub{font-size:13px;font-weight:600;fill:var(--muted)}
+.cd-radar-sub{font-weight:400;color:var(--muted)}
+.cd-radar-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:8px;font-size:14px}
+.cd-radar-legend-item{display:inline-flex;align-items:center;gap:6px}
+.cd-radar-swatch{width:12px;height:12px;border-radius:3px;display:inline-block}
+.cd-radar-swatch.held{background:var(--accent)}
+.cd-radar-swatch.cand{background:var(--accent-2)}
+.cd-radar-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.cd-radar-table caption{text-align:left;font-size:14px;font-weight:700;color:var(--text-sub);margin-bottom:6px}
+.cd-radar-table th,.cd-radar-table td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--border)}
+.cd-radar-table th{color:var(--text-sub);font-weight:700}
+.cd-radar-note{font-size:14px;color:var(--text-sub);margin-top:8px}
+.next-primary[data-cand-key],.next-other-row[data-cand-key]{cursor:pointer}
+.next-primary.cd-cand-selected,.next-other-row.cd-cand-selected{outline:2px solid var(--accent-2);outline-offset:2px;border-radius:var(--r);background:var(--accent-2-soft)}
+
+/* 年会費ありのカードが「余裕」不足で順位を下げられた理由(2026-09-20) */
+.next-margin-note { color: var(--peach-ink); }
+.next-none-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.next-none-detail { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
+
+/* ================= 入会ボーナスの比較(段階C, 2026-09-20) =================
+   GET /api/cards/bonus の結果をそのまま出す一覧。手元(mode=local)専用の画面だが、
+   スタイルは他の機能と同じくこの1枚にまとめる。 */
+.bonus-plan-note { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
+.bonus-few-notice {
+  font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 14px;
+  padding: 10px 12px; border-radius: var(--r); background: var(--band);
+}
+.bonus-cand-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 4px; }
+.bonus-cand {
+  border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; background: var(--surface);
+}
+.bonus-cand-blocked { background: var(--band); }
+.bonus-cand-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.bonus-cand-rank {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink);
+  font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.bonus-cand-name { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+.bonus-cand-text { font-size: 14px; color: var(--text-sub); margin-bottom: 4px; overflow-wrap: anywhere; }
+.bonus-cand-value { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.bonus-cand-note { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 2px; }
+.bonus-cand-warn { color: var(--warn-fg); font-weight: 700; }
+.bonus-cand-personal { font-size: 14px; color: var(--accent-ink); margin-top: 4px; }
+.bonus-cand-blocked-note { font-size: 14px; color: var(--peach-ink); font-weight: 700; margin-top: 4px; }
+
+/* タイルを開いたときの「倍率 → 実質%」対応表(2026-09-20)。タイルのチップの 5x が
+   レーダーの何%に当たるかを本人が辿れるようにする */
+.earn-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0 4px; }
+.earn-table caption { text-align: left; font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 4px; }
+.earn-table th, .earn-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.earn-table th { color: var(--text-sub); font-weight: 700; }
+.earn-table td:nth-child(3) { font-weight: 700; }
+
+/* 相談の根拠+免責(段階C)。コードが出す行なので改行を保つ */
+#cd-adviceSources { white-space: pre-line; }
+
+/* 提示のスクショから読み取る入口。手入力より先に置く(2026-09-20) */
+/* 絵文字はフォントが無い環境で豆腐になる(今月やることで先に踏んだ)。同梱SVGにする */
+.bonus-shot-btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.bonus-shot-btn svg { width: 20px; height: 20px; flex: none; }
+.bonus-manual { margin-top: 10px; }
+.bonus-manual > .collapse-summary { cursor: pointer; }
+
+/* ================= Me: 入会ボーナスを記録(段階B, 2026-09-20) =================
+   「月の支出配分」節と同じ見た目(.p-card/.p-field-label/.p-actions/.p-btn/.p-status)に揃え、
+   一覧部分だけこの節専用のクラスを足す。 */
+.bn-record-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  border-top: 1px solid var(--border); padding: 10px 0;
+}
+.bn-record-row:first-child { border-top: 0; }
+.bn-record-body { min-width: 0; flex: 1 1 auto; }
+.bn-record-name { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.bn-record-text { font-size: 14px; color: var(--text-sub); margin-top: 2px; overflow-wrap: anywhere; }
+.bn-record-meta { font-size: 14px; color: var(--text-sub); margin-top: 2px; overflow-wrap: anywhere; }
+.bn-record-source { font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
+.bn-record-warn { color: var(--warn-fg); font-weight: 700; }
+
+/* ================= /home (v2, 2026-09-20, DealMate デザイン案 v2準拠) =================
+   ヒーローは色とタイポグラフィだけで作る(写真・ブランドロゴなし)。場面ごとの色は
+   .scene-food(ピーチ)/.scene-free(ピンク)/.scene-shop(ブルー)/.scene-kids(イエロー)/
+   .scene-travel(ティール)の5色で、アイコンの丸とチップに共通して使う(v2案「色を場面ごとに
+   分ける」)。 */
+.section-title.sec-title2 { background: none; padding: 0; margin: 20px 0 10px; font-size: 15px; font-weight: 800; }
+.home-header { padding: 14px 0 6px; }
+.home-header-row { display: flex; align-items: center; gap: 9px; }
+.home-brand { display: flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+.home-brand .home-mark {
+  width: 30px; height: 30px; border-radius: 10px; flex: none;
+  background: linear-gradient(135deg, var(--accent), #7fb0ff);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(59,125,237,.3);
+}
+.home-brand svg { width: 16px; height: 16px; fill: #fff; }
+.home-brand-name { display: block; }
+.home-region { display: block; font-size: 13px; color: var(--dim); font-weight: 600; margin: 1px 0 0; }
+.home-bell {
+  margin-left: auto; width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-soft);
+  display: flex; align-items: center; justify-content: center; color: var(--sub); position: relative; flex: none;
+}
+.home-bell svg { width: 19px; height: 19px; stroke: currentColor; fill: none; }
+.home-bell::after { content: ''; position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); border: 1.5px solid #fff; }
+
+.home-hero-section { margin: 14px 0 6px; }
+.home-hero {
+  background: linear-gradient(135deg, #ff7a9a 0%, #ff9a6c 100%); color: #fff; border-radius: var(--r-lg);
+  padding: 18px 18px 16px; box-shadow: 0 12px 28px rgba(255,122,154,.35); position: relative; overflow: hidden;
+}
+.home-hero::after { content: ''; position: absolute; right: -50px; top: -60px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.16); }
+.home-hero::before { content: ''; position: absolute; left: -30px; bottom: -70px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,.1); }
+.home-hero > * { position: relative; }
+.home-tag-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.home-hero-mark {
+  width: 44px; height: 44px; border-radius: 14px; background: #fff; flex: none;
+  display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--accent-2-ink);
+  font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+.home-tag { font-size: 14px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.28); color: #fff; white-space: nowrap; }
+/* あなたにおすすめ(白背景の店リスト)のチップは場面色(下の .chip-* 参照)を使う。 */
+.home-tag-light { font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 8px; background: var(--band); color: var(--sub); white-space: nowrap; }
+.home-hero-store { font-size: 14px; font-weight: 700; margin: 0; opacity: .95; }
+.home-hero-headline { font-size: 26px; font-weight: 900; letter-spacing: -.02em; line-height: 1.2; margin: 12px 0 0; }
+.home-hero-cond { font-size: 14px; margin: 6px 0 0; opacity: .95; font-weight: 600; }
+.home-hero-deadline {
+  display: inline-block; font-size: 14px; font-weight: 800; margin: 10px 0 0;
+  background: #fff; color: var(--accent-2-ink); padding: 5px 11px; border-radius: 999px;
+}
+.home-hero-cta {
+  display: flex; align-items: center; justify-content: center; text-decoration: none; margin-top: 14px;
+  background: #fff; color: var(--accent-2-ink); font-weight: 800; width: 100%; border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+
+/* あなたにおすすめ: 白カード1枚にまとめて、行の間だけ罫線を引く(v2案 .list/.it) */
+.home-store-list { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; }
+.home-store-row { display: flex; gap: 12px; padding: 13px 14px; align-items: flex-start; border-top: 1px solid var(--line); }
+.home-store-row:first-child { border-top: 0; }
+.home-store-icon {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 14px; color: var(--ink);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
+  background: var(--band);
+}
+/* 場面色(v2案「色を場面ごとに分ける」): 外食=ピーチ/無料=ピンク/店・EC=ブルー/子ども=イエロー/旅行=ティール */
+.home-store-icon.scene-food, .chip.scene-food { background: var(--peach-soft); color: var(--peach-ink); }
+.home-store-icon.scene-free, .chip.scene-free { background: var(--accent-2-soft); color: var(--accent-2-ink); }
+.home-store-icon.scene-shop, .chip.scene-shop { background: var(--accent-soft); color: var(--accent-ink); }
+.home-store-icon.scene-kids, .chip.scene-kids { background: var(--yellow-soft); color: var(--yellow-ink); }
+.home-store-icon.scene-travel, .chip.scene-travel { background: var(--teal-soft); color: var(--teal-ink); }
+.chip.scene-who { background: var(--band); color: var(--sub); }
+/* 店ロゴ(Simple Icons)。ロゴが無い店は頭文字のまま(混在してよい)。場面色/親要素の文字色を
+   そのまま currentColor でマスクに使う(ブランドカラーは使わない)。home-hero-mark(白丸)の
+   中でも同じクラスを使い回すので汎用ルールにしてある。 */
+.icon-logo {
+  display: inline-block; width: 22px; height: 22px; background-color: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.home-store-body { min-width: 0; flex: 1 1 auto; }
+.home-store-name { font-size: 13px; font-weight: 700; color: var(--sub); }
+.home-store-headline { font-size: 16px; font-weight: 800; letter-spacing: -.01em; line-height: 1.3; margin: 1px 0 0; overflow-wrap: anywhere; }
+.home-store-cond { font-size: 14px; color: var(--sub); margin: 4px 0 0; line-height: 1.45; overflow-wrap: anywhere; }
+.home-store-deal { font-size: 15px; color: var(--text); margin: 2px 0 6px; overflow-wrap: anywhere; } /* 後方互換(未使用時のフォールバック) */
+.chip { font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 8px; display: inline-block; }
+.home-store-due-wrap { flex: none; text-align: right; padding-top: 1px; }
+.home-due { display: inline-block; font-size: 14px; font-weight: 800; padding: 4px 9px; border-radius: 999px; background: var(--accent-2-soft); color: var(--accent-2-ink); white-space: nowrap; }
+.home-due.soft { background: var(--band); color: var(--sub); }
+
+.home-expire-band {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin: 14px 0 8px;
+  padding: 13px 15px; border-radius: var(--r); text-decoration: none; min-height: 48px;
+  background: linear-gradient(120deg, #fff3cf, #ffe6b3); box-shadow: 0 6px 18px rgba(255,200,87,.25);
+}
+.home-expire-title { font-size: 14px; font-weight: 700; color: var(--yellow-ink); flex: 1 1 auto; }
+.home-expire-amt { font-size: 24px; font-weight: 900; color: #6b4d05; letter-spacing: -.02em; flex-basis: 100%; }
+.home-expire-days { font-size: 14px; font-weight: 700; color: #a07d2a; background: none; padding: 0; }
+
+/* ================= 支払いの最適化(v2b, 2026-09-20, DealMate v2案 画面3準拠) =================
+   /deals タブの主機能「どのカードで払う?」。店を選ぶ→payhd(店アイコン+店名+店を変える)→
+   amt(使う金額)→pay(rank1だけ薄いピンク地+ピンクの丸番号+青いCTA、2・3位は静か)→
+   この店の今のお得(dealRowHtml、Home「あなたにおすすめ」と同じ行の形)。 */
+.pay-optimize { margin: 4px 0 22px; }
+.pay-quick-stores { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 2px; }
+.pay-quick-store-btn {
+  min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.pay-quick-store-btn:active { background: var(--band); }
+
+/* 店ヘッダー(v2案 .payhd): アイコン(ロゴ/頭文字)+店名+「店を変える」ピル */
+.payhd {
+  background: var(--surface); border-radius: var(--r) var(--r) 0 0; box-shadow: var(--shadow-soft);
+  padding: 14px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--line);
+}
+.payhd-ico {
+  flex: none; width: 40px; height: 40px; border-radius: 13px; background: var(--band); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900;
+}
+.payhd-nm { font-size: 17px; font-weight: 800; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.payhd-sw {
+  flex: none; min-height: 48px; font-size: 14px; color: var(--accent); font-weight: 800;
+  background: var(--accent-soft); padding: 6px 14px; border-radius: 999px; border: 0; font-family: inherit; cursor: pointer;
+}
+/* 金額入力(v2案 .amt) */
+.amt {
+  background: var(--surface); box-shadow: var(--shadow-soft); padding: 11px 14px; display: flex;
+  align-items: center; gap: 9px; border-bottom: 1px solid var(--line); font-size: 15px; color: var(--text-sub); font-weight: 600;
+}
+.amt input[type=number] {
+  font: inherit; font-size: 17px; font-weight: 800; color: var(--text); width: 92px; padding: 7px 10px;
+  min-height: 48px; border: 1.5px solid var(--line); border-radius: 11px; text-align: right; background: var(--bg);
+}
+/* ランキング(v2案 .pay/.pr/.rk) */
+.pay { background: var(--surface); box-shadow: var(--shadow-soft); border-radius: 0 0 var(--r) var(--r); overflow: hidden; }
+.pay .pr { padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
+.pay .pr + .pr { border-top: 1px solid var(--line); }
+.pay .pr.win { background: linear-gradient(100deg, var(--surface), var(--accent-2-soft)); }
+.pay .rk {
+  width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  flex: none; font-size: 14px; font-weight: 900; background: var(--band); color: var(--muted);
+}
+.pay .pr.win .rk { background: var(--accent-2); color: #fff; box-shadow: 0 4px 10px rgba(255,107,143,.4); }
+.pay .bd { flex: 1; min-width: 0; }
+.pay .nm { font-size: 15px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; }
+.pay .wy { font-size: 14px; color: var(--text-sub); margin-top: 4px; }
+/* 並び順の根拠(ポイントの現金換算値)。基準そのものより一段弱く出す */
+.pay .wy .pv { color: var(--muted); }
+.pay .val { font-size: 14px; margin-top: 8px; font-weight: 700; color: var(--text-sub); }
+.pay .val b { font-size: 24px; font-weight: 900; color: var(--accent-2-ink); letter-spacing: -.02em; }
+.pay .pr.win .use {
+  display: block; width: 100%; margin-top: 11px; background: var(--accent); color: #fff; border: 0;
+  font: inherit; font-size: 15px; font-weight: 800; padding: 11px; border-radius: 12px; min-height: 48px;
+  box-shadow: 0 5px 14px rgba(59,125,237,.35); cursor: pointer;
+}
+.pay-tags-wrap { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.pay-tags-label { font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+.pay-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.pay-tag { font-size: 14px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.pay-store-deals { margin-top: 18px; }
+.pay-fairness-note { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 16px 2px 0; }
+
+/* ===== 読みもの(公開サイトの /deals/articles/)=====
+   要件: playbook/deals-site-article-pages-2026-09-20.md §1
+   本文幅 680px・行間 1.8・表は横スクロール可・画像は使わない。 */
+.pb-article { max-width: 680px; margin: 0 auto; padding: 8px 0 28px; }
+.pb-article-head { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 26px; }
+.pb-article-meta { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+.pb-article h1 { font-size: 28px; line-height: 1.45; margin: 0; color: var(--ink); }
+.pb-article-summary { font-size: 16px; line-height: 1.8; color: var(--text-sub); margin: 14px 0 0; }
+.pb-article-body { font-size: 17px; line-height: 1.8; color: var(--ink); }
+.pb-article-body h2 { font-size: 21px; line-height: 1.5; margin: 38px 0 14px; padding-left: 12px; border-left: 4px solid var(--accent); }
+.pb-article-body h3 { font-size: 18px; line-height: 1.5; margin: 28px 0 10px; }
+.pb-article-body p { margin: 0 0 18px; }
+.pb-article-body ul, .pb-article-body ol { margin: 0 0 18px; padding-left: 1.4em; }
+.pb-article-body li { margin: 0 0 8px; }
+.pb-article-body a { color: var(--accent-ink); }
+.pb-article-body strong { font-weight: 700; }
+.pb-article-body code { background: var(--band); border-radius: 5px; padding: 1px 6px; font-size: .92em; }
+.pb-article-body blockquote { margin: 0 0 18px; padding: 12px 16px; background: var(--band); border-radius: 10px; }
+.pb-article-body blockquote p { margin: 0; }
+.pb-article-body hr { border: 0; border-top: 1px solid var(--line); margin: 30px 0; }
+.pb-article-table { overflow-x: auto; margin: 0 0 20px; -webkit-overflow-scrolling: touch; }
+.pb-article-table table { border-collapse: collapse; min-width: 100%; font-size: 15px; }
+.pb-article-table th, .pb-article-table td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; white-space: nowrap; }
+.pb-article-table th { background: var(--band); font-weight: 700; }
+.pb-article-disclaimer { max-width: 680px; margin: 30px auto 0; padding: 14px 16px; background: var(--band); border-radius: 12px; font-size: 14px; line-height: 1.8; color: var(--text-sub); }
+.pb-article-rel { margin: 30px 0 0; }
+.pb-article-rel h2 { font-size: 16px; margin: 0 0 10px; color: var(--text-sub); }
+.pb-article-rel ul { margin: 0; padding-left: 1.2em; }
+.pb-article-rel li { margin: 0 0 6px; }
+.pb-article-rel a { color: var(--accent-ink); }
+.pb-article-back { margin: 26px 0 0; }
+.pb-article-cta { display: inline-block; background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; padding: 12px 22px; border-radius: 999px; }
+
+/* 一覧 */
+.pb-articles-index { max-width: 680px; margin: 0 auto; }
+.pb-article-list { list-style: none; margin: 20px 0 0; padding: 0; }
+.pb-article-item { border-bottom: 1px solid var(--line); }
+.pb-article-item a { display: block; padding: 18px 2px; text-decoration: none; color: inherit; }
+.pb-article-item-date { display: block; font-size: 13px; color: var(--muted); }
+.pb-article-item-title { display: block; font-size: 18px; font-weight: 700; line-height: 1.5; margin: 4px 0 6px; color: var(--ink); }
+.pb-article-item-sum { display: block; font-size: 15px; line-height: 1.75; color: var(--text-sub); }
+.pb-article-empty { color: var(--muted); margin: 20px 0 0; }
+
+/* Home と Cards の下の帯 */
+.pb-read-strip { margin-top: 28px; }
+.pb-read-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pb-read-head h2 { font-size: 18px; margin: 0; }
+.pb-read-head a { font-size: 14px; color: var(--accent-ink); text-decoration: none; }
+.pb-read-cards { display: grid; gap: 10px; margin-top: 12px; }
+.pb-read-card { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: inherit; }
+.pb-read-date { display: block; font-size: 13px; color: var(--muted); }
+.pb-read-title { display: block; font-size: 16px; font-weight: 700; line-height: 1.55; margin-top: 4px; }
+@media (min-width: 640px) { .pb-read-cards { grid-template-columns: repeat(3, 1fr); } }
+
+/* ===== もっと見る / 場面別(公開サイトの index 軽量化。§2 2026-09-20)===== */
+.more-section { margin-top: 18px; }
+.more-btn { width: 100%; min-height: 52px; border: 1px solid var(--line); background: var(--surface); color: var(--accent-ink); font-size: 16px; font-weight: 700; border-radius: 14px; cursor: pointer; }
+.more-btn:disabled { color: var(--muted); cursor: default; }
+.scene-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; }
+.scene-links-label { font-size: 14px; color: var(--muted); }
+.scene-link { font-size: 14px; font-weight: 700; color: var(--accent-ink); text-decoration: none; background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
+.scene-page .page-date { margin-bottom: 14px; }
+
+/* ===== 知っておくこと(カードのページ。ニュース区分。2026-09-20)===== */
+.news-section { margin-top: 30px; }
+.news-note { font-size: 14px; line-height: 1.8; color: var(--text-sub); margin: 0 0 14px; }
+.news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.news-item { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.news-head { font-size: 16px; font-weight: 700; margin: 0 0 6px; line-height: 1.55; }
+.news-sep { color: var(--muted); margin: 0 4px; font-weight: 400; }
+.news-body { font-size: 15px; line-height: 1.75; color: var(--text-sub); margin: 0; }
+.news-meta { font-size: 13px; color: var(--muted); margin: 8px 0 0; display: flex; gap: 12px; flex-wrap: wrap; }
+.news-link { color: var(--accent-ink); text-decoration: none; font-weight: 700; }
