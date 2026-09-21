@@ -734,8 +734,9 @@
       if (el.store) el.store.textContent = d.store || '';
       if (el.headline) el.headline.textContent = d.headline || '';
       if (el.facts) {
+        // personal は手元モードにしか入っていない(公開ビルドは deal_detail が落とす)
         el.facts.innerHTML = row('条件', d.cond || d.cond_full) + row('対象者', d.who)
-          + row('期間', d.period) + row('地域', d.region);
+          + row('期間', d.period) + row('地域', d.region) + row('手元メモ', d.personal);
       }
       if (el.src) {
         var bits = [];
