@@ -25,9 +25,9 @@
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">
-    <p class="pb-footer-note">運営: PlugBits ／発信名義: オケオ ／お問い合わせ: <a href="mailto:support@plugbits.app">support@plugbits.app</a></p>
-    <nav class="pb-footer-links"><a href="/deals/">今週のお得</a><a href="/cards/">カードの基礎知識</a><a href="/articles/">読みもの</a><a href="/ranking.html">順番の決め方</a><a href="/about.html">このサイトについて</a><a href="/privacy.html">プライバシー</a><a href="https://plugbits.app/" rel="noopener">PlugBits トップ</a></nav>
-    <small>&copy; 2026 PlugBits. All rights reserved.</small>
+    <p class="pb-footer-note">運営: ドルトク ／お問い合わせ: <a href="mailto:support@dorutoku.com">support@dorutoku.com</a></p>
+    <nav class="pb-footer-links"><a href="/deals/">今週のお得</a><a href="/cards/">カードの基礎知識</a><a href="/articles/">読みもの</a><a href="/ranking.html">順番の決め方</a><a href="/about.html">このサイトについて</a><a href="/privacy.html">プライバシー</a></nav>
+    <small>&copy; 2026 ドルトク</small>
   </div>
 </footer>
 <div class="sheet-backdrop" id="dk-sheet-backdrop" hidden></div>
@@ -52,7 +52,7 @@
   </div>
   <div class="sheet-body">
     <p class="dk-sheet-headline" id="dk-sheet-headline"></p>
-    <p class="dk-sheet-summary" id="dk-sheet-summary" hidden></p>
+    <div class="dk-sheet-summary" id="dk-sheet-summary" hidden></div>
     <blockquote class="dk-sheet-quote" id="dk-sheet-quote" hidden></blockquote>
     <dl class="dk-sheet-facts" id="dk-sheet-facts"></dl>
     <p class="dk-sheet-src" id="dk-sheet-src"></p>
@@ -65,14 +65,29 @@
     <a class="dk-sheet-store-link" id="dk-sheet-storelink" href="#">この店のお得をすべて見る<span class="chev">&rsaquo;</span></a>
   </div>
 </div>
+<div class="sheet" id="dk-import-sheet" hidden role="dialog" aria-modal="true" aria-label="気になるリストの取り込み">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3>気になるリストが届きました</h3>
+    <button class="sheet-close" type="button" data-dk-close aria-label="閉じる">&#10005;</button></div>
+  <div class="sheet-body">
+    <p class="dk-import-lead" id="dk-import-lead"></p>
+    <div id="dk-import-list"></div>
+    <p class="dk-saved-out-note">取り込んでも、いまこの端末に入っているものは消えません(足すだけです)。</p>
+    <div class="dk-sheet-actions">
+      <button class="dk-btn primary" type="button" id="dk-import-go">この端末のリストに取り込む</button>
+      <button class="dk-btn ghost" type="button" data-dk-close>閉じる</button>
+    </div>
+    <p class="dk-saved-msg" id="dk-import-msg" hidden></p>
+  </div>
+</div>
 <div class="sheet" id="dk-due-sheet" hidden role="dialog" aria-modal="true" aria-label="期限が近いお得">
   <div class="sheet-handle"></div>
   <div class="sheet-head"><h3>期限が近い</h3>
     <button class="sheet-close" type="button" data-dk-close aria-label="閉じる">&#10005;</button></div>
   <div class="sheet-body"><div class="dk-due-list" id="dk-due-list" data-base="/s/"></div></div>
 </div>
-<script type="application/json" id="dk-due-data">[{"store":"Bath & Body Works","headline":"ウォールフラワー詰め替えが$2.95","pill":"今日まで","slug":"bath-body-works"},{"store":"IHG","headline":"ポイント宿泊が15%オフ","pill":"今日まで","slug":"ihg"},{"store":"KFC","headline":"チキンウィング10本が無料","pill":"今日まで","slug":"kfc"},{"store":"Southwest","headline":"フライトのポイントが2倍","pill":"今日まで","slug":"southwest"},{"store":"Woot","headline":"整備済みiPadが10%追加オフ","pill":"今日まで","slug":"woot"},{"store":"QVC","headline":"NFLのTシャツとパーカーが$55.98","pill":"あと1日","slug":"qvc"},{"store":"adidas","headline":"セール品が追加30%オフ","pill":"あと1日","slug":"adidas"},{"store":"adidas","headline":"通常価格品も30%オフ","pill":"あと1日","slug":"adidas"},{"store":"Woot","headline":"おもちゃが6点以上で60%追加オフ","pill":"あと2日","slug":"woot"},{"store":"Woot","headline":"ビューティー用品が最大30%オフ","pill":"あと3日","slug":"woot"},{"store":"Woot","headline":"ミルウォーキー工具が追加10%オフ","pill":"あと3日","slug":"woot"},{"store":"eBay","headline":"対象商品が40%オフ","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"X_PLR Path シューズが$23.40","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"Adilette Lite サンダルが$8.40","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"Grand Court 2.0 スニーカーが$18","pill":"あと3日","slug":"ebay"}]</script>
-<script type="application/json" id="dk-deal-data" data-summary-src="/deals-summary.json">{"d-20260918-fc6a":{"id":"d-20260918-fc6a","store":"Taco Bell","slug":"taco-bell","headline":"毎週火曜に限定特典","cond":"会員向け・内容は毎週変更","cond_full":"毎週火曜に内容が変わる会員向け特典","who":"無料会員","period":"記載なし","region":"全米","url":"https://livingonthecheap.com/taco-bell-tuesday-drops-deals-giveaways/","sources":["Living on the Cheap"],"updated":"2026-09-19","pill":"","due_soon":false,"logo":"<span class=\"dk-logo\" aria-hidden=\"true\"><span class=\"dk-logo-glyph\" style=\"background-color:#38096C;mask-image:url(/assets/icons/tacobell.svg);-webkit-mask-image:url(/assets/icons/tacobell.svg)\"></span></span>","href":"/s/taco-bell/"}}</script>
+<script type="application/json" id="dk-due-data">[{"store":"Bath & Body Works","headline":"ウォールフラワー詰め替えが$2.95","pill":"今日まで","slug":"bath-body-works"},{"store":"IHG","headline":"ポイント宿泊が15%オフ","pill":"今日まで","slug":"ihg"},{"store":"KFC","headline":"チキンウィング10本が無料","pill":"今日まで","slug":"kfc"},{"store":"Southwest","headline":"フライトのポイントが2倍","pill":"今日まで","slug":"southwest"},{"store":"Wayfair","headline":"椅子が最大70%オフ","pill":"今日まで","slug":"wayfair"},{"store":"Woot","headline":"整備済みiPadが10%追加オフ","pill":"今日まで","slug":"woot"},{"store":"Dunkin'","headline":"カップスリーブが無料","pill":"9/22だけ","slug":"dunkin"},{"store":"QVC","headline":"NFLのTシャツとパーカーが$55.98","pill":"あと1日","slug":"qvc"},{"store":"adidas","headline":"セール品が追加30%オフ","pill":"あと1日","slug":"adidas"},{"store":"adidas","headline":"通常価格品も30%オフ","pill":"あと1日","slug":"adidas"},{"store":"Steam","headline":"パソコン用ゲームが無料","pill":"あと2日","slug":"steam"},{"store":"Woot","headline":"おもちゃが6点以上で60%追加オフ","pill":"あと2日","slug":"woot"},{"store":"Woot","headline":"ビューティー用品が最大30%オフ","pill":"あと3日","slug":"woot"},{"store":"Woot","headline":"ミルウォーキー工具が追加10%オフ","pill":"あと3日","slug":"woot"},{"store":"eBay","headline":"対象商品が40%オフ","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"X_PLR Path シューズが$23.40","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"Adilette Lite サンダルが$8.40","pill":"あと3日","slug":"ebay"},{"store":"eBay","headline":"Grand Court 2.0 スニーカーが$18","pill":"あと3日","slug":"ebay"}]</script>
+<script type="application/json" id="dk-deal-data" data-summary-src="/deals-summary.json">{"d-20260918-fc6a":{"id":"d-20260918-fc6a","store":"Taco Bell","slug":"taco-bell","headline":"毎週火曜に限定特典","cond":"会員向け・内容は毎週変更","cond_full":"毎週火曜に内容が変わる会員向け特典","who":"無料会員","period":"記載なし","region":"全米","url":"https://livingonthecheap.com/taco-bell-tuesday-drops-deals-giveaways/","sources":["Living on the Cheap"],"updated":"2026-09-21","pill":"","due_soon":false,"logo":"<span class=\"dk-logo\" aria-hidden=\"true\"><span class=\"dk-logo-glyph\" style=\"background-color:#38096C;mask-image:url(/assets/icons/tacobell.svg);-webkit-mask-image:url(/assets/icons/tacobell.svg)\"></span></span>","href":"/s/taco-bell/"}}</script>
 <script type="application/json" id="zip-states">{"ranges":[[500,599,"NY"],[600,799,"PR"],[800,899,"VI"],[900,999,"PR"],[1000,2799,"MA"],[2800,2999,"RI"],[3000,3899,"NH"],[3900,4999,"ME"],[5000,5999,"VT"],[6000,6389,"CT"],[6390,6390,"NY"],[6391,6999,"CT"],[7000,8999,"NJ"],[10000,14999,"NY"],[15000,19699,"PA"],[19700,19999,"DE"],[20000,20099,"DC"],[20100,20199,"VA"],[20200,20599,"DC"],[20600,21999,"MD"],[22000,24699,"VA"],[24700,26899,"WV"],[27000,28999,"NC"],[29000,29999,"SC"],[30000,31999,"GA"],[32000,34999,"FL"],[35000,36999,"AL"],[37000,38599,"TN"],[38600,39799,"MS"],[39800,39999,"GA"],[40000,42799,"KY"],[43000,45999,"OH"],[46000,47999,"IN"],[48000,49999,"MI"],[50000,52999,"IA"],[53000,54999,"WI"],[55000,56799,"MN"],[56900,56999,"DC"],[57000,57799,"SD"],[58000,58899,"ND"],[59000,59999,"MT"],[60000,62999,"IL"],[63000,65899,"MO"],[66000,67999,"KS"],[68000,69399,"NE"],[70000,71499,"LA"],[71600,72999,"AR"],[73000,74999,"OK"],[75000,79999,"TX"],[80000,81999,"CO"],[82000,83199,"WY"],[83200,83899,"ID"],[84000,84799,"UT"],[85000,86999,"AZ"],[87000,88499,"NM"],[88500,88599,"TX"],[88900,89899,"NV"],[90000,96199,"CA"],[96700,96899,"HI"],[96910,96932,"GU"],[96950,96952,"MP"],[97000,97999,"OR"],[98000,99499,"WA"],[99500,99999,"AK"]],"labels":{"AL":"アラバマ州","AK":"アラスカ州","AZ":"アリゾナ州","AR":"アーカンソー州","CA":"カリフォルニア州","CO":"コロラド州","CT":"コネチカット州","DE":"デラウェア州","FL":"フロリダ州","GA":"ジョージア州","HI":"ハワイ州","ID":"アイダホ州","IL":"イリノイ州","IN":"インディアナ州","IA":"アイオワ州","KS":"カンザス州","KY":"ケンタッキー州","LA":"ルイジアナ州","ME":"メイン州","MD":"メリーランド州","MA":"マサチューセッツ州","MI":"ミシガン州","MN":"ミネソタ州","MS":"ミシシッピ州","MO":"ミズーリ州","MT":"モンタナ州","NE":"ネブラスカ州","NV":"ネバダ州","NH":"ニューハンプシャー州","NJ":"ニュージャージー州","NM":"ニューメキシコ州","NY":"ニューヨーク州","NC":"ノースカロライナ州","ND":"ノースダコタ州","OH":"オハイオ州","OK":"オクラホマ州","OR":"オレゴン州","PA":"ペンシルベニア州","RI":"ロードアイランド州","SC":"サウスカロライナ州","SD":"サウスダコタ州","TN":"テネシー州","TX":"テキサス州","UT":"ユタ州","VT":"バーモント州","VA":"バージニア州","WA":"ワシントン州","WV":"ウェストバージニア州","WI":"ウィスコンシン州","WY":"ワイオミング州","DC":"ワシントンD.C.","PR":"プエルトリコ","VI":"米領ヴァージン諸島","GU":"グアム","MP":"北マリアナ諸島"}}</script>
 <nav class="pb-tabbar" aria-label="タブ"><div class="pb-tabbar-inner"><a class="pb-tab" href="/"><span class="pb-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-6h5v6"/></svg></span><span class="pb-tab-label">Home</span></a><a class="pb-tab active" href="/deals/" aria-current="page"><span class="pb-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span><span class="pb-tab-label">Deals</span></a><a class="pb-tab" href="/cards/"><span class="pb-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6 15h4"/></svg></span><span class="pb-tab-label">Cards</span></a><a class="pb-tab" href="/me/"><span class="pb-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"/></svg></span><span class="pb-tab-label">Me</span></a></div></nav>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "86511d1154774394986239de33d21882"}'></script><!-- End Cloudflare Web Analytics -->

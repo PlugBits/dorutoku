@@ -1,31 +1,7 @@
-/* PlugBits お得/カード。手元の非公開モード(mode=local)と公開サイト(dorutoku.com,
-   mode=public)が共有する唯一のスタイルシート。ダークトークンは使わない(オーナーの指示:
-   「UIは実際に合わせてほしい」=この明るいトーンを正としてダーク版を廃止する)。
-   タイポグラフィ: 本文18px・見出し22px以上・補助テキスト15px以上・14px未満は使わない・
-   行間1.7・タップ領域48px以上・390px/320pxで横スクロールなし、を全モード共通で守る。
-   例外(オケオ承認 2026-09-20): 図の軸ラベルは13px可。短い語(4文字以内)で、同じ数値が
-   図の下の表に14px以上で出ていることが条件。
-   例外(オケオ承認 2026-09-20 21:50、UI v3 仕様 §9): モック準拠の画面(ヘッダー・行・ヒーロー・
-   タイル・店ページ)は仕様の字の大きさ(店名13px・地名13px・期限バッジ11px 等)をそのまま使う。
-
-   v2シェル(2026-09-20): 配色は ドルトク デザイン案 v2
-   (vault/PlugBits/articles/deals/ の設計案)にあわせて更新。
-   クリーム背景(--bg)に白いカード(--surface)を浮かせ、場面ごとの色(外食=ピーチ/無料=ピンク/
-   店・EC=ブルー/子ども=イエロー/旅行=ティール)をアイコンとチップで揃える。ヒーローは
-   ピンク→ピーチの暖色グラデーション、下タブの選択色はピンク。カードv2(Cardsタブ)の
-   ウォレットタイルは発行会社/提携ブランドごとの色(--wal-*、下のウォレットタイル節を参照)。
-   色は必ずこのトークン集合(:root)経由で使い、このブロックの外にブランド色の16進を直書き
-   しない(状態色=公式/非公式バッジ・処理中/成功/警告メッセージ・FTC開示バナーの黄色は、
-   ブランドの一部ではない意味色のため、こちらもトークン化した上でこのブロックに集約する。
-   ウォレットタイルの発行会社別グラデーションだけは例外で、v2案自体が発行会社ごとに固有の
-   16進を直書きしているため、そのすぐ下の専用ブロックにまとめて書く)。 */
 :root {
-  /* v3 UI(2026-09-20, playbook/dorutoku-ui-spec-v3-2026-09-20.md §9-0): 値は DORUTOKU デザイン
-     システム(playbook/dorutoku-design-system-2026-09-20.md)のトークン。地は Off White、文字は
-     ネイビー、ピンクは「無料・期限・CTA」だけ。主色の青 #3b7ded は使わない(旧 --accent の参照は
-     ネイビーに落とす)。店ごとに面の色を変えない。 */
+
   --ink: #12345B; --sub: #5d6a85; --dim: #94a0b8;
-  --bg: #FFFDF9;              /* Off White */
+  --bg: #FFFDF9;
   --surface: #fff; --line: #EFE9E3; --border: #EFE9E3;
   --pink: #F23D78; --pink-soft: #FCE5EC; --pink-ink: #D62E66;
   --pale-blue: #DDF3FA; --lavender: #E9E4F7; --yellow: #FFD34E; --yellow-soft: #FFF4CC;
@@ -46,7 +22,7 @@
   --r: 18px; --r-lg: 24px;
   --shadow-soft: 0 1px 2px rgba(18,52,91,.04), 0 6px 20px rgba(18,52,91,.06);
   --shadow-lg: 0 10px 34px rgba(18,52,91,.16);
-  /* 意味色(ブランドアクセントではない状態表示) */
+
   --ok-bg: #e6f4ea; --ok-fg: #1e7a34;
   --warn-bg: #fdeeee; --warn-fg: #b3261e;
   --busy-bg: #fff4d6; --busy-fg: #8a6100;
@@ -66,17 +42,12 @@ body { padding-bottom: 56px; }
 a { color: var(--accent); }
 .pb-main { max-width: 640px; margin: 0 auto; padding: 0 16px; }
 
-/* FTC 16 CFR Part 255 開示。v3(§9-7): 提携前(AFFILIATE_STATE=none)は帯そのものを出さない。
-   提携後はフッターの常設1行(.pb-disclosure)+広告リンクを置いた要素の直下の1行(.pb-disclosure-inline)。 */
 .pb-disclosure {
   background: var(--disclosure-bg); border: 1px solid var(--disclosure-border); color: var(--disclosure-fg);
   font-size: 14px; line-height: 1.5; padding: 8px 12px; border-radius: 10px; margin: 0 0 12px;
 }
 .pb-disclosure-inline { font-size: 13px; color: var(--disclosure-fg); margin: 4px 0 0; }
 
-/* ================= v3 ヘッダー(§9-1、全画面共通・高さ56px+セーフエリア) =================
-   左=あいさつ(時間帯で3種、app.js が切り替える)+その下に小さく地名。右=ベル(期限3日以内が
-   1件以上ならピンクの点)。DORUTOKU の字・チップ・日付の帯・郵便番号の欄・開示帯は置かない。 */
 .dk-head { padding-top: env(safe-area-inset-top, 0px); background: var(--bg); }
 .dk-head-inner {
   max-width: 640px; margin: 0 auto; padding: 8px 16px 4px; min-height: var(--head-h);
@@ -94,6 +65,14 @@ a { color: var(--accent); }
   align-self: flex-start; -webkit-tap-highlight-color: transparent;
 }
 .dk-loc svg { width: 14px; height: 14px; flex: none; }
+
+.dk-loc::after, .dk-bell::before {
+  content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+  width: 100%; min-width: 44px; height: 48px;
+}
+.dk-loc::after { bottom: 0; }
+.dk-bell::before { top: 50%; margin-top: -24px; }
+.dk-loc { position: relative; }
 .dk-bell {
   flex: none; margin-left: auto; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 0;
   box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: center; color: var(--ink);
@@ -109,8 +88,6 @@ a { color: var(--accent); }
 .page-title { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
 .page-date { font-size: 15px; color: var(--text-sub); margin: 0; }
 
-/* 絞り込みの道具(日付の帯)は絞り込む対象の上に置く。タブと一緒に上部へ吸着する
-   (2026-09-20 オケオの指摘: 「9/22で絞り込み中」なのに帯が一覧の下にあった) */
 .date-strip-wrap { background: var(--bg); margin: 6px 0 0; padding: 0; }
 .date-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
 .date-chip {
@@ -120,17 +97,13 @@ a { color: var(--accent); }
   scroll-snap-align: start; -webkit-tap-highlight-color: transparent;
 }
 .date-chip .wd { font-size: 13px; font-weight: 500; color: var(--text-sub); }
-/* 「案件がある日」の点。選択中の塗りと同じ青だと、点の並んだ日が塗られて見える
-   (2026-09-20 オケオの指摘「3つが青塗り」。実際は塗りは1日だけで、残りは点)。
-   彩度を落として、濃い青の塗り=選択中 が一目で1つだと分かるようにする */
+
 .date-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); margin-top: 2px; }
 .date-chip.today { border-color: var(--accent); border-width: 2px; }
 .date-chip.selected { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 .date-chip.selected .wd { color: var(--accent-soft); }
 .date-chip.selected .dot { background: var(--surface); }
 
-/* 吸着する要素なので、iPhoneのステータスバー(時計)に潜り込まないよう safe-area を足す
-   (2026-09-20 オケオの指摘: 「すべて」タブの上に 23:48 が重なっていた。実機だけで出る) */
 .tabs-wrap { position: sticky; top: 0; background: var(--bg); z-index: 5; margin: 0 -16px 14px;
   padding: calc(6px + env(safe-area-inset-top, 0px)) 16px 8px; border-bottom: 1px solid var(--border); }
 .tabs { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; padding: 2px; }
@@ -148,26 +121,18 @@ a { color: var(--accent); }
 .card, .bundle-item { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; background: var(--surface); box-shadow: var(--shadow-soft); }
 .card.due-soon { border-left: 4px solid var(--due-soon); padding-left: 11px; }
 
-/* 店バンドル(v2, 2026-09-19): 同じ店に2件以上あるとき店名を1回だけ見出しにして中にまとめる */
 .store-bundle { padding: 12px 14px 6px; }
 .bundle-store-head { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; font-size: 20px; font-weight: 800; line-height: 1.25; color: var(--text); }
 .bundle-count { flex: none; font-size: 12px; font-weight: 700; color: var(--text-sub); background: var(--band); padding: 2px 9px; border-radius: 999px; }
 .bundle-list { display: flex; flex-direction: column; }
 .store-bundle .bundle-item { border: 0; border-radius: 0; padding: 10px 0 6px; margin: 4px 0 0; border-top: 1px dashed var(--border); }
 .store-bundle .bundle-item:first-child { border-top: 0; margin-top: 0; padding-top: 2px; }
-/* バンドル内では店名を隠す(重複表示防止)。「気になる」に複製されバンドルの外に出た時だけ
-   この規則が効かなくなり、標準のカードと同じ見た目(店名あり)に自然に戻る */
+
 .store-bundle .bundle-item-store { display: none; }
 
-/* v2ui行レイアウト(2026-09-20, 承認済みデザイン案v2の .it 準拠): アイコンタイル(色分けは
-   Homeの .home-store-icon をそのまま使い回す)/本文(店名・見出し・条件・チップ)/右端の
-   ハート・期限の3列。.card 自体はflexにせず、.card-row をこの行専用の横並びラッパにして
-   .card-detail はその外(兄弟)に置く=詳細欄は行の下に全幅で開く。 */
 .card-row { display: flex; gap: 12px; align-items: flex-start; }
 .card-body { min-width: 0; flex: 1 1 auto; }
-/* flex-wrap: wrap(2026-09-20追記): 「おすすめ」ピルが付く行は320px幅だと店名と場所を
-   取り合って店名が極端に省略されてしまうため、入りきらない時はピルを次の行に落とす
-   (店名側は min-width:0 のままいっぱいまで使えるようにする) */
+
 .card-store-line { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; }
 .card-store { font-size: 13px; font-weight: 700; color: var(--sub); margin: 0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pills { display: flex; gap: 4px; flex: 0 0 auto; }
@@ -185,9 +150,7 @@ a { color: var(--accent); }
   color: var(--accent); cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .heart-btn.on { background: var(--accent-soft); border-color: var(--accent); }
-/* チップと「くわしく」を同じ行に置く(2026-09-20)。別行のフッターにすると
-   min-height:48px ぶんの空の帯がチップの下に必ず残り、1件ごとに無駄な余白ができていた。
-   チップが多くて入りきらないときは折り返し、「くわしく」は常に右端に寄る。 */
+
 .card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
 .card-meta .detail-link { margin-left: auto; }
 .detail-link { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 2px; font-size: 15px; font-weight: 700; color: var(--accent); background: transparent; border: none; padding: 0 2px; min-height: 48px; cursor: pointer; }
@@ -198,10 +161,10 @@ a { color: var(--accent); }
 .detail-row dt { flex: 0 0 76px; font-size: 15px; font-weight: 700; color: var(--text-sub); margin: 0; }
 .detail-row dd { flex: 1 1 auto; min-width: 0; font-size: 16px; margin: 0; }
 .card-detail .sources { font-size: 14px; color: var(--text-sub); margin: 0 0 10px; }
-.card-detail a.official { display: inline-block; font-size: 15px; font-weight: 700; color: var(--accent); min-height: 48px; line-height: 48px; }
+
+a.official { display: inline-block; font-size: 15px; font-weight: 700; color: var(--accent); min-height: 48px; line-height: 48px; }
 .empty-note { font-size: 15px; color: var(--text-sub); padding: 4px 0 8px; }
 
-/* 単品特価(既定で畳む。v2, 2026-09-19): オーナーの指摘「単品の値引きが延々続いて埋もれる」への対応 */
 .singles-section {
   margin: 28px 0 8px; border: 1px solid var(--accent); border-radius: 14px; background: var(--accent-soft);
   overflow: hidden;
@@ -218,13 +181,12 @@ a { color: var(--accent); }
 .saved-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 24px; }
 .saved-note { font-size: 14px; color: var(--text-sub); margin: 0 0 12px; }
 
-/* --- legal / article pages (cards, privacy, about, ranking) --- */
 .lead { font-size: 16px; color: var(--text-sub); margin: 8px 0 20px; }
 .legal-section { margin: 0 0 26px; }
 .legal-section h2 { font-size: 18px; font-weight: 800; margin: 0 0 10px; }
 .legal-section p { margin: 0 0 10px; }
 .legal-note { margin-top: 32px; color: var(--text-sub); font-size: 14px; }
-/* v2ui(2026-09-20): /me・/deals/about.html の「使用している画像の出どころ」一覧 */
+
 .asset-manifest { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; margin: 10px 0; }
 .asset-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 14px; }
 .asset-row:first-child { border-top: 0; }
@@ -255,9 +217,9 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
 .pb-footer-links { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; }
 .pb-footer-links a { font-size: 14px; color: var(--text-sub); text-decoration: underline; }
 .pb-deals-footer small { color: var(--text-sub); font-size: 13px; }
-.pb-back-foot { font-size: 15px; font-weight: 700; color: var(--accent); text-decoration: none; }
 
-/* ================= 個人利用の断片(mode=local のみ。/web/personal.js が使う) ================= */
+.pb-back-foot { display: inline-block; min-height: 48px; line-height: 48px; font-size: 15px; font-weight: 700; color: var(--accent); text-decoration: none; }
+
 .personal-section { margin-top: 8px; }
 .p-card { border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; background: var(--surface); margin-bottom: 10px; box-shadow: var(--shadow-soft); }
 .p-subtitle { font-size: 16px; font-weight: 800; margin: 0 0 8px; }
@@ -267,9 +229,7 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
   border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-family: inherit;
   font-size: 16px; line-height: 1.7; resize: vertical;
 }
-/* select も同じ見た目・同じ幅にする(2026-09-20: 入会ボーナスの記録でカード選択の
-   <select> が中身の一番長い項目の幅になり、390pxで157px・320pxで227px はみ出していた。
-   ページ自体は横スクロールしないため、はみ出し検査だけでは見落とす) */
+
 .personal-section input[type=text], .personal-section input[type=date], .personal-section input[type=number], .personal-section input:not([type]), .personal-section select {
   box-sizing: border-box; background: var(--surface); color: var(--text); border: 1px solid var(--border);
   border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 16px; min-height: 48px; width: 100%;
@@ -308,17 +268,14 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
 .p-row .p-amt { font-size: 16px; color: var(--text); flex: none; text-align: right; white-space: nowrap; }
 .p-row .p-days { font-size: 14px; flex: none; text-align: right; white-space: nowrap; color: var(--text-sub); }
 .p-row .p-days.soon { color: var(--warn-fg); font-weight: 700; }
-/* Fix B(2026-09-20): 今月やること行のカード名(小さい添え書き、detail行の頭に置く) */
+
 .p-row-card { font-weight: 700; color: var(--text); }
 
-/* v2b(2026-09-20): 今月やること(ドルトク v2案 .todo/.td)。#pc-month の .p-card は
-   このリストのときだけパディングを0にし(親要素のパディングを打ち消す)、行ごとに
-   自前のパディング+区切り線を持たせる(v2案の白いカード1枚+内部の横線という構造に合わせる)。 */
 #pc-month .p-card { padding: 0; overflow: hidden; }
 .p-todo-row { display: flex; gap: 12px; align-items: center; padding: 12px 14px; min-height: 48px; box-sizing: border-box; }
 .p-todo-row + .p-todo-row { border-top: 1px solid var(--line); }
 .p-todo-ico { flex: none; width: 40px; height: 40px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-/* 絵文字をやめて同梱SVGにした(2026-09-20)。Linux等で絵文字フォントが無いと豆腐になるため */
+
 .p-todo-ico svg { width: 21px; height: 21px; }
 .p-todo-ico.p svg { color: var(--accent-2-ink); }
 .p-todo-ico.y svg { color: var(--yellow-ink); }
@@ -333,7 +290,7 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
 .p-tag-unofficial { display: inline-block; font-size: 12px; border-radius: 999px; padding: 1px 7px; background: transparent; border: 1px solid var(--border); color: var(--text-sub); flex: none; line-height: 1.6; margin-left: 6px; }
 
 .p-holding-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-/* v3c(2026-09-20, Fix A): opened欄が増えたため縦積みに変更(320px幅での横あふれ防止)。 */
+
 .p-close-form { display: none; flex-direction: column; gap: 8px; margin-top: 8px; align-items: stretch; }
 .p-close-form.open { display: flex; }
 .p-close-field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -364,15 +321,11 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
 .holding-row .hd-note { color: var(--text-sub); overflow-wrap: anywhere; word-break: break-word; }
 [hidden] { display: none !important; }
 
-/* ================= 2026-09-19 IA修正: FAB・ボトムシート・折りたたみ・日課/設定の分離 ================= */
-
-/* 日課性が高いものを上に、たまにしか触らないものは下か畳む、という原則のUI部品 */
-.quiet-link { margin: 28px 0 8px; text-align: center; }
-.quiet-link a { font-size: 15px; font-weight: 700; text-decoration: none; }
+.quiet-link { margin: 14px 0 0; text-align: center; }
+.quiet-link a { display: inline-block; min-height: 48px; line-height: 48px; font-size: 15px; font-weight: 700; text-decoration: none; }
 .subpage-back { margin: 4px 0 10px; }
 .subpage-back a { font-size: 15px; font-weight: 700; text-decoration: none; color: var(--accent); }
 
-/* 折りたたみセクション(ルールの状態・次に検討できるカード)。native <details> を使う */
 .collapse-section { border: 1px solid var(--border); border-radius: 16px; padding: 0; margin-bottom: 10px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow-soft); }
 .collapse-summary {
   list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
@@ -385,7 +338,6 @@ details[open] > .collapse-summary::after { transform: rotate(-90deg); }
 .collapse-section > .p-card { border: 0; border-radius: 0; margin: 0; border-top: 1px solid var(--border); }
 .collapse-section .p-subtitle { margin-top: 14px; }
 
-/* 店を聞くコンパクト入力(お得トップ「日課」ゾーン) */
 .ask-compact { margin: 4px 0 18px; }
 .ask-row { display: flex; gap: 8px; align-items: center; }
 .ask-row input[type=text] { flex: 1 1 auto; min-width: 0; }
@@ -393,11 +345,6 @@ details[open] > .collapse-summary::after { transform: rotate(-90deg); }
 .ask-compact .collapse-section, .ask-compact details.collapse-section { border: 0; background: transparent; margin-top: 6px; }
 .ask-compact .collapse-summary { background: transparent; padding: 8px 2px; font-size: 15px; font-weight: 700; color: var(--text-sub); min-height: 40px; }
 
-/* 右下の丸い+ボタン(カード追加)。v3b(2026-09-20): 「+ボタンがタイルの文字に重なる」指摘への
-   対応で、FABのサイズ・余白をトークン化し(--fab-size/--fab-gap)、スクロールする一覧側の
-   下パディングをその2つの式だけから計算する(一覧の最後のタイルの下端が必ずFABの上端と同じ
-   位置か、それより上で終わるようにする=タイル側の右パディングでは絶対に解決しない)。
-   mode=local はボトムタブバー(--tabbar-h)の上に浮かせる(下記「ボトムタブバー」参照)。 */
 :root { --fab-size: 56px; --fab-gap: 18px; }
 body.has-fab { padding-bottom: calc(var(--fab-size) + var(--fab-gap) + env(safe-area-inset-bottom)); }
 body[data-mode="local"].has-fab { padding-bottom: calc(var(--tabbar-h) + var(--fab-size) + var(--fab-gap) + env(safe-area-inset-bottom)); }
@@ -410,9 +357,6 @@ body[data-mode="local"].has-fab { padding-bottom: calc(var(--tabbar-h) + var(--f
 body[data-mode="local"] .fab { bottom: calc(var(--tabbar-h) + var(--fab-gap) + env(safe-area-inset-bottom)); }
 .fab:active { transform: scale(.96); }
 
-/* ================= ボトムタブバー(Home/Deals/Cards/Me、mode=local専用、v3シェル 2026-09-19) =================
-   ドルトクモックアップの「下部ナビゲーション(4つ)」。固定・safe-area対応・56px以上の高さ・
-   タップ領域48px以上。旧「お得/カード」2タブ(pb-nav, ヘッダー側)を置き換える唯一のナビゲーション。 */
 body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
 .pb-tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
@@ -429,12 +373,11 @@ body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
 .pb-tab svg { width: 23px; height: 23px; display: block; }
 .pb-tab .pb-tab-icon { display: flex; align-items: center; justify-content: center; padding: 3px 14px; border-radius: 12px; }
 .pb-tab .pb-tab-label { font-size: 14px; font-weight: 700; line-height: 1.2; }
-/* v3(§9-6): 選択中はネイビー、それ以外は淡色。丸の色地は敷かない(モックどおり) */
+
 .pb-tab.active { color: var(--ink); }
 .pb-tab .pb-tab-label { color: inherit; }
 .pb-tab:active { opacity: .75; }
 
-/* カードを選ぶ、のボトムシート */
 .sheet-backdrop {
   position: fixed; inset: 0; background: var(--overlay); z-index: 29;
 }
@@ -451,23 +394,12 @@ body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
 .sheet-close { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); font-size: 16px; color: var(--text-sub); cursor: pointer; }
 .sheet-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; }
 
-/* ベネフィット行: 金額と残り日数は本文の下に置き、名前と説明の幅を確保する */
 .p-row .p-meta-line { display: flex; gap: 10px; align-items: baseline; margin-top: 2px; }
 .p-row .p-meta-line .p-amt { font-size: 17px; font-weight: 700; }
 .p-row .p-meta-line .p-days { font-size: 14px; }
-/* カタログのシート: 検索欄を横いっぱいに */
+
 .sheet .sheet-body input[type=text], .sheet .sheet-body input:not([type]) { width: 100%; box-sizing: border-box; min-height: 48px; font-size: 16px; }
 
-/* ================= カードv2(2026-09-20, ドルトク デザイン案 v2準拠): ウォレットタイル =================
-   1枚のタイル = 発行会社/提携ブランドごとに色分けしたカード素材(.wal-*、上部に発行会社/
-   提携ブランドのロゴ、右下にネットワーク(Visa/Mastercard/Amex/Discover)のマークを白モノクロ・
-   半透明で載せる)+カード名+ステータスピル、その下に行1(獲得率チップ+Offers件数)・
-   行2(取得日+保有期間)の2行。折りたたみを開くと年会費・ベネフィット進捗などが白地の本文
-   (.card-tile-body)に出る。ロゴが無い発行会社/ブランド(Citi・Capital One・US Bank・IHG・
-   Hyatt・Wyndham・Alaska Airlines)は頭文字の白丸にフォールバックする(web/personal.js参照)。
-   カード実物の券面(card art)は今回は入れない(発行会社の許諾が無い版権素材のため)。
-   card-catalog.json の image キー(assets/cards/<key>.png)が存在すればそちらを最優先で表示し、
-   無ければこの色分けグラデーション+ロゴにフォールバックする。 */
 .card-tile { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); margin-bottom: 11px; overflow: hidden; box-shadow: var(--shadow-soft); }
 .card-tile.urgent { border-left: 4px solid var(--due-soon); }
 .card-tile.is-closed { opacity: .72; }
@@ -485,8 +417,7 @@ body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
 .card-tile-art-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 
 .wallet-top { display: flex; align-items: flex-start; gap: 12px; }
-/* 発行会社/提携ブランドのロゴ(上部左)。web/assets/logos/{issuers,brands}/*.svg を
-   mask-image で白半透明1色に描く(拡大しない=枠に収める。ブランドカラーは使わない)。 */
+
 .wallet-art {
   flex: 0 0 auto; width: 44px; height: 30px; border-radius: 7px; background: rgba(255,255,255,.16);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
@@ -498,8 +429,7 @@ body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
   -webkit-mask-size: contain; mask-size: contain;
 }
 .wallet-art .tile-fallback { color: #fff; font-weight: 900; font-size: 15px; opacity: .92; }
-/* ネットワークのマーク(Visa/Mastercard/Amex/Discover、右下)。常にどれかのロゴが載る
-   (4ネットワークとも Simple Icons に存在するため頭文字フォールバックは無い)。 */
+
 .wallet-net {
   position: absolute; right: 14px; bottom: 12px; width: 34px; height: 20px; z-index: 1;
 }
@@ -510,8 +440,7 @@ body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
   -webkit-mask-size: contain; mask-size: contain;
 }
 .wallet-title { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-/* v2b(2026-09-20): 「アクティブ」バッジ廃止。右上には年会費ピルだけを出す(v2案 .wal .fee)。
-   解約済みはこのピルではなく、タイル全体の .is-closed(opacity .72)+並び順(末尾)で見分ける。 */
+
 .wallet-fee { align-self: flex-start; font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; background: rgba(255,255,255,.22); color: #fff; flex: none; }
 .wallet-chevron { flex: 0 0 auto; margin-top: 4px; color: rgba(255,255,255,.85); }
 .wallet-chevron::before { content: '\203a'; display: inline-block; font-size: 20px; transform: rotate(90deg); transition: transform .15s; }
@@ -522,10 +451,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .wallet-chip { font-size: 14px; font-weight: 800; color: #fff; background: rgba(255,255,255,.22); border-radius: 9px; padding: 4px 10px; white-space: nowrap; }
 .wallet-offers { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.85); white-space: nowrap; }
 
-/* 発行会社/提携ブランドごとの色(v2案「カードの色は発行会社で分ける」。Chase/Hilton/Deltaは
-   v2案の直書き16進をそのまま使用。他はブランド公式カラーに寄せた色を新規に割り当てた
-   (Simple Iconsにロゴが無いCiti/Capital One/US Bank/IHG/Hyatt/Wyndham/Alaskaを含む)。
-   個々のブランド色はここだけで直書きしてよい例外ブロック(:root冒頭のコメント参照)。 */
 .card-tile.wal-chase { box-shadow: var(--shadow-soft), 0 8px 22px rgba(46,91,216,.3); }
 .card-tile.wal-chase > .card-tile-summary { background: linear-gradient(135deg,#2e5bd8,#5f8dff); box-shadow: none; }
 .card-tile.wal-americanexpress { box-shadow: var(--shadow-soft), 0 8px 22px rgba(10,110,110,.3); }
@@ -569,10 +494,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .card-tile.wal-default { box-shadow: var(--shadow-soft), 0 8px 22px rgba(31,42,68,.2); }
 .card-tile.wal-default > .card-tile-summary { background: linear-gradient(135deg,var(--sub),var(--dim)); box-shadow: none; }
 
-/* ================= 次に検討できるカード(v3, 2026-09-20, ドルトクモックアップ画面5準拠) =================
-   プライマリ1件を大きく見せ「なぜおすすめ?」のチェックマーク行(最大3)+年会費(カタログに
-   ある時だけ。ボーナス額はcatalogに無いフィールドなので出さない)+詳細を見る。その下に
-   「その他の候補」を2行のコンパクト表示。 */
 .next-primary { padding: 4px 2px 14px; }
 .next-primary-art { width: 64px; height: 44px; border-radius: 10px; margin-bottom: 10px; }
 .next-primary-name { font-size: 20px; font-weight: 800; margin: 0 0 12px; line-height: 1.3; }
@@ -594,8 +515,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .next-other-note { font-size: 14px; color: var(--text-sub); margin-top: 2px; }
 .next-other-fee { flex: none; font-size: 14px; color: var(--text-sub); white-space: nowrap; }
 
-/* v4(2026-09-20): card_next_calc.evaluate() をそのまま描く根拠行・カテゴリ表・0件時の文言。
-   数字・しきい値・理由文はここでは作らない(web/personal.js の renderNextResult 参照)。 */
 .next-basis { font-size: 13px; color: var(--text-sub); line-height: 1.6; padding: 0 2px 8px; }
 .next-rows-table-wrap { overflow-x: auto; margin: 4px 0 14px; -webkit-overflow-scrolling: touch; }
 .next-rows-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -604,8 +523,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .next-rows-table td:first-child { white-space: normal; overflow-wrap: anywhere; }
 .next-row-usable td { font-weight: 700; }
 .next-cell-sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-sub); white-space: normal; overflow-wrap: anywhere; }
-/* 狭い幅では4列の表が潰れ、「今」の列でカード名が1文字ずつ折り返されて読めなくなる
-   (2026-09-20 320pxで確認)。380px以下では行を縦積みにし、各セルに見出しを添える。 */
+
 @media (max-width: 380px) {
   .next-rows-table thead { display: none; }
   .next-rows-table, .next-rows-table tbody, .next-rows-table tr, .next-rows-table td { display: block; width: auto; }
@@ -616,10 +534,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   .next-rows-table td:first-child::before { content: ""; }
   .next-rows-table .next-cell-sub { display: inline; }
 }
-/* ================= 次に検討できるカード: 目的の切替とレーダー(段階A, 2026-09-20) =================
-   手元(mode=local)専用の画面だが、スタイルは他の機能と同じくこの1枚にまとめる。
-   このファイルは公開ビルドにもコピーされるが、クラス名だけで個人データは含まない
-   (.pay / .next-rows-table など、既に手元専用機能の定義がここに入っているのと同じ扱い)。 */
+
 .cd-goal-row{margin-bottom:12px}
 .cd-goal-label{font-size:14px;font-weight:700;color:var(--text-sub);margin-bottom:8px}
 .cd-goal-chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -632,9 +547,9 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .cd-radar-axisline{stroke:var(--border);stroke-width:1}
 .cd-radar-held{fill:var(--accent);fill-opacity:.18;stroke:var(--accent);stroke-width:2}
 .cd-radar-cand{fill:var(--accent-2);fill-opacity:.18;stroke:var(--accent-2);stroke-width:2}
-/* SVGのユーザー単位。viewBox(320)が実幅に縮むぶんを見越して大きめにしてある */
+
 .cd-radar-axis-label{font-size:16px;font-weight:700;fill:var(--text-sub)}
-/* 軸ラベル2行目の条件(店頭・直接)。1行目より小さく薄く */
+
 .cd-radar-axis-sub{font-size:13px;font-weight:600;fill:var(--muted)}
 .cd-radar-sub{font-weight:400;color:var(--muted)}
 .cd-radar-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:8px;font-size:14px}
@@ -650,14 +565,10 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .next-primary[data-cand-key],.next-other-row[data-cand-key]{cursor:pointer}
 .next-primary.cd-cand-selected,.next-other-row.cd-cand-selected{outline:2px solid var(--accent-2);outline-offset:2px;border-radius:var(--r);background:var(--accent-2-soft)}
 
-/* 年会費ありのカードが「余裕」不足で順位を下げられた理由(2026-09-20) */
 .next-margin-note { color: var(--peach-ink); }
 .next-none-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
 .next-none-detail { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
 
-/* ================= 入会ボーナスの比較(段階C, 2026-09-20) =================
-   GET /api/cards/bonus の結果をそのまま出す一覧。手元(mode=local)専用の画面だが、
-   スタイルは他の機能と同じくこの1枚にまとめる。 */
 .bonus-plan-note { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
 .bonus-few-notice {
   font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 14px;
@@ -681,27 +592,19 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .bonus-cand-personal { font-size: 14px; color: var(--accent-ink); margin-top: 4px; }
 .bonus-cand-blocked-note { font-size: 14px; color: var(--peach-ink); font-weight: 700; margin-top: 4px; }
 
-/* タイルを開いたときの「倍率 → 実質%」対応表(2026-09-20)。タイルのチップの 5x が
-   レーダーの何%に当たるかを本人が辿れるようにする */
 .earn-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0 4px; }
 .earn-table caption { text-align: left; font-size: 14px; font-weight: 700; color: var(--text-sub); margin-bottom: 4px; }
 .earn-table th, .earn-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
 .earn-table th { color: var(--text-sub); font-weight: 700; }
 .earn-table td:nth-child(3) { font-weight: 700; }
 
-/* 相談の根拠+免責(段階C)。コードが出す行なので改行を保つ */
 #cd-adviceSources { white-space: pre-line; }
 
-/* 提示のスクショから読み取る入口。手入力より先に置く(2026-09-20) */
-/* 絵文字はフォントが無い環境で豆腐になる(今月やることで先に踏んだ)。同梱SVGにする */
 .bonus-shot-btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .bonus-shot-btn svg { width: 20px; height: 20px; flex: none; }
 .bonus-manual { margin-top: 10px; }
 .bonus-manual > .collapse-summary { cursor: pointer; }
 
-/* ================= Me: 入会ボーナスを記録(段階B, 2026-09-20) =================
-   「月の支出配分」節と同じ見た目(.p-card/.p-field-label/.p-actions/.p-btn/.p-status)に揃え、
-   一覧部分だけこの節専用のクラスを足す。 */
 .bn-record-row {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
   border-top: 1px solid var(--border); padding: 10px 0;
@@ -714,11 +617,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .bn-record-source { font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
 .bn-record-warn { color: var(--warn-fg); font-weight: 700; }
 
-/* ================= /home (v2, 2026-09-20, ドルトク デザイン案 v2準拠) =================
-   ヒーローは色とタイポグラフィだけで作る(写真・ブランドロゴなし)。場面ごとの色は
-   .scene-food(ピーチ)/.scene-free(ピンク)/.scene-shop(ブルー)/.scene-kids(イエロー)/
-   .scene-travel(ティール)の5色で、アイコンの丸とチップに共通して使う(v2案「色を場面ごとに
-   分ける」)。 */
 .section-title.sec-title2 { background: none; padding: 0; margin: 20px 0 10px; font-size: 15px; font-weight: 800; }
 .home-header { padding: 14px 0 6px; }
 .home-header-row { display: flex; align-items: center; gap: 9px; }
@@ -754,7 +652,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.12);
 }
 .home-tag { font-size: 14px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.28); color: #fff; white-space: nowrap; }
-/* あなたにおすすめ(白背景の店リスト)のチップは場面色(下の .chip-* 参照)を使う。 */
+
 .home-tag-light { font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 8px; background: var(--band); color: var(--sub); white-space: nowrap; }
 .home-hero-store { font-size: 14px; font-weight: 700; margin: 0; opacity: .95; }
 .home-hero-headline { font-size: 26px; font-weight: 900; letter-spacing: -.02em; line-height: 1.2; margin: 12px 0 0; }
@@ -769,7 +667,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   box-shadow: 0 4px 12px rgba(0,0,0,.1);
 }
 
-/* あなたにおすすめ: 白カード1枚にまとめて、行の間だけ罫線を引く(v2案 .list/.it) */
 .home-store-list { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; }
 .home-store-row { display: flex; gap: 12px; padding: 13px 14px; align-items: flex-start; border-top: 1px solid var(--line); }
 .home-store-row:first-child { border-top: 0; }
@@ -778,16 +675,14 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900;
   background: var(--band);
 }
-/* 場面色(v2案「色を場面ごとに分ける」): 外食=ピーチ/無料=ピンク/店・EC=ブルー/子ども=イエロー/旅行=ティール */
+
 .home-store-icon.scene-food, .chip.scene-food { background: var(--peach-soft); color: var(--peach-ink); }
 .home-store-icon.scene-free, .chip.scene-free { background: var(--accent-2-soft); color: var(--accent-2-ink); }
 .home-store-icon.scene-shop, .chip.scene-shop { background: var(--accent-soft); color: var(--accent-ink); }
 .home-store-icon.scene-kids, .chip.scene-kids { background: var(--yellow-soft); color: var(--yellow-ink); }
 .home-store-icon.scene-travel, .chip.scene-travel { background: var(--teal-soft); color: var(--teal-ink); }
 .chip.scene-who { background: var(--band); color: var(--sub); }
-/* 店ロゴ(Simple Icons)。ロゴが無い店は頭文字のまま(混在してよい)。場面色/親要素の文字色を
-   そのまま currentColor でマスクに使う(ブランドカラーは使わない)。home-hero-mark(白丸)の
-   中でも同じクラスを使い回すので汎用ルールにしてある。 */
+
 .icon-logo {
   display: inline-block; width: 22px; height: 22px; background-color: currentColor;
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
@@ -798,7 +693,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .home-store-name { font-size: 13px; font-weight: 700; color: var(--sub); }
 .home-store-headline { font-size: 16px; font-weight: 800; letter-spacing: -.01em; line-height: 1.3; margin: 1px 0 0; overflow-wrap: anywhere; }
 .home-store-cond { font-size: 14px; color: var(--sub); margin: 4px 0 0; line-height: 1.45; overflow-wrap: anywhere; }
-.home-store-deal { font-size: 15px; color: var(--text); margin: 2px 0 6px; overflow-wrap: anywhere; } /* 後方互換(未使用時のフォールバック) */
+.home-store-deal { font-size: 15px; color: var(--text); margin: 2px 0 6px; overflow-wrap: anywhere; }
 .chip { font-size: 14px; font-weight: 800; padding: 3px 9px; border-radius: 8px; display: inline-block; }
 .home-store-due-wrap { flex: none; text-align: right; padding-top: 1px; }
 .home-due { display: inline-block; font-size: 14px; font-weight: 800; padding: 4px 9px; border-radius: 999px; background: var(--accent-2-soft); color: var(--accent-2-ink); white-space: nowrap; }
@@ -813,10 +708,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .home-expire-amt { font-size: 24px; font-weight: 900; color: #6b4d05; letter-spacing: -.02em; flex-basis: 100%; }
 .home-expire-days { font-size: 14px; font-weight: 700; color: #a07d2a; background: none; padding: 0; }
 
-/* ================= 支払いの最適化(v2b, 2026-09-20, ドルトク v2案 画面3準拠) =================
-   /deals タブの主機能「どのカードで払う?」。店を選ぶ→payhd(店アイコン+店名+店を変える)→
-   amt(使う金額)→pay(rank1だけ薄いピンク地+ピンクの丸番号+青いCTA、2・3位は静か)→
-   この店の今のお得(dealRowHtml、Home「あなたにおすすめ」と同じ行の形)。 */
 .pay-optimize { margin: 4px 0 22px; }
 .pay-quick-stores { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 2px; }
 .pay-quick-store-btn {
@@ -826,7 +717,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 }
 .pay-quick-store-btn:active { background: var(--band); }
 
-/* 店ヘッダー(v2案 .payhd): アイコン(ロゴ/頭文字)+店名+「店を変える」ピル */
 .payhd {
   background: var(--surface); border-radius: var(--r) var(--r) 0 0; box-shadow: var(--shadow-soft);
   padding: 14px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--line);
@@ -840,7 +730,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   flex: none; min-height: 48px; font-size: 14px; color: var(--accent); font-weight: 800;
   background: var(--accent-soft); padding: 6px 14px; border-radius: 999px; border: 0; font-family: inherit; cursor: pointer;
 }
-/* 金額入力(v2案 .amt) */
+
 .amt {
   background: var(--surface); box-shadow: var(--shadow-soft); padding: 11px 14px; display: flex;
   align-items: center; gap: 9px; border-bottom: 1px solid var(--line); font-size: 15px; color: var(--text-sub); font-weight: 600;
@@ -849,7 +739,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   font: inherit; font-size: 17px; font-weight: 800; color: var(--text); width: 92px; padding: 7px 10px;
   min-height: 48px; border: 1.5px solid var(--line); border-radius: 11px; text-align: right; background: var(--bg);
 }
-/* ランキング(v2案 .pay/.pr/.rk) */
+
 .pay { background: var(--surface); box-shadow: var(--shadow-soft); border-radius: 0 0 var(--r) var(--r); overflow: hidden; }
 .pay .pr { padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
 .pay .pr + .pr { border-top: 1px solid var(--line); }
@@ -862,7 +752,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pay .bd { flex: 1; min-width: 0; }
 .pay .nm { font-size: 15px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; }
 .pay .wy { font-size: 14px; color: var(--text-sub); margin-top: 4px; }
-/* 並び順の根拠(ポイントの現金換算値)。基準そのものより一段弱く出す */
+
 .pay .wy .pv { color: var(--muted); }
 .pay .val { font-size: 14px; margin-top: 8px; font-weight: 700; color: var(--text-sub); }
 .pay .val b { font-size: 24px; font-weight: 900; color: var(--accent-2-ink); letter-spacing: -.02em; }
@@ -878,9 +768,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pay-store-deals { margin-top: 18px; }
 .pay-fairness-note { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 16px 2px 0; }
 
-/* ===== 読みもの(公開サイトの /deals/articles/)=====
-   要件: playbook/deals-site-article-pages-2026-09-20.md §1
-   本文幅 680px・行間 1.8・表は横スクロール可・画像は使わない。 */
 .pb-article { max-width: 680px; margin: 0 auto; padding: 8px 0 28px; }
 .pb-article-head { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 26px; }
 .pb-article-meta { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
@@ -911,7 +798,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pb-article-back { margin: 26px 0 0; }
 .pb-article-cta { display: inline-block; background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; padding: 12px 22px; border-radius: 999px; }
 
-/* 一覧 */
 .pb-articles-index { max-width: 680px; margin: 0 auto; }
 .pb-article-list { list-style: none; margin: 20px 0 0; padding: 0; }
 .pb-article-item { border-bottom: 1px solid var(--line); }
@@ -921,7 +807,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pb-article-item-sum { display: block; font-size: 15px; line-height: 1.75; color: var(--text-sub); }
 .pb-article-empty { color: var(--muted); margin: 20px 0 0; }
 
-/* Home と Cards の下の帯 */
 .pb-read-strip { margin-top: 28px; }
 .pb-read-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .pb-read-head h2 { font-size: 18px; margin: 0; }
@@ -932,7 +817,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pb-read-title { display: block; font-size: 16px; font-weight: 700; line-height: 1.55; margin-top: 4px; }
 @media (min-width: 640px) { .pb-read-cards { grid-template-columns: repeat(3, 1fr); } }
 
-/* ===== もっと見る / 場面別(公開サイトの index 軽量化。§2 2026-09-20)===== */
 .more-section { margin-top: 18px; }
 .more-btn { width: 100%; min-height: 52px; border: 1px solid var(--line); background: var(--surface); color: var(--accent-ink); font-size: 16px; font-weight: 700; border-radius: 14px; cursor: pointer; }
 .more-btn:disabled { color: var(--muted); cursor: default; }
@@ -941,7 +825,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .scene-link { font-size: 14px; font-weight: 700; color: var(--accent-ink); text-decoration: none; background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
 .scene-page .page-date { margin-bottom: 14px; }
 
-/* ===== 知っておくこと(カードのページ。ニュース区分。2026-09-20)===== */
 .news-section { margin-top: 30px; }
 .news-note { font-size: 14px; line-height: 1.8; color: var(--text-sub); margin: 0 0 14px; }
 .news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
@@ -952,7 +835,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .news-meta { font-size: 13px; color: var(--muted); margin: 8px 0 0; display: flex; gap: 12px; flex-wrap: wrap; }
 .news-link { color: var(--accent-ink); text-decoration: none; font-weight: 700; }
 
-/* ===== 郵便番号での絞り込み(公開サイト。2026-09-20)===== */
 .zip-filter { padding: 12px 0 4px; }
 .zip-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; }
 .zip-row { display: flex; gap: 8px; align-items: center; }
@@ -962,11 +844,6 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .zip-note { font-size: 13px; line-height: 1.7; color: var(--muted); margin: 8px 0 0; }
 .zip-note.on { color: var(--accent-ink); font-weight: 700; }
 
-/* ================= v3 UI(2026-09-20, playbook/dorutoku-ui-spec-v3-2026-09-20.md §4・§7・§9) =================
-   モックの再現。画像は使わない(生成もしない)。使う画像素材は web/icons の Simple Icons だけ。
-   余白・字の大きさ・影は、仕様に数値があるものはその数値、無いものはモックの実測(390px 換算)。 */
-
-/* ---- 店ロゴ(§4): どの店も同じ 44px の丸に収める ---- */
 .dk-logo {
   flex: none; width: 44px; height: 44px; border-radius: 50%; background: #fff;
   border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
@@ -983,16 +860,20 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .dk-logo.lg .dk-logo-glyph { width: 30px; height: 30px; }
 .dk-logo.lg .dk-logo-initials { font-size: 19px; }
 
-/* ---- 節見出し(§7): 15px 太字 + 小さいアイコン、右に「もっと見る ›」 ---- */
 .dk-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 10px; }
 .dk-sec-title { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 800; color: var(--ink); margin: 0; }
 .dk-sec-ico { display: flex; color: var(--ink); }
 .dk-sec-ico svg { width: 16px; height: 16px; }
 .dk-more { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 700; color: var(--pink); text-decoration: none; white-space: nowrap; }
 .dk-more .chev { font-size: 16px; line-height: 1; }
+
+.dk-more { position: relative; }
+.dk-more::after {
+  content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: 0;
+  width: 100%; min-width: 44px; height: 48px;
+}
 .dk-empty { font-size: 15px; color: var(--sub); padding: 10px 2px; }
 
-/* ---- 一覧(§9-2): 白いカード1枚に行を積む。1行 64px ---- */
 .dk-list { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; }
 .dk-row {
   display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 64px;
@@ -1000,13 +881,12 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 }
 .dk-row + .dk-row { border-top: 1px solid var(--line); }
 .dk-row:active { background: var(--bg); }
-/* <button> の行(Me の「お住まいの地域」)も <a> の行と同じ見た目にする */
+
 button.dk-row { width: 100%; text-align: left; background: none; border: 0; font-family: inherit; cursor: pointer; }
 .dk-row-body { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
-/* 行の主従(2026-09-21 ドルトク指示でモックに合わせた): 店名がネイビーの太字で主、
-   その下に得がピンクで従。得は §9-2a の割り方の1段目(便益)だけなので、ふつうは省略されない。 */
+
 .dk-row-store { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* 2段目(§12-b): 便益はピンクで必ず残し、対象の側だけが幅で省略される */
+
 .dk-row-deal { display: flex; align-items: baseline; gap: 5px; min-width: 0; line-height: 1.3; }
 .dk-row-benefit { flex: none; font-size: 15px; font-weight: 800; color: var(--pink); white-space: nowrap; }
 .dk-row-target { min-width: 0; font-size: 15px; font-weight: 600; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1016,8 +896,6 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 }
 .dk-pill.soon { background: var(--pink-soft); color: var(--pink-ink); }
 
-/* ---- 件数タイル(§9-2 の4): モックの「今週の節約額」の位置・同じピンクの面・右上に上向き矢印。
-       金額は出さない(使った記録が無いため)。 ---- */
 .dk-count {
   display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; padding: 14px 16px;
   border-radius: var(--r); background: var(--pink-soft); text-decoration: none; color: var(--ink);
@@ -1030,7 +908,6 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-count-arrow { flex: none; align-self: flex-start; color: var(--pink); }
 .dk-count-arrow svg { width: 30px; height: 30px; }
 
-/* ---- ヒーロー(§9-2 の1): モックを1対1で写す。写真の位置はネイビーの無地。装飾は足さない ---- */
 .dk-hero {
   display: block; margin: 14px 0 4px; border-radius: 20px; overflow: hidden;
   background: var(--surface); box-shadow: var(--shadow-soft); text-decoration: none; color: inherit;
@@ -1039,8 +916,7 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
   background: #12345B; min-height: 226px; padding: 16px 20px 18px;
   display: flex; flex-direction: column; align-items: flex-start;
 }
-/* ヒーローのロゴ(§9-2a の3): 白い丸の地は置かない。ロゴのある店は白い単色グリフ48px、
-   無い店は同じ位置に店名を白28px 800。頭文字のタイルはヒーローでは使わない。 */
+
 .dk-hero-logo { display: flex; align-items: center; min-height: 48px; }
 .dk-hero-glyph {
   display: block; width: 48px; height: 48px; background-color: #fff;
@@ -1049,12 +925,11 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
   -webkit-mask-size: contain; mask-size: contain;
 }
 .dk-hero-store { font-size: 28px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -.01em; }
-/* 2段の文字(§9-2a): 字の大きさは中身で決まるので、大きさだけ style 属性で渡す。 */
+
 .dk-hero-l1 { font-weight: 900; color: #fff; line-height: 1.05; letter-spacing: -.02em; margin: auto 0 0; }
 .dk-hero-l2 { font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -.01em; margin: 2px 0 0;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-/* 期限ピル(§9-2a の2): 19px 800・高さ30px・左右の余白14px・幅は中身なり。
-   end=不明 のときは .is-empty で場所だけ空ける(何かで埋めない)。 */
+
 .dk-hero-pill {
   margin: 12px 0 0; background: var(--pink); color: #fff; font-size: 19px; font-weight: 800;
   height: 30px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center;
@@ -1068,7 +943,6 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dk-hero-chev { flex: none; font-size: 24px; line-height: 1; color: var(--ink); }
 
-/* ---- Deals(§9-3): 検索窓 → カテゴリのタイル8個(4列×2段)→ 店ごとの一覧 ---- */
 .dk-search { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 14px;
   background: var(--surface); color: var(--ink); font-size: 16px; font-family: inherit; padding: 0 14px; margin: 10px 0 2px; }
 .dk-search:focus { outline: 2px solid var(--pink); outline-offset: 1px; }
@@ -1080,7 +954,7 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 }
 .dk-tile-ico { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
 .dk-tile-ico svg { width: 26px; height: 26px; }
-/* 日本語のラベルは2行になるものがあるので(食料品・日用品)、高さを2行ぶんで固定して段をそろえる */
+
 .dk-tile-label { font-size: 13px; font-weight: 700; color: var(--ink); text-align: center; line-height: 1.25;
   min-height: 2.5em; display: flex; align-items: flex-start; justify-content: center; }
 .dk-tile-count {
@@ -1092,7 +966,6 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-tile.is-on .dk-tile-ico { outline: 2px solid var(--pink); outline-offset: 2px; }
 .dk-store-count { flex: none; font-size: 13px; font-weight: 700; color: var(--sub); background: var(--band); border-radius: 999px; padding: 2px 9px; }
 
-/* ---- 店ページ(§9-4) ---- */
 .dk-store-head { display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; }
 .dk-store-name { font-size: 22px; font-weight: 800; color: var(--ink); margin: 0; min-width: 0; overflow-wrap: anywhere; }
 .dk-store-n { font-size: 14px; color: var(--sub); margin: 2px 0 0; }
@@ -1104,12 +977,10 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-deal-src a { color: var(--pink); font-weight: 700; text-decoration: none; }
 .dk-who { font-size: 13px; font-weight: 700; color: var(--sub); background: var(--band); border-radius: 8px; padding: 3px 9px; }
 
-/* ---- ベルの一覧(§9-1)・地域のシート(§2) ---- */
 .dk-due-list { display: flex; flex-direction: column; }
 .dk-due-list .dk-row + .dk-row { border-top: 1px solid var(--line); }
 .dk-region-note { font-size: 13px; font-weight: 700; color: var(--sub); margin: 10px 0 0; }
 
-/* ---- カードのカタログ(§9-5): 横スクロールする表をやめ、白い行カードに揃える ---- */
 .dk-card-list { margin: 10px 0 24px; }
 .dk-card-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px; }
 .dk-card-row + .dk-card-row { border-top: 1px solid var(--line); }
@@ -1120,11 +991,9 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-card-benefit { font-size: 14px; color: var(--sub); margin: 5px 0 0; line-height: 1.5; overflow-wrap: anywhere; }
 .dk-card-fee { flex: none; font-size: 14px; font-weight: 800; color: var(--ink); background: var(--band); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
 
-/* ---- §12 日付の帯(2026-09-21、Home だけ。モックに無い要素を足す唯一の例外) ----
-   高さ56px の1行・横スクロール・今日から7日。前の版の背の高い日付カードには戻さない。 */
 .dk-strip { display: flex; align-items: center; gap: 8px; height: 56px; margin: 4px 0 2px; }
 .dk-today {
-  flex: none; height: 40px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line);
+  flex: none; height: 48px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--surface); font-family: inherit; font-size: 13px; font-weight: 800; color: var(--ink);
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
@@ -1147,11 +1016,18 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-day.is-on .dk-day-wd { color: rgba(255,255,255,.78); }
 .dk-day.is-on .dk-day-dot { background: #fff; }
 
-/* ---- §10 ディールの詳細(ボトムシート、2026-09-21) ---- */
 .dk-deal-sheet .sheet-head { align-items: center; }
 .dk-sheet-store { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 16px; font-weight: 800; color: var(--ink); }
 .dk-sheet-headline { font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.4; margin: 4px 0 0; overflow-wrap: anywhere; }
-.dk-sheet-summary { font-size: 16px; line-height: 1.85; color: var(--ink); margin: 14px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.dk-sheet-summary { font-size: 16px; line-height: 1.7; color: var(--ink); margin: 14px 0 0; overflow-wrap: anywhere; }
+.dk-sheet-summary > *:first-child { margin-top: 0; }
+.dk-sheet-summary p { margin: 8px 0 0; }
+.dk-sheet-summary h4 { margin: 8px 0 0; font-size: 13px; font-weight: 800; color: var(--sub); letter-spacing: .02em; }
+.dk-sheet-summary h4 + p, .dk-sheet-summary h4 + ol { margin-top: 4px; }
+.dk-sheet-summary ol { margin: 4px 0 0; padding-left: 1.4em; }
+.dk-sheet-summary li { margin: 2px 0 0; }
+.dk-sheet-summary strong { font-weight: 800; color: var(--ink); }
 .dk-sheet-quote {
   margin: 14px 0 0; padding: 12px 14px; background: var(--band); border-radius: 12px;
   font-size: 14px; line-height: 1.7; color: var(--sub); overflow-wrap: anywhere;
@@ -1173,4 +1049,19 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-btn.primary { background: var(--pink); border-color: var(--pink); color: #fff; }
 .dk-btn.ghost { flex: 0 0 auto; padding: 0 16px; color: var(--sub); font-weight: 700; }
 .dk-btn.is-on { background: var(--pink-soft); border-color: var(--pink); color: var(--pink-ink); }
-.dk-sheet-store-link { display: inline-flex; align-items: center; gap: 2px; margin: 16px 0 4px; font-size: 15px; font-weight: 700; color: var(--pink); text-decoration: none; }
+
+.dk-saved-out { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.dk-saved-out-title { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--sub); }
+.dk-saved-out-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.dk-saved-out-btns .dk-btn { flex: 1 1 auto; min-width: 140px; }
+.dk-saved-out-note { margin: 10px 0 0; font-size: 13px; line-height: 1.6; color: var(--sub); }
+.dk-saved-msg { margin: 10px 0 0; font-size: 14px; font-weight: 700; color: var(--ink); }
+.dk-saved-ta {
+  margin-top: 10px; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 13px;
+  line-height: 1.6; color: var(--ink); background: var(--band); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 12px; resize: vertical;
+}
+.dk-import-lead { margin: 0 0 10px; font-size: 15px; line-height: 1.6; color: var(--ink); }
+#dk-import-list .dk-row { cursor: default; }
+
+.dk-sheet-store-link { display: inline-flex; align-items: center; gap: 2px; min-height: 48px; margin: 6px 0 0; font-size: 15px; font-weight: 700; color: var(--pink); text-decoration: none; }

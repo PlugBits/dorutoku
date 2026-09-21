@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>このサイトについて | ドルトク</title>
-<meta name="description" content="ドルトク(dorutoku.com)の運営者情報(運営 PlugBits・発信名義オケオ)と、このサイトが情報提供であり金融助言ではないことの説明です。">
+<meta name="description" content="ドルトク(dorutoku.com)の運営者情報(運営 ドルトク)と、このサイトが情報提供であり金融助言ではないことの説明です。">
 <link rel="canonical" href="https://dorutoku.com/about.html">
 <link rel="stylesheet" href="/assets/app.css">
 </head>
@@ -24,9 +24,8 @@
 
 <section class="legal-section">
   <h2>運営者情報</h2>
-  <p>発信名義: <strong>オケオ</strong><br>
-  運営: PlugBits<br>
-  お問い合わせ: <a href="mailto:support@plugbits.app">support@plugbits.app</a></p>
+  <p>運営: <strong>ドルトク</strong><br>
+  お問い合わせ: <a href="mailto:support@dorutoku.com">support@dorutoku.com</a></p>
   <p>本名・勤務先等は公開していません。</p>
 </section>
 
@@ -49,7 +48,7 @@
 <section class="legal-section">
   <h2>正確性について</h2>
   <p>内容はできる限り正確を期していますが、誤りが含まれる可能性があります。誤りに気づいた場合は
-  <a href="mailto:support@plugbits.app">support@plugbits.app</a> までご連絡ください。</p>
+  <a href="mailto:support@dorutoku.com">support@dorutoku.com</a> までご連絡ください。</p>
 </section>
 
 <section class="legal-section">
@@ -72,9 +71,9 @@
 </main>
 <footer class="pb-deals-footer">
   <div class="pb-deals-footer-inner">
-    <p class="pb-footer-note">運営: PlugBits ／発信名義: オケオ ／お問い合わせ: <a href="mailto:support@plugbits.app">support@plugbits.app</a></p>
-    <nav class="pb-footer-links"><a href="/deals/">今週のお得</a><a href="/cards/">カードの基礎知識</a><a href="/articles/">読みもの</a><a href="/ranking.html">順番の決め方</a><a href="/about.html">このサイトについて</a><a href="/privacy.html">プライバシー</a><a href="https://plugbits.app/" rel="noopener">PlugBits トップ</a></nav>
-    <small>&copy; 2026 PlugBits. All rights reserved.</small>
+    <p class="pb-footer-note">運営: ドルトク ／お問い合わせ: <a href="mailto:support@dorutoku.com">support@dorutoku.com</a></p>
+    <nav class="pb-footer-links"><a href="/deals/">今週のお得</a><a href="/cards/">カードの基礎知識</a><a href="/articles/">読みもの</a><a href="/ranking.html">順番の決め方</a><a href="/about.html">このサイトについて</a><a href="/privacy.html">プライバシー</a></nav>
+    <small>&copy; 2026 ドルトク</small>
   </div>
 </footer>
 <div class="sheet-backdrop" id="dk-sheet-backdrop" hidden></div>
@@ -99,7 +98,7 @@
   </div>
   <div class="sheet-body">
     <p class="dk-sheet-headline" id="dk-sheet-headline"></p>
-    <p class="dk-sheet-summary" id="dk-sheet-summary" hidden></p>
+    <div class="dk-sheet-summary" id="dk-sheet-summary" hidden></div>
     <blockquote class="dk-sheet-quote" id="dk-sheet-quote" hidden></blockquote>
     <dl class="dk-sheet-facts" id="dk-sheet-facts"></dl>
     <p class="dk-sheet-src" id="dk-sheet-src"></p>
@@ -110,6 +109,21 @@
       <button class="dk-btn ghost" type="button" data-dk-close>閉じる</button>
     </div>
     <a class="dk-sheet-store-link" id="dk-sheet-storelink" href="#">この店のお得をすべて見る<span class="chev">&rsaquo;</span></a>
+  </div>
+</div>
+<div class="sheet" id="dk-import-sheet" hidden role="dialog" aria-modal="true" aria-label="気になるリストの取り込み">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3>気になるリストが届きました</h3>
+    <button class="sheet-close" type="button" data-dk-close aria-label="閉じる">&#10005;</button></div>
+  <div class="sheet-body">
+    <p class="dk-import-lead" id="dk-import-lead"></p>
+    <div id="dk-import-list"></div>
+    <p class="dk-saved-out-note">取り込んでも、いまこの端末に入っているものは消えません(足すだけです)。</p>
+    <div class="dk-sheet-actions">
+      <button class="dk-btn primary" type="button" id="dk-import-go">この端末のリストに取り込む</button>
+      <button class="dk-btn ghost" type="button" data-dk-close>閉じる</button>
+    </div>
+    <p class="dk-saved-msg" id="dk-import-msg" hidden></p>
   </div>
 </div>
 <div class="sheet" id="dk-due-sheet" hidden role="dialog" aria-modal="true" aria-label="期限が近いお得">

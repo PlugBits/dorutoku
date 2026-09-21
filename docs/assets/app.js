@@ -433,6 +433,7 @@
       if (!sheet || !backdrop) return;
       backdrop.hidden = false;
       sheet.hidden = false;
+      if (window.dkSyncScrollLock) window.dkSyncScrollLock();
     }
     function closeSheets() {
       if (backdrop) backdrop.hidden = true;
@@ -442,6 +443,7 @@
       });
       // ディールのシート(§10)は履歴を1つ積んでいるので、専用の閉じ方を呼ぶ
       if (typeof window.dkCloseDeal === 'function') window.dkCloseDeal();
+      if (window.dkSyncScrollLock) window.dkSyncScrollLock();
     }
     if (backdrop) backdrop.addEventListener('click', closeSheets);
     document.addEventListener('click', function (e) {
@@ -586,6 +588,225 @@
   else initMe();
 })();
 
+// ---- シートを開いているあいだ背景をスクロールさせない(2026-09-21 の指摘) ----
+// iPhone の Safari は body{overflow:hidden} だけでは背面が動くので、position:fixed +
+// top:-<開いた時のスクロール量> で止め、閉じたら元の位置へ戻す。シートの中身(.sheet-body)は
+// overflow-y:auto のままなので縦に動かせる。シートは position:fixed なので body の固定に影響されない。
+(function () {
+  'use strict';
+  var IDS = ['dk-deal-sheet', 'dk-loc-sheet', 'dk-due-sheet', 'dk-import-sheet'];
+  var y = 0, locked = false;
+  function anyOpen() {
+    for (var i = 0; i < IDS.length; i++) {
+      var el = document.getElementById(IDS[i]);
+      if (el && !el.hidden) return true;
+    }
+    return false;
+  }
+  function lock() {
+    if (locked) return;
+    y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var b = document.body;
+    b.style.position = 'fixed';
+    b.style.top = -y + 'px';
+    b.style.left = '0';
+    b.style.right = '0';
+    b.style.width = '100%';
+    locked = true;
+  }
+  function unlock() {
+    if (!locked) return;
+    var b = document.body;
+    b.style.position = ''; b.style.top = ''; b.style.left = ''; b.style.right = ''; b.style.width = '';
+    locked = false;
+    window.scrollTo(0, y);
+  }
+  // 開閉のたびに呼ぶ。どれか1枚でも開いていれば止め、全部閉じたら戻す(何度呼んでもよい)。
+  window.dkSyncScrollLock = function () { if (anyOpen()) lock(); else unlock(); };
+})();
+
+// ---- 気になるリストの持ち出しと取り込み(2026-09-21) ----
+// ログインも名簿も作らない代わりに、端末内の「気になる」を持ち出せるようにする。
+//  - テキストで写す: 1件1行「店名 / 見出し / 期限 / 元ページのURL」をクリップボードへ
+//  - リンクで持ち運ぶ: いまのページのURLに #saved=<id>,<id>… を付けて共有
+//  - #saved= 付きで開かれたら中身を見せて「この端末のリストに取り込む」(既存に**足す**)
+// **URLに載せるのはお得の番号だけ。** 地域やカードの持ち物、手元メモの類は一切載せない
+// (載せる欄は templates.SAVED_EXPORT_KEYS に限ってある)。公開と手元で同じこの関数が動く。
+(function () {
+  'use strict';
+  var SAVED_KEY = 'pb_deals_saved_v1';
+  var MAX_SHARE = 50;        // URLが長くなりすぎないように先頭50件まで
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function savedGet() {
+    try { var a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); return Array.isArray(a) ? a : []; }
+    catch (e) { return []; }
+  }
+  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) { /* ignore */ } }
+
+  // 名前を引く先は2つ: Me に焼いた一覧と、そのページのシート用の一覧。どちらも無ければ番号だけ出す。
+  function catalogs() {
+    var out = [];
+    ['dk-saved-catalog', 'dk-deal-data'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      try { out.push(JSON.parse(el.textContent) || {}); } catch (e) { /* ignore */ }
+    });
+    return out;
+  }
+  function lookup(id) {
+    var cs = catalogs();
+    for (var i = 0; i < cs.length; i++) { if (cs[i][id]) return cs[i][id]; }
+    return null;
+  }
+  // 番号として通す形だけ受け付ける(URL から来た文字をそのまま信じない)
+  function validIds(list) {
+    var seen = {}, out = [];
+    (list || []).forEach(function (raw) {
+      var id = String(raw || '').trim();
+      if (!/^d-\d{8}-[0-9a-z]{4}$/.test(id) || seen[id]) return;
+      seen[id] = 1; out.push(id);
+    });
+    return out;
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {      // 古い端末向けの控え
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ok ? resolve() : reject(new Error('copy failed'));
+      } catch (e) { reject(e); }
+    });
+  }
+
+  // ---- 書き出す(Me のボタン2つ) ----
+  function initExport() {
+    var box = document.getElementById('dk-saved-out');
+    var copyBtn = document.getElementById('dk-saved-copy');
+    var linkBtn = document.getElementById('dk-saved-link');
+    var msg = document.getElementById('dk-saved-msg');
+    var ta = document.getElementById('dk-saved-ta');
+    if (!box || !copyBtn || !linkBtn) return;
+    var ids = validIds(savedGet());
+    if (!ids.length) return;                 // 1件も無いときはボタンを出さない
+    box.hidden = false;
+
+    function say(text) { if (!msg) return; msg.textContent = text; msg.hidden = false; }
+    function showFallback(text) {            // クリップボードが使えない端末では見せて選べるようにする
+      if (!ta) return;
+      ta.value = text; ta.hidden = false; ta.focus(); ta.select();
+    }
+    function limited() {
+      return ids.length > MAX_SHARE ? ids.slice(0, MAX_SHARE) : ids;
+    }
+
+    copyBtn.addEventListener('click', function () {
+      var lines = ids.map(function (id) {
+        var d = lookup(id);
+        if (!d) return id;
+        return [d.store || '', d.headline || '', d.period || '期限なし', d.url || ''].join(' / ');
+      });
+      var text = lines.join('\n');
+      copyText(text).then(function () { say(ids.length + '件をコピーしました。'); })
+        .catch(function () { say('コピーできなかったので、下の文字を選んで写してください。'); showFallback(text); });
+    });
+
+    linkBtn.addEventListener('click', function () {
+      var use = limited();
+      var url = location.origin + location.pathname + '#saved=' + use.join(',');
+      var note = use.length < ids.length
+        ? ('50件まで持ち出せます(' + ids.length + '件のうち先頭' + use.length + '件のリンクを作りました)。')
+        : (use.length + '件のリンクを作りました。');
+      function done(how) { say(note + how); }
+      if (navigator.share) {
+        navigator.share({ url: url }).then(function () { done(''); })
+          .catch(function () { copyText(url).then(function () { done('リンクをコピーしました。'); })
+            .catch(function () { done(''); showFallback(url); }); });
+      } else {
+        copyText(url).then(function () { done('リンクをコピーしました。'); })
+          .catch(function () { done(''); showFallback(url); });
+      }
+    });
+  }
+
+  // ---- 取り込む(#saved= 付きで開かれたとき) ----
+  function initImport() {
+    var m = location.hash.match(/^#saved=(.*)$/);
+    if (!m) return;
+    var incoming = validIds(decodeURIComponent(m[1]).split(','));
+    var sheet = document.getElementById('dk-import-sheet');
+    var lead = document.getElementById('dk-import-lead');
+    var listEl = document.getElementById('dk-import-list');
+    var goBtn = document.getElementById('dk-import-go');
+    var msg = document.getElementById('dk-import-msg');
+    var backdrop = document.getElementById('dk-sheet-backdrop');
+    if (!sheet || !incoming.length) return;
+
+    var mine = validIds(savedGet());
+    var add = incoming.filter(function (id) { return mine.indexOf(id) === -1; });
+    if (lead) {
+      lead.textContent = incoming.length + '件が入ったリンクです。'
+        + (add.length === incoming.length ? 'すべてこの端末にはまだありません。'
+           : (add.length ? ('うち' + add.length + '件がこの端末にはまだありません。')
+              : 'すべてこの端末にすでにあります。'));
+    }
+    if (listEl) {
+      listEl.innerHTML = '<div class="dk-list">' + incoming.map(function (id) {
+        var d = lookup(id);
+        var already = mine.indexOf(id) !== -1;
+        var store = d ? esc(d.store) : 'このページでは名前が分かりません';
+        var head = d ? esc(d.headline) : esc(id);
+        return '<div class="dk-row">' +
+          '<span class="dk-row-body"><span class="dk-row-store">' + store + '</span>' +
+          '<span class="dk-row-deal">' + head + '</span></span>' +
+          (already ? '<span class="dk-pill">保存ずみ</span>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    if (goBtn) {
+      goBtn.disabled = false;
+      goBtn.textContent = 'この端末のリストに取り込む';
+      if (msg) { msg.hidden = true; msg.textContent = ''; }
+      // addEventListener ではなく代入にする(#saved= が読み込み無しで変わったときに
+      // もう一度ここを通るので、二重に効かないようにするため)
+      goBtn.onclick = function () {
+        var now = validIds(savedGet());              // 押した時点のものに足す(上書きしない)
+        var added = 0;
+        incoming.forEach(function (id) { if (now.indexOf(id) === -1) { now.push(id); added++; } });
+        savedSet(now);
+        if (msg) {
+          msg.textContent = added ? (added + '件を取り込みました。Me の気になるリストに入っています。')
+                                  : 'すでに全部この端末にありました。';
+          msg.hidden = false;
+        }
+        goBtn.disabled = true;
+        goBtn.textContent = '取り込みました';
+      };
+    }
+    if (backdrop) backdrop.hidden = false;
+    sheet.hidden = false;
+    if (window.dkSyncScrollLock) window.dkSyncScrollLock();
+  }
+
+  function init() { initExport(); initImport(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+  // 同じページのまま #saved= が付いたとき(リンクをアドレス欄に貼った・別のタブから戻った)も開く。
+  // ハッシュだけの移動ではページが読み直されないので、これが無いと何も起きない。
+  window.addEventListener('hashchange', initImport);
+})();
+
+
 // ---- §12 日付の帯(2026-09-21): 選んだ日でヒーローと一覧の両方を絞る ----
 // 日ごとのヒーローはサーバーが全部選んで焼いてあるので、ここは見せ替えるだけ。
 // 行は「その日に使えるか」(start ≤ その日 ≤ end、不明の側は縛らない)で絞り、8件で頭打ちにする。
@@ -704,10 +925,43 @@
       if (!value) return '';
       return '<div class="row"><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>';
     }
+    // 要約の書式(2026-09-21 の指摘「見出しや改行を入れて読みやすく」「太文字も」)。
+    // **先にエスケープしてから** 4つだけを組み立てる: `## 見出し` / 空行での段落 /
+    // `**…**` の太字 / 行頭の `1.` の番号リスト。それ以外のタグは一切通さない。
+    // 書式の入っていない古い要約は、丸ごと1つの段落として読める。
+    function bold(t) {
+      return t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    }
+    function fmtSummary(src) {
+      var lines = String(src == null ? '' : src).replace(/\r\n?/g, '\n').split('\n');
+      var out = [], para = [], list = [];
+      function flushList() {
+        if (!list.length) return;
+        out.push('<ol>' + list.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ol>');
+        list = [];
+      }
+      function flushPara() {
+        if (!para.length) return;
+        out.push('<p>' + para.join('<br>') + '</p>');
+        para = [];
+      }
+      lines.forEach(function (raw) {
+        var t = esc(raw.trim());
+        if (!t) { flushList(); flushPara(); return; }
+        var mh = t.match(/^#{2,4}\s+(.+)$/);
+        if (mh) { flushList(); flushPara(); out.push('<h4>' + bold(mh[1]) + '</h4>'); return; }
+        var ml = t.match(/^\d+[.)]\s+(.+)$/);
+        if (ml) { flushPara(); list.push(bold(ml[1])); return; }
+        flushList();
+        para.push(bold(t));
+      });
+      flushList(); flushPara();
+      return out.join('');
+    }
     function renderSummary(id) {
       var s = summaries && summaries[id];
       if (el.summary) {
-        el.summary.textContent = (s && s.summary) || '';
+        el.summary.innerHTML = (s && s.summary) ? fmtSummary(s.summary) : '';
         el.summary.hidden = !(s && s.summary);
       }
       if (el.quote) {
@@ -760,6 +1014,7 @@
       fill(d);
       if (backdrop) backdrop.hidden = false;
       sheet.hidden = false;
+      if (window.dkSyncScrollLock) window.dkSyncScrollLock();
       if (push && location.hash !== '#d-' + id) {
         try { history.pushState({ deal: id }, '', '#d-' + id); } catch (e) { /* ignore */ }
       }
@@ -769,6 +1024,7 @@
       if (sheet.hidden) return;
       sheet.hidden = true;
       if (backdrop) backdrop.hidden = true;
+      if (window.dkSyncScrollLock) window.dkSyncScrollLock();
       current = null;
       if (!pop && location.hash.indexOf('#d-') === 0) {
         try { history.back(); } catch (e) { /* ignore */ }
