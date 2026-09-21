@@ -346,3 +346,238 @@
     initDealsPage();
   }
 })();
+
+// ================= v3 シェル(2026-09-20, 仕様 §9-1・§2・§9-3) =================
+// ヘッダーのあいさつ/地名/ベル、地域と「期限が近い」の2枚のボトムシート、Deals の
+// タイル8個と検索の絞り込み。公開サイトでも手元モードでも同じこの1つが動く
+// (どちらも実行時に外部へは一切 fetch しない。データはページに焼いてある)。
+(function () {
+  'use strict';
+  var ZIP_KEY = 'pb_deals_zip_v1';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function readJSON(id) {
+    var el = document.getElementById(id);
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+  function zipLoad() {
+    try { return JSON.parse(localStorage.getItem(ZIP_KEY) || 'null') || null; } catch (e) { return null; }
+  }
+  function zipSave(v) {
+    try {
+      if (v) localStorage.setItem(ZIP_KEY, JSON.stringify(v));
+      else localStorage.removeItem(ZIP_KEY);
+    } catch (e) { /* プライベートウィンドウ等。絞り込み自体はこのまま動く */ }
+  }
+
+  function initV3() {
+    var head = document.querySelector('.dk-head');
+    if (!head) return;
+    var zipTable = readJSON('zip-states') || { ranges: [], labels: {} };
+    var due = readJSON('dk-due-data') || [];
+
+    // ---- あいさつ(§9-1): 05-10 おはようございます / 10-17 こんにちは / それ以外 こんばんは。
+    // 公開サイトは1日1回しか作られないので、焼いた時刻ではなく読む人の時計で決める。
+    var greetEl = document.getElementById('dk-greet'), sunEl = document.getElementById('dk-sun');
+    if (greetEl) {
+      var h = new Date().getHours();
+      var night = (h < 5 || h >= 17);
+      greetEl.textContent = (h >= 5 && h < 10) ? 'おはようございます' : (night ? 'こんばんは' : 'こんにちは');
+      if (sunEl && night) {
+        sunEl.classList.add('night');
+        sunEl.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+          '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>';
+      }
+    }
+
+    // ---- 地名(§9-1)と州の絞り込み(§2) ----
+    var locName = document.getElementById('dk-loc-name');
+    var state = null;
+    var saved = zipLoad();
+    if (saved && saved.state) state = saved.state;
+
+    function stateOfZip(raw) {
+      var m = String(raw || '').match(/^\s*(\d{5})(?:-\d{4})?\s*$/);
+      if (!m) return null;
+      var n = parseInt(m[1], 10);
+      for (var i = 0; i < zipTable.ranges.length; i++) {
+        var r = zipTable.ranges[i];
+        if (n >= r[0] && n <= r[1]) return r[2];
+      }
+      return null;
+    }
+    function stateLabel(code) { return (zipTable.labels || {})[code] || code; }
+    function renderLoc() {
+      if (locName) locName.textContent = state ? stateLabel(state) : '全米・オンライン';
+      var clear = document.getElementById('zip-clear');
+      if (clear) clear.hidden = !state;
+    }
+
+    // 州限定の行だけを隠す(全米・オンライン・不明は常に出す)
+    function regionOk(el) {
+      if (!state) return true;
+      var attr = el.getAttribute('data-region') || 'unknown';
+      if (attr === 'all' || attr === 'online' || attr === 'unknown') return true;
+      return attr.split(',').indexOf(state) !== -1;
+    }
+
+    // ---- ボトムシート ----
+    var backdrop = document.getElementById('dk-sheet-backdrop');
+    function openSheet(id) {
+      var sheet = document.getElementById(id);
+      if (!sheet || !backdrop) return;
+      backdrop.hidden = false;
+      sheet.hidden = false;
+    }
+    function closeSheets() {
+      if (backdrop) backdrop.hidden = true;
+      ['dk-loc-sheet', 'dk-due-sheet'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.hidden = true;
+      });
+    }
+    if (backdrop) backdrop.addEventListener('click', closeSheets);
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-dk-close]')) { closeSheets(); return; }
+      if (e.target.closest('#dk-loc')) { openSheet('dk-loc-sheet'); return; }
+      if (e.target.closest('#dk-bell')) { openSheet('dk-due-sheet'); return; }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheets(); });
+
+    // ---- ベルの一覧(§9-1): 期限3日以内。ページに焼いた一覧をそのまま出す ----
+    var dueList = document.getElementById('dk-due-list');
+    if (dueList) {
+      dueList.innerHTML = due.length ? due.map(function (d) {
+        return '<a class="dk-row" href="' + esc(d.slug ? (dueList.getAttribute('data-base') || '') + d.slug + '/' : '#') + '">' +
+          '<span class="dk-row-body"><span class="dk-row-store">' + esc(d.store) + '</span>' +
+          '<span class="dk-row-deal">' + esc(d.headline) + '</span></span>' +
+          (d.pill ? '<span class="dk-pill soon">' + esc(d.pill) + '</span>' : '') + '</a>';
+      }).join('') : '<p class="dk-empty">期限が近いお得はありません</p>';
+    }
+
+    // ---- 郵便番号の入力(§2) ----
+    var zipInput = document.getElementById('zip-input'), zipNote = document.getElementById('zip-note');
+    if (zipInput) {
+      if (saved && saved.zip) zipInput.value = saved.zip;
+      zipInput.addEventListener('input', function () {
+        var raw = zipInput.value;
+        if (String(raw || '').trim() === '') { state = null; zipSave(null); renderLoc(); applyFilters(); return; }
+        if (!/^\s*\d{5}/.test(String(raw))) return;   // 打っている途中は変えない
+        var st = stateOfZip(raw);
+        if (st === null) {
+          if (zipNote) zipNote.textContent = 'その郵便番号から州を判定できませんでした。5桁で入れてみてください。';
+          return;
+        }
+        if (zipNote) zipNote.textContent = '州限定のお得だけを絞ります。全米・オンラインは常に出ます。';
+        state = st;
+        zipSave({ zip: String(raw).trim(), state: st });
+        renderLoc(); applyFilters();
+      });
+    }
+    var zipClear = document.getElementById('zip-clear');
+    if (zipClear) {
+      zipClear.addEventListener('click', function () {
+        if (zipInput) zipInput.value = '';
+        state = null; zipSave(null); renderLoc(); applyFilters();
+      });
+    }
+
+    // ---- Deals(§9-3): タイル8個 + 検索で店の一覧を絞る ----
+    var tilesWrap = document.getElementById('dk-tiles');
+    var storeList = document.getElementById('dk-store-list');
+    var storeEmpty = document.getElementById('dk-store-empty');
+    var searchEl = document.getElementById('dk-search');
+    var activeTile = null;
+
+    function applyFilters() {
+      var q = (searchEl && searchEl.value || '').trim().toLowerCase();
+      var any = false;
+      if (storeList) {
+        storeList.querySelectorAll('.dk-row').forEach(function (row) {
+          var tiles = (row.getAttribute('data-tiles') || '').split(' ');
+          var okTile = !activeTile || tiles.indexOf(activeTile) !== -1;
+          var okQ = !q || (row.getAttribute('data-search') || '').indexOf(q) !== -1;
+          var show = okTile && okQ && regionOk(row);
+          row.hidden = !show;
+          if (show) any = true;
+        });
+        if (storeEmpty) storeEmpty.hidden = any;
+      }
+      // Home の一覧も州で絞る(行に data-region がある場合だけ)
+      document.querySelectorAll('.dk-list .dk-row[data-region]').forEach(function (row) {
+        if (storeList && storeList.contains(row)) return;
+        row.hidden = !regionOk(row);
+      });
+    }
+
+    if (tilesWrap) {
+      tilesWrap.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-tile]');
+        if (!btn || btn.disabled) return;
+        var key = btn.getAttribute('data-tile');
+        activeTile = (activeTile === key) ? null : key;
+        tilesWrap.querySelectorAll('[data-tile]').forEach(function (b) {
+          b.classList.toggle('is-on', b.getAttribute('data-tile') === activeTile);
+        });
+        applyFilters();
+      });
+    }
+    if (searchEl) searchEl.addEventListener('input', applyFilters);
+
+    renderLoc();
+    applyFilters();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initV3);
+  else initV3();
+})();
+
+// ---- Me タブ(§9-5): お住まいの地域の入口と、気になるリスト(端末内) ----
+(function () {
+  'use strict';
+  function initMe() {
+    var locBtn = document.getElementById('dk-me-loc');
+    var listEl = document.getElementById('dk-saved-list');
+    if (!locBtn && !listEl) return;
+
+    // 地域: ヘッダーの地名と同じボトムシートを開く(§2 入口は2つ、シートは1枚)
+    if (locBtn) {
+      locBtn.addEventListener('click', function () {
+        var head = document.getElementById('dk-loc');
+        if (head) head.click();
+      });
+      var nameEl = document.getElementById('dk-me-loc-name');
+      var headName = document.getElementById('dk-loc-name');
+      if (nameEl && headName) {
+        nameEl.textContent = headName.textContent;
+        new MutationObserver(function () { nameEl.textContent = headName.textContent; })
+          .observe(headName, { childList: true, characterData: true, subtree: true });
+      }
+    }
+
+    // 気になるリスト: localStorage の id と、ページに焼いた一覧を突き合わせるだけ
+    if (!listEl) return;
+    var catalog = {};
+    try { catalog = JSON.parse(document.getElementById('dk-saved-catalog').textContent) || {}; } catch (e) { catalog = {}; }
+    var ids = [];
+    try { ids = JSON.parse(localStorage.getItem('pb_deals_saved_v1') || '[]') || []; } catch (e) { ids = []; }
+    var base = (document.body.dataset.mode === 'public') ? '/s/' : '/s/';
+    var rows = ids.map(function (id) { return catalog[id]; }).filter(Boolean);
+    var empty = document.getElementById('dk-saved-empty');
+    if (!rows.length) { if (empty) empty.hidden = false; return; }
+    if (empty) empty.hidden = true;
+    listEl.innerHTML = '<div class="dk-list">' + rows.map(function (d) {
+      return '<a class="dk-row" href="' + base + d.slug + '/">' +
+        '<span class="dk-row-body"><span class="dk-row-store">' + d.store + '</span>' +
+        '<span class="dk-row-deal">' + d.headline + '</span></span>' +
+        (d.pill ? '<span class="dk-pill">' + d.pill + '</span>' : '') + '</a>';
+    }).join('') + '</div>';
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMe);
+  else initMe();
+})();

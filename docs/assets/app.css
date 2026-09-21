@@ -5,8 +5,10 @@
    行間1.7・タップ領域48px以上・390px/320pxで横スクロールなし、を全モード共通で守る。
    例外(オケオ承認 2026-09-20): 図の軸ラベルは13px可。短い語(4文字以内)で、同じ数値が
    図の下の表に14px以上で出ていることが条件。
+   例外(オケオ承認 2026-09-20 21:50、UI v3 仕様 §9): モック準拠の画面(ヘッダー・行・ヒーロー・
+   タイル・店ページ)は仕様の字の大きさ(店名13px・地名13px・期限バッジ11px 等)をそのまま使う。
 
-   v2シェル(2026-09-20): 配色は DealMate デザイン案 v2
+   v2シェル(2026-09-20): 配色は ドルトク デザイン案 v2
    (vault/PlugBits/articles/deals/dealmate-ui-design-2026-09-20.html)にあわせて更新。
    クリーム背景(--bg)に白いカード(--surface)を浮かせ、場面ごとの色(外食=ピーチ/無料=ピンク/
    店・EC=ブルー/子ども=イエロー/旅行=ティール)をアイコンとチップで揃える。ヒーローは
@@ -18,35 +20,40 @@
    ウォレットタイルの発行会社別グラデーションだけは例外で、v2案自体が発行会社ごとに固有の
    16進を直書きしているため、そのすぐ下の専用ブロックにまとめて書く)。 */
 :root {
-  --ink: #1f2a44; --sub: #5d6a85; --dim: #94a0b8;
-  --bg: #fbf7f3;              /* 温かみのあるクリーム */
-  --surface: #fff; --line: #efe9e3; --border: #efe9e3;
-  --accent: #3b7ded; --accent-soft: #e9f1ff; --accent-ink: #2458b8;
-  --accent-2: #ff6b8f; --accent-2-soft: #ffe9ef; --accent-2-ink: #d33b66;
+  /* v3 UI(2026-09-20, playbook/dorutoku-ui-spec-v3-2026-09-20.md §9-0): 値は DORUTOKU デザイン
+     システム(playbook/dorutoku-design-system-2026-09-20.md)のトークン。地は Off White、文字は
+     ネイビー、ピンクは「無料・期限・CTA」だけ。主色の青 #3b7ded は使わない(旧 --accent の参照は
+     ネイビーに落とす)。店ごとに面の色を変えない。 */
+  --ink: #12345B; --sub: #5d6a85; --dim: #94a0b8;
+  --bg: #FFFDF9;              /* Off White */
+  --surface: #fff; --line: #EFE9E3; --border: #EFE9E3;
+  --pink: #F23D78; --pink-soft: #FCE5EC; --pink-ink: #D62E66;
+  --pale-blue: #DDF3FA; --lavender: #E9E4F7; --yellow: #FFD34E; --yellow-soft: #FFF4CC;
+  --accent: var(--ink); --accent-soft: var(--pale-blue); --accent-ink: var(--ink);
+  --accent-2: var(--pink); --accent-2-soft: var(--pink-soft); --accent-2-ink: var(--pink-ink);
   --peach: #ff9a6c; --peach-soft: #fff0e8; --peach-ink: #b5461f;
-  --yellow: #ffc857; --yellow-soft: #fff6dc; --yellow-ink: #8a6410;
   --green: #3fb98a; --green-soft: #e6f7ef; --green-ink: #1f7d59;
   --teal: #3fb3c9; --teal-soft: #e6f6f9; --teal-ink: #1c7a8c;
   --violet: #8b7cf2; --violet-soft: #efecff; --violet-ink: #5747c4;
   --text: var(--ink);
   --text-sub: var(--sub);
   --muted: var(--dim);
-  --band: #f2f0ee;
-  --tier1: var(--accent-2);
-  --tier2: var(--accent);
-  --tier3: var(--muted);
-  --due-soon: var(--accent-2);
+  --band: #F4F1EC;
+  --tier1: var(--pink);
+  --tier2: var(--ink);
+  --tier3: var(--ink);
+  --due-soon: var(--pink);
   --r: 18px; --r-lg: 24px;
-  --shadow-soft: 0 1px 2px rgba(31,42,68,.04), 0 6px 20px rgba(31,42,68,.07);
-  --shadow-lg: 0 10px 34px rgba(31,42,68,.16);
-  /* 意味色(ブランドアクセントではない状態表示。値は据え置き、トークン化のみ) */
+  --shadow-soft: 0 1px 2px rgba(18,52,91,.04), 0 6px 20px rgba(18,52,91,.06);
+  --shadow-lg: 0 10px 34px rgba(18,52,91,.16);
+  /* 意味色(ブランドアクセントではない状態表示) */
   --ok-bg: #e6f4ea; --ok-fg: #1e7a34;
   --warn-bg: #fdeeee; --warn-fg: #b3261e;
   --busy-bg: #fff4d6; --busy-fg: #8a6100;
   --disclosure-bg: #fff7e0; --disclosure-border: #f4e6bd; --disclosure-fg: #7a5f16;
-  --shadow-soft: 0 1px 2px rgba(31,42,68,.04), 0 6px 20px rgba(31,42,68,.07);
-  --overlay: rgba(31,42,68,.45);
+  --overlay: rgba(18,52,91,.45);
   --tabbar-h: 60px;
+  --head-h: 56px;
 }
 * { box-sizing: border-box; }
 html { overflow-x: hidden; }
@@ -59,33 +66,44 @@ body { padding-bottom: 56px; }
 a { color: var(--accent); }
 .pb-main { max-width: 640px; margin: 0 auto; padding: 0 16px; }
 
-/* FTC 16 CFR Part 255 開示バナー。ページ先頭・本文より上・クリーム背景(=通知だと分かる配色)で
-   常に表示する。v3b(2026-09-20): オーナー指摘「本文よりデカい」への対応で、文字サイズは本文と
-   同じ18px・左寄せにし、帯の高さは元(12px上下パディング+16px/1.6行間 ≒ 50px)からおよそ半分
-   (4px上下パディング+18px/1.3行間 ≒ 27px)に詰めた。目立たせる役目は背景色とボーダーだけに
-   任せ、文字の大きさでは目立たせない。 */
+/* FTC 16 CFR Part 255 開示。v3(§9-7): 提携前(AFFILIATE_STATE=none)は帯そのものを出さない。
+   提携後はフッターの常設1行(.pb-disclosure)+広告リンクを置いた要素の直下の1行(.pb-disclosure-inline)。 */
 .pb-disclosure {
-  background: var(--disclosure-bg);
-  border-bottom: 2px solid var(--disclosure-border);
-  color: var(--disclosure-fg);
-  font-size: 18px;
-  line-height: 1.3;
-  padding: 4px 16px;
-  text-align: left;
+  background: var(--disclosure-bg); border: 1px solid var(--disclosure-border); color: var(--disclosure-fg);
+  font-size: 14px; line-height: 1.5; padding: 8px 12px; border-radius: 10px; margin: 0 0 12px;
 }
+.pb-disclosure-inline { font-size: 13px; color: var(--disclosure-fg); margin: 4px 0 0; }
 
-.pb-deals-header { border-bottom: 1px solid var(--border); background: var(--bg); }
-.pb-deals-header-inner {
-  max-width: 640px; margin: 0 auto; padding: 12px 16px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+/* ================= v3 ヘッダー(§9-1、全画面共通・高さ56px+セーフエリア) =================
+   左=あいさつ(時間帯で3種、app.js が切り替える)+その下に小さく地名。右=ベル(期限3日以内が
+   1件以上ならピンクの点)。DORUTOKU の字・チップ・日付の帯・郵便番号の欄・開示帯は置かない。 */
+.dk-head { padding-top: env(safe-area-inset-top, 0px); background: var(--bg); }
+.dk-head-inner {
+  max-width: 640px; margin: 0 auto; padding: 8px 16px 4px; min-height: var(--head-h);
+  display: flex; align-items: center; gap: 12px;
 }
-.pb-brand { display: flex; align-items: baseline; gap: 6px; text-decoration: none; color: var(--text); }
-.pb-brand-name { font-weight: 800; font-size: 18px; }
-.pb-brand-sub { font-size: 14px; color: var(--text-sub); }
-.pb-back { font-size: 16px; font-weight: 700; color: var(--accent); text-decoration: none; min-height: 48px; display: flex; align-items: center; }
-.pb-nav { display: flex; gap: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.pb-nav-link { font-size: 14px; font-weight: 600; color: var(--text-sub); text-decoration: none; white-space: nowrap; padding: 6px 0; min-height: 48px; display: flex; align-items: center; }
-.pb-nav-link.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+.dk-head-sun { flex: none; width: 34px; height: 34px; color: var(--yellow); display: flex; align-items: center; justify-content: center; }
+.dk-head-sun svg { width: 30px; height: 30px; }
+.dk-head-sun.night { color: var(--ink); }
+.dk-head-sun.night svg { width: 24px; height: 24px; }
+.dk-head-text { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
+.dk-greet { font-size: 17px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0; }
+.dk-loc {
+  display: inline-flex; align-items: center; gap: 3px; font-size: 13px; font-weight: 600; color: var(--sub);
+  background: none; border: 0; padding: 0; font-family: inherit; line-height: 1.3; cursor: pointer; text-decoration: none;
+  align-self: flex-start; -webkit-tap-highlight-color: transparent;
+}
+.dk-loc svg { width: 14px; height: 14px; flex: none; }
+.dk-bell {
+  flex: none; margin-left: auto; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 0;
+  box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: center; color: var(--ink);
+  position: relative; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent;
+}
+.dk-bell svg { width: 19px; height: 19px; }
+.dk-bell.has-due::after {
+  content: ''; position: absolute; top: 7px; right: 8px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--pink); border: 1.5px solid #fff;
+}
 
 .deals-top { padding: 14px 0 4px; }
 .page-title { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
@@ -293,7 +311,7 @@ table.catalog-table th { background: var(--band); font-weight: 800; white-space:
 /* Fix B(2026-09-20): 今月やること行のカード名(小さい添え書き、detail行の頭に置く) */
 .p-row-card { font-weight: 700; color: var(--text); }
 
-/* v2b(2026-09-20): 今月やること(DealMate v2案 .todo/.td)。#pc-month の .p-card は
+/* v2b(2026-09-20): 今月やること(ドルトク v2案 .todo/.td)。#pc-month の .p-card は
    このリストのときだけパディングを0にし(親要素のパディングを打ち消す)、行ごとに
    自前のパディング+区切り線を持たせる(v2案の白いカード1枚+内部の横線という構造に合わせる)。 */
 #pc-month .p-card { padding: 0; overflow: hidden; }
@@ -393,9 +411,9 @@ body[data-mode="local"] .fab { bottom: calc(var(--tabbar-h) + var(--fab-gap) + e
 .fab:active { transform: scale(.96); }
 
 /* ================= ボトムタブバー(Home/Deals/Cards/Me、mode=local専用、v3シェル 2026-09-19) =================
-   DealMateモックアップの「下部ナビゲーション(4つ)」。固定・safe-area対応・56px以上の高さ・
+   ドルトクモックアップの「下部ナビゲーション(4つ)」。固定・safe-area対応・56px以上の高さ・
    タップ領域48px以上。旧「お得/カード」2タブ(pb-nav, ヘッダー側)を置き換える唯一のナビゲーション。 */
-body[data-mode="local"] { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+body { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
 .pb-tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
   background: var(--surface); border-top: 1px solid var(--line);
@@ -411,9 +429,9 @@ body[data-mode="local"] { padding-bottom: calc(var(--tabbar-h) + env(safe-area-i
 .pb-tab svg { width: 23px; height: 23px; display: block; }
 .pb-tab .pb-tab-icon { display: flex; align-items: center; justify-content: center; padding: 3px 14px; border-radius: 12px; }
 .pb-tab .pb-tab-label { font-size: 14px; font-weight: 700; line-height: 1.2; }
-/* v2案「下タブの選択色をピンクに」: アイコンの丸(pill)にもうっすら色を敷く */
-.pb-tab.active { color: var(--accent-2); }
-.pb-tab.active .pb-tab-icon { background: var(--accent-2-soft); }
+/* v3(§9-6): 選択中はネイビー、それ以外は淡色。丸の色地は敷かない(モックどおり) */
+.pb-tab.active { color: var(--ink); }
+.pb-tab .pb-tab-label { color: inherit; }
 .pb-tab:active { opacity: .75; }
 
 /* カードを選ぶ、のボトムシート */
@@ -440,7 +458,7 @@ body[data-mode="local"] { padding-bottom: calc(var(--tabbar-h) + env(safe-area-i
 /* カタログのシート: 検索欄を横いっぱいに */
 .sheet .sheet-body input[type=text], .sheet .sheet-body input:not([type]) { width: 100%; box-sizing: border-box; min-height: 48px; font-size: 16px; }
 
-/* ================= カードv2(2026-09-20, DealMate デザイン案 v2準拠): ウォレットタイル =================
+/* ================= カードv2(2026-09-20, ドルトク デザイン案 v2準拠): ウォレットタイル =================
    1枚のタイル = 発行会社/提携ブランドごとに色分けしたカード素材(.wal-*、上部に発行会社/
    提携ブランドのロゴ、右下にネットワーク(Visa/Mastercard/Amex/Discover)のマークを白モノクロ・
    半透明で載せる)+カード名+ステータスピル、その下に行1(獲得率チップ+Offers件数)・
@@ -551,7 +569,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .card-tile.wal-default { box-shadow: var(--shadow-soft), 0 8px 22px rgba(31,42,68,.2); }
 .card-tile.wal-default > .card-tile-summary { background: linear-gradient(135deg,var(--sub),var(--dim)); box-shadow: none; }
 
-/* ================= 次に検討できるカード(v3, 2026-09-20, DealMateモックアップ画面5準拠) =================
+/* ================= 次に検討できるカード(v3, 2026-09-20, ドルトクモックアップ画面5準拠) =================
    プライマリ1件を大きく見せ「なぜおすすめ?」のチェックマーク行(最大3)+年会費(カタログに
    ある時だけ。ボーナス額はcatalogに無いフィールドなので出さない)+詳細を見る。その下に
    「その他の候補」を2行のコンパクト表示。 */
@@ -696,7 +714,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .bn-record-source { font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
 .bn-record-warn { color: var(--warn-fg); font-weight: 700; }
 
-/* ================= /home (v2, 2026-09-20, DealMate デザイン案 v2準拠) =================
+/* ================= /home (v2, 2026-09-20, ドルトク デザイン案 v2準拠) =================
    ヒーローは色とタイポグラフィだけで作る(写真・ブランドロゴなし)。場面ごとの色は
    .scene-food(ピーチ)/.scene-free(ピンク)/.scene-shop(ブルー)/.scene-kids(イエロー)/
    .scene-travel(ティール)の5色で、アイコンの丸とチップに共通して使う(v2案「色を場面ごとに
@@ -795,7 +813,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .home-expire-amt { font-size: 24px; font-weight: 900; color: #6b4d05; letter-spacing: -.02em; flex-basis: 100%; }
 .home-expire-days { font-size: 14px; font-weight: 700; color: #a07d2a; background: none; padding: 0; }
 
-/* ================= 支払いの最適化(v2b, 2026-09-20, DealMate v2案 画面3準拠) =================
+/* ================= 支払いの最適化(v2b, 2026-09-20, ドルトク v2案 画面3準拠) =================
    /deals タブの主機能「どのカードで払う?」。店を選ぶ→payhd(店アイコン+店名+店を変える)→
    amt(使う金額)→pay(rank1だけ薄いピンク地+ピンクの丸番号+青いCTA、2・3位は静か)→
    この店の今のお得(dealRowHtml、Home「あなたにおすすめ」と同じ行の形)。 */
@@ -943,3 +961,156 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .zip-clear { min-height: 44px; padding: 0 14px; font-size: 14px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border: 0; border-radius: 10px; cursor: pointer; }
 .zip-note { font-size: 13px; line-height: 1.7; color: var(--muted); margin: 8px 0 0; }
 .zip-note.on { color: var(--accent-ink); font-weight: 700; }
+
+/* ================= v3 UI(2026-09-20, playbook/dorutoku-ui-spec-v3-2026-09-20.md §4・§7・§9) =================
+   モックの再現。画像は使わない(生成もしない)。使う画像素材は web/icons の Simple Icons だけ。
+   余白・字の大きさ・影は、仕様に数値があるものはその数値、無いものはモックの実測(390px 換算)。 */
+
+/* ---- 店ロゴ(§4): どの店も同じ 44px の丸に収める ---- */
+.dk-logo {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; background: #fff;
+  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.dk-logo-glyph {
+  display: block; width: 24px; height: 24px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.dk-logo-initials { font-size: 15px; font-weight: 900; letter-spacing: -.02em; line-height: 1; }
+.dk-logo.lg { width: 56px; height: 56px; }
+.dk-logo.lg .dk-logo-glyph { width: 30px; height: 30px; }
+.dk-logo.lg .dk-logo-initials { font-size: 19px; }
+
+/* ---- 節見出し(§7): 15px 太字 + 小さいアイコン、右に「もっと見る ›」 ---- */
+.dk-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 10px; }
+.dk-sec-title { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 800; color: var(--ink); margin: 0; }
+.dk-sec-ico { display: flex; color: var(--ink); }
+.dk-sec-ico svg { width: 16px; height: 16px; }
+.dk-more { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 700; color: var(--pink); text-decoration: none; white-space: nowrap; }
+.dk-more .chev { font-size: 16px; line-height: 1; }
+.dk-empty { font-size: 15px; color: var(--sub); padding: 10px 2px; }
+
+/* ---- 一覧(§9-2): 白いカード1枚に行を積む。1行 64px ---- */
+.dk-list { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; }
+.dk-row {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 64px;
+  text-decoration: none; color: inherit; -webkit-tap-highlight-color: transparent;
+}
+.dk-row + .dk-row { border-top: 1px solid var(--line); }
+.dk-row:active { background: var(--bg); }
+/* <button> の行(Me の「お住まいの地域」)も <a> の行と同じ見た目にする */
+button.dk-row { width: 100%; text-align: left; background: none; border: 0; font-family: inherit; cursor: pointer; }
+.dk-row-body { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
+.dk-row-store { font-size: 13px; font-weight: 700; color: var(--sub); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-row-deal { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-pill {
+  flex: none; font-size: 14px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+  background: var(--band); color: var(--sub); white-space: nowrap;
+}
+.dk-pill.soon { background: var(--pink-soft); color: var(--pink-ink); }
+
+/* ---- 件数タイル(§9-2 の4): モックの「今週の節約額」の位置・同じピンクの面・右上に上向き矢印。
+       金額は出さない(使った記録が無いため)。 ---- */
+.dk-count {
+  display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; padding: 14px 16px;
+  border-radius: var(--r); background: var(--pink-soft); text-decoration: none; color: var(--ink);
+}
+.dk-count-body { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
+.dk-count-label { display: block; font-size: 14px; font-weight: 700; color: var(--pink-ink); }
+.dk-count-num { display: block; font-size: 30px; font-weight: 900; letter-spacing: -.02em; line-height: 1.2; color: var(--ink); }
+.dk-count-num .unit { font-size: 17px; font-weight: 800; margin-left: 2px; }
+.dk-count-sub { display: block; font-size: 13px; color: var(--sub); margin-top: 2px; }
+.dk-count-arrow { flex: none; align-self: flex-start; color: var(--pink); }
+.dk-count-arrow svg { width: 30px; height: 30px; }
+
+/* ---- ヒーロー(§9-2 の1): モックを1対1で写す。写真の位置はネイビーの無地。装飾は足さない ---- */
+.dk-hero {
+  display: block; margin: 14px 0 4px; border-radius: 20px; overflow: hidden;
+  background: var(--surface); box-shadow: var(--shadow-soft); text-decoration: none; color: inherit;
+}
+.dk-hero-art {
+  background: #12345B; min-height: 226px; padding: 16px 20px 18px;
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+/* ヒーローのロゴ(§9-2a の3): 白い丸の地は置かない。ロゴのある店は白い単色グリフ48px、
+   無い店は同じ位置に店名を白28px 800。頭文字のタイルはヒーローでは使わない。 */
+.dk-hero-logo { display: flex; align-items: center; min-height: 48px; }
+.dk-hero-glyph {
+  display: block; width: 48px; height: 48px; background-color: #fff;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: left center; mask-position: left center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.dk-hero-store { font-size: 28px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -.01em; }
+/* 2段の文字(§9-2a): 字の大きさは中身で決まるので、大きさだけ style 属性で渡す。 */
+.dk-hero-l1 { font-weight: 900; color: #fff; line-height: 1.05; letter-spacing: -.02em; margin: auto 0 0; }
+.dk-hero-l2 { font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -.01em; margin: 2px 0 0;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+/* 期限ピル(§9-2a の2): 19px 800・高さ30px・左右の余白14px・幅は中身なり。
+   end=不明 のときは .is-empty で場所だけ空ける(何かで埋めない)。 */
+.dk-hero-pill {
+  margin: 12px 0 0; background: var(--pink); color: #fff; font-size: 19px; font-weight: 800;
+  height: 30px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center;
+}
+.dk-hero-pill.is-empty { background: none; padding: 0; }
+.dk-hero-foot {
+  display: flex; align-items: center; gap: 12px; min-height: 59px; padding: 0 20px;
+  background: var(--surface);
+}
+.dk-hero-cond { flex: 1 1 auto; min-width: 0; font-size: 17px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-hero-chev { flex: none; font-size: 24px; line-height: 1; color: var(--ink); }
+
+/* ---- Deals(§9-3): 検索窓 → カテゴリのタイル8個(4列×2段)→ 店ごとの一覧 ---- */
+.dk-search { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); color: var(--ink); font-size: 16px; font-family: inherit; padding: 0 14px; margin: 10px 0 2px; }
+.dk-search:focus { outline: 2px solid var(--pink); outline-offset: 1px; }
+.dk-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; margin: 16px 0 6px; align-items: start; }
+.dk-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none;
+  color: var(--ink); background: none; border: 0; padding: 0; font-family: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; position: relative;
+}
+.dk-tile-ico { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.dk-tile-ico svg { width: 26px; height: 26px; }
+/* 日本語のラベルは2行になるものがあるので(食料品・日用品)、高さを2行ぶんで固定して段をそろえる */
+.dk-tile-label { font-size: 13px; font-weight: 700; color: var(--ink); text-align: center; line-height: 1.25;
+  min-height: 2.5em; display: flex; align-items: flex-start; justify-content: center; }
+.dk-tile-count {
+  position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; border-radius: 999px;
+  background: var(--surface); box-shadow: var(--shadow-soft); color: var(--sub);
+  font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 5px;
+}
+.dk-tile.is-empty { opacity: .4; pointer-events: none; }
+.dk-tile.is-on .dk-tile-ico { outline: 2px solid var(--pink); outline-offset: 2px; }
+.dk-store-count { flex: none; font-size: 13px; font-weight: 700; color: var(--sub); background: var(--band); border-radius: 999px; padding: 2px 9px; }
+
+/* ---- 店ページ(§9-4) ---- */
+.dk-store-head { display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; }
+.dk-store-name { font-size: 22px; font-weight: 800; color: var(--ink); margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.dk-store-n { font-size: 14px; color: var(--sub); margin: 2px 0 0; }
+.dk-deal { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); padding: 14px 16px; margin-bottom: 10px; }
+.dk-deal-headline { font-size: 18px; font-weight: 800; color: var(--ink); line-height: 1.35; margin: 0; overflow-wrap: anywhere; }
+.dk-deal-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 8px; }
+.dk-deal-cond { font-size: 15px; color: var(--sub); line-height: 1.55; margin: 6px 0 0; overflow-wrap: anywhere; }
+.dk-deal-src { font-size: 14px; margin: 8px 0 0; }
+.dk-deal-src a { color: var(--pink); font-weight: 700; text-decoration: none; }
+.dk-who { font-size: 13px; font-weight: 700; color: var(--sub); background: var(--band); border-radius: 8px; padding: 3px 9px; }
+
+/* ---- ベルの一覧(§9-1)・地域のシート(§2) ---- */
+.dk-due-list { display: flex; flex-direction: column; }
+.dk-due-list .dk-row + .dk-row { border-top: 1px solid var(--line); }
+.dk-region-note { font-size: 13px; font-weight: 700; color: var(--sub); margin: 10px 0 0; }
+
+/* ---- カードのカタログ(§9-5): 横スクロールする表をやめ、白い行カードに揃える ---- */
+.dk-card-list { margin: 10px 0 24px; }
+.dk-card-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px; }
+.dk-card-row + .dk-card-row { border-top: 1px solid var(--line); }
+.dk-card-main { min-width: 0; flex: 1 1 auto; }
+.dk-card-issuer { font-size: 13px; font-weight: 700; color: var(--sub); margin: 0; }
+.dk-card-name { font-size: 16px; font-weight: 800; color: var(--ink); margin: 1px 0 0; line-height: 1.35; overflow-wrap: anywhere; }
+.dk-card-en { font-size: 13px; color: var(--dim); margin: 1px 0 0; overflow-wrap: anywhere; }
+.dk-card-benefit { font-size: 14px; color: var(--sub); margin: 5px 0 0; line-height: 1.5; overflow-wrap: anywhere; }
+.dk-card-fee { flex: none; font-size: 14px; font-weight: 800; color: var(--ink); background: var(--band); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
