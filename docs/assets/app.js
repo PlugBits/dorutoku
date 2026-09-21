@@ -823,11 +823,33 @@
     var rows = Array.prototype.slice.call(list.querySelectorAll('.dk-row'));
 
     function availableOn(row, day) {
-      var s = row.getAttribute('data-start') || '';
+      // §17(2026-09-21): 無料・在庫限りは start の前日から出す。出し始める日は
+      // data-from(サーバーが preview_from() で計算したもの)を見る。無ければ start。
+      var s = row.getAttribute('data-from') || row.getAttribute('data-start') || '';
       var e = row.getAttribute('data-end') || '';
       if (s && s !== '不明' && s > day) return false;
       if (e && e !== '不明' && e < day) return false;
       return true;
+    }
+    // その日にはまだ始まっていない(前日に先出ししている)か
+    function notYet(row, day) {
+      var st = row.getAttribute('data-start') || '';
+      return !!st && st !== '不明' && day < st;
+    }
+    function markSoon(row, day) {
+      var body = row.querySelector('.dk-row-body');
+      if (!body) return;
+      var tag = body.querySelector('.dk-row-soon');
+      if (notYet(row, day)) {
+        if (!tag) {
+          tag = document.createElement('span');
+          tag.className = 'dk-row-soon';
+          tag.textContent = '明日から';
+          body.appendChild(tag);
+        }
+      } else if (tag) {
+        tag.remove();
+      }
     }
     function heroIdFor(day) {
       var slot = slots && slots.querySelector('.dk-hero-slot[data-day="' + day + '"]');
@@ -849,7 +871,7 @@
         var ok = availableOn(row, day) && row.getAttribute('data-deal') !== heroId
           && shown < ROWS_MAX && !row.classList.contains('is-region-out');
         row.hidden = !ok;
-        if (ok) shown++;
+        if (ok) { shown++; markSoon(row, day); }
       });
       list.hidden = shown === 0;
       if (emptyEl) emptyEl.hidden = shown !== 0;

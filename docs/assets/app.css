@@ -1050,6 +1050,13 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-btn.ghost { flex: 0 0 auto; padding: 0 16px; color: var(--sub); font-weight: 700; }
 .dk-btn.is-on { background: var(--pink-soft); border-color: var(--pink); color: var(--pink-ink); }
 
+.dk-row-soon {
+
+  align-self: flex-start; margin-top: 3px; padding: 1px 8px; border-radius: 999px;
+  background: var(--pblue, #DDF3FA); color: var(--ink); font-size: 12px; font-weight: 800;
+  white-space: nowrap;
+}
+
 .dk-saved-out { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
 .dk-saved-out-title { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--sub); }
 .dk-saved-out-btns { display: flex; gap: 8px; flex-wrap: wrap; }
