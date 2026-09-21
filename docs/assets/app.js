@@ -440,6 +440,8 @@
         var el = document.getElementById(id);
         if (el) el.hidden = true;
       });
+      // ディールのシート(§10)は履歴を1つ積んでいるので、専用の閉じ方を呼ぶ
+      if (typeof window.dkCloseDeal === 'function') window.dkCloseDeal();
     }
     if (backdrop) backdrop.addEventListener('click', closeSheets);
     document.addEventListener('click', function (e) {
@@ -508,11 +510,13 @@
         });
         if (storeEmpty) storeEmpty.hidden = any;
       }
-      // Home の一覧も州で絞る(行に data-region がある場合だけ)
+      // Home の一覧も州で絞る。日付の帯(§12)が8件の頭打ちを数えるので、ここでは
+      // hidden を直接いじらず印だけ付け、数え直しは日付側に任せる。
       document.querySelectorAll('.dk-list .dk-row[data-region]').forEach(function (row) {
         if (storeList && storeList.contains(row)) return;
-        row.hidden = !regionOk(row);
+        row.classList.toggle('is-region-out', !regionOk(row));
       });
+      if (typeof window.dkReselectDay === 'function') window.dkReselectDay();
     }
 
     if (tilesWrap) {
@@ -580,4 +584,224 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMe);
   else initMe();
+})();
+
+// ---- §12 日付の帯(2026-09-21): 選んだ日でヒーローと一覧の両方を絞る ----
+// 日ごとのヒーローはサーバーが全部選んで焼いてあるので、ここは見せ替えるだけ。
+// 行は「その日に使えるか」(start ≤ その日 ≤ end、不明の側は縛らない)で絞り、8件で頭打ちにする。
+(function () {
+  'use strict';
+  var ROWS_MAX = 8;
+  function initStrip() {
+    var days = document.getElementById('dk-days');
+    var list = document.getElementById('dk-home-list');
+    if (!days || !list) return;
+    var slots = document.getElementById('dk-hero-slots');
+    var titleEl = document.getElementById('dk-rows-title');
+    var emptyEl = document.getElementById('dk-home-empty');
+    var rows = Array.prototype.slice.call(list.querySelectorAll('.dk-row'));
+
+    function availableOn(row, day) {
+      var s = row.getAttribute('data-start') || '';
+      var e = row.getAttribute('data-end') || '';
+      if (s && s !== '不明' && s > day) return false;
+      if (e && e !== '不明' && e < day) return false;
+      return true;
+    }
+    function heroIdFor(day) {
+      var slot = slots && slots.querySelector('.dk-hero-slot[data-day="' + day + '"]');
+      var a = slot && slot.querySelector('.dk-hero');
+      return a ? (a.getAttribute('data-deal') || '') : '';
+    }
+    function select(day, label) {
+      days.querySelectorAll('.dk-day').forEach(function (b) {
+        b.classList.toggle('is-on', b.getAttribute('data-day') === day);
+      });
+      if (slots) {
+        slots.querySelectorAll('.dk-hero-slot').forEach(function (el) {
+          el.hidden = el.getAttribute('data-day') !== day;
+        });
+      }
+      if (titleEl && label) titleEl.textContent = label + 'に使えるお得';
+      var heroId = heroIdFor(day), shown = 0;
+      rows.forEach(function (row) {
+        var ok = availableOn(row, day) && row.getAttribute('data-deal') !== heroId
+          && shown < ROWS_MAX && !row.classList.contains('is-region-out');
+        row.hidden = !ok;
+        if (ok) shown++;
+      });
+      list.hidden = shown === 0;
+      if (emptyEl) emptyEl.hidden = shown !== 0;
+    }
+    days.addEventListener('click', function (e) {
+      var b = e.target.closest('.dk-day');
+      if (!b) return;
+      select(b.getAttribute('data-day'), b.getAttribute('data-label'));
+    });
+    var todayBtn = document.getElementById('dk-today');
+    if (todayBtn) {
+      todayBtn.addEventListener('click', function () {
+        var first = days.querySelector('.dk-day');
+        if (first) select(first.getAttribute('data-day'), first.getAttribute('data-label'));
+      });
+    }
+    // 州の絞り込み(ヘッダーの地名)が行を隠したあとも、8件の頭打ちを数え直す
+    window.dkReselectDay = function () {
+      var on = days.querySelector('.dk-day.is-on') || days.querySelector('.dk-day');
+      if (on) select(on.getAttribute('data-day'), on.getAttribute('data-label'));
+    };
+    var on = days.querySelector('.dk-day.is-on') || days.querySelector('.dk-day');
+    if (on) select(on.getAttribute('data-day'), on.getAttribute('data-label'));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStrip);
+  else initStrip();
+})();
+
+// ---- §10 ディールの詳細(ボトムシート、2026-09-21) ----
+// 行・ヒーローをタップしてもページを移らない。history.pushState で #d-<id> を積み、
+// 端末の戻る操作(popstate)で閉じる。#d-<id> 付きで直接開かれたら、その状態で開く。
+// 要約(§11)だけは別ファイルから1回だけ読む(無くてもシートは成立する)。
+(function () {
+  'use strict';
+  var SAVED_KEY = 'pb_deals_saved_v1';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function savedGet() {
+    try { var a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); return Array.isArray(a) ? a : []; }
+    catch (e) { return []; }
+  }
+  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) { /* ignore */ } }
+
+  function initDealSheet() {
+    var dataEl = document.getElementById('dk-deal-data');
+    var sheet = document.getElementById('dk-deal-sheet');
+    if (!dataEl || !sheet) return;
+    var deals = {};
+    try { deals = JSON.parse(dataEl.textContent) || {}; } catch (e) { deals = {}; }
+    var summarySrc = dataEl.getAttribute('data-summary-src') || '';
+    var summaries = null, summaryTried = false;
+    var backdrop = document.getElementById('dk-sheet-backdrop');
+    var current = null;
+
+    var el = {
+      logo: document.getElementById('dk-sheet-logo'),
+      store: document.getElementById('dk-sheet-storename'),
+      headline: document.getElementById('dk-sheet-headline'),
+      summary: document.getElementById('dk-sheet-summary'),
+      quote: document.getElementById('dk-sheet-quote'),
+      facts: document.getElementById('dk-sheet-facts'),
+      src: document.getElementById('dk-sheet-src'),
+      open: document.getElementById('dk-sheet-open'),
+      save: document.getElementById('dk-sheet-save'),
+      storelink: document.getElementById('dk-sheet-storelink')
+    };
+
+    function row(label, value) {
+      if (!value) return '';
+      return '<div class="row"><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>';
+    }
+    function renderSummary(id) {
+      var s = summaries && summaries[id];
+      if (el.summary) {
+        el.summary.textContent = (s && s.summary) || '';
+        el.summary.hidden = !(s && s.summary);
+      }
+      if (el.quote) {
+        el.quote.textContent = (s && s.source_quote) || '';
+        el.quote.hidden = !(s && s.source_quote);
+      }
+    }
+    function loadSummaries(id) {
+      if (summaries || summaryTried || !summarySrc) { renderSummary(id); return; }
+      summaryTried = true;
+      fetch(summarySrc, { credentials: 'omit' })
+        .then(function (r) { return r.ok ? r.json() : {}; })
+        .then(function (j) { summaries = j || {}; renderSummary(id); })
+        .catch(function () { summaries = {}; renderSummary(id); });   // 読めなくてもシートは成立する
+    }
+    function renderSaveBtn(id) {
+      if (!el.save) return;
+      var on = savedGet().indexOf(id) !== -1;
+      el.save.classList.toggle('is-on', on);
+      el.save.textContent = on ? '気になるに入れた' : '気になる';
+    }
+    function fill(d) {
+      if (el.logo) el.logo.innerHTML = d.logo || '';
+      if (el.store) el.store.textContent = d.store || '';
+      if (el.headline) el.headline.textContent = d.headline || '';
+      if (el.facts) {
+        el.facts.innerHTML = row('条件', d.cond || d.cond_full) + row('対象者', d.who)
+          + row('期間', d.period) + row('地域', d.region);
+      }
+      if (el.src) {
+        var bits = [];
+        if (d.sources && d.sources.length) bits.push('出どころ: ' + d.sources.join('・'));
+        if (d.updated) bits.push('確認日: ' + d.updated);
+        el.src.innerHTML = esc(bits.join(' ・ '));
+      }
+      if (el.open) {
+        el.open.href = d.url || '#';
+        el.open.hidden = !d.url;
+      }
+      if (el.storelink) el.storelink.href = d.href || '#';
+      renderSaveBtn(d.id);
+      renderSummary(d.id);
+      loadSummaries(d.id);
+    }
+    function openDeal(id, push) {
+      var d = deals[id];
+      if (!d) return false;
+      current = id;
+      fill(d);
+      if (backdrop) backdrop.hidden = false;
+      sheet.hidden = false;
+      if (push && location.hash !== '#d-' + id) {
+        try { history.pushState({ deal: id }, '', '#d-' + id); } catch (e) { /* ignore */ }
+      }
+      return true;
+    }
+    function closeDeal(pop) {
+      if (sheet.hidden) return;
+      sheet.hidden = true;
+      if (backdrop) backdrop.hidden = true;
+      current = null;
+      if (!pop && location.hash.indexOf('#d-') === 0) {
+        try { history.back(); } catch (e) { /* ignore */ }
+      }
+    }
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-deal]');
+      if (trigger) {
+        var id = trigger.getAttribute('data-deal');
+        if (deals[id]) { e.preventDefault(); openDeal(id, true); return; }
+      }
+      if (e.target.closest('#dk-sheet-save')) {
+        if (!current) return;
+        var ids = savedGet(), i = ids.indexOf(current);
+        if (i === -1) ids.push(current); else ids.splice(i, 1);
+        savedSet(ids); renderSaveBtn(current);
+        return;
+      }
+      if (!sheet.hidden && e.target.closest('[data-dk-close]')) { closeDeal(false); return; }
+    }, true);
+    window.addEventListener('popstate', function () {
+      var m = location.hash.match(/^#d-(.+)$/);
+      if (m && deals[m[1]]) openDeal(m[1], false);
+      else closeDeal(true);
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDeal(false); });
+
+    window.dkCloseDeal = function () { closeDeal(false); };
+
+    // #d-<id> 付きで直接開かれたとき
+    var m0 = location.hash.match(/^#d-(.+)$/);
+    if (m0) openDeal(m0[1], false);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDealSheet);
+  else initDealSheet();
 })();

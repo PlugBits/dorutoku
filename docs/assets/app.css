@@ -9,7 +9,7 @@
    タイル・店ページ)は仕様の字の大きさ(店名13px・地名13px・期限バッジ11px 等)をそのまま使う。
 
    v2シェル(2026-09-20): 配色は ドルトク デザイン案 v2
-   (vault/PlugBits/articles/deals/dealmate-ui-design-2026-09-20.html)にあわせて更新。
+   (vault/PlugBits/articles/deals/ の設計案)にあわせて更新。
    クリーム背景(--bg)に白いカード(--surface)を浮かせ、場面ごとの色(外食=ピーチ/無料=ピンク/
    店・EC=ブルー/子ども=イエロー/旅行=ティール)をアイコンとチップで揃える。ヒーローは
    ピンク→ピーチの暖色グラデーション、下タブの選択色はピンク。カードv2(Cardsタブ)の
@@ -1003,8 +1003,13 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 /* <button> の行(Me の「お住まいの地域」)も <a> の行と同じ見た目にする */
 button.dk-row { width: 100%; text-align: left; background: none; border: 0; font-family: inherit; cursor: pointer; }
 .dk-row-body { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
-.dk-row-store { font-size: 13px; font-weight: 700; color: var(--sub); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dk-row-deal { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 行の主従(2026-09-21 ドルトク指示でモックに合わせた): 店名がネイビーの太字で主、
+   その下に得がピンクで従。得は §9-2a の割り方の1段目(便益)だけなので、ふつうは省略されない。 */
+.dk-row-store { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 2段目(§12-b): 便益はピンクで必ず残し、対象の側だけが幅で省略される */
+.dk-row-deal { display: flex; align-items: baseline; gap: 5px; min-width: 0; line-height: 1.3; }
+.dk-row-benefit { flex: none; font-size: 15px; font-weight: 800; color: var(--pink); white-space: nowrap; }
+.dk-row-target { min-width: 0; font-size: 15px; font-weight: 600; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dk-pill {
   flex: none; font-size: 14px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
   background: var(--band); color: var(--sub); white-space: nowrap;
@@ -1114,3 +1119,58 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-card-en { font-size: 13px; color: var(--dim); margin: 1px 0 0; overflow-wrap: anywhere; }
 .dk-card-benefit { font-size: 14px; color: var(--sub); margin: 5px 0 0; line-height: 1.5; overflow-wrap: anywhere; }
 .dk-card-fee { flex: none; font-size: 14px; font-weight: 800; color: var(--ink); background: var(--band); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+
+/* ---- §12 日付の帯(2026-09-21、Home だけ。モックに無い要素を足す唯一の例外) ----
+   高さ56px の1行・横スクロール・今日から7日。前の版の背の高い日付カードには戻さない。 */
+.dk-strip { display: flex; align-items: center; gap: 8px; height: 56px; margin: 4px 0 2px; }
+.dk-today {
+  flex: none; height: 40px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); font-family: inherit; font-size: 13px; font-weight: 800; color: var(--ink);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.dk-days {
+  display: flex; align-items: center; gap: 8px; height: 56px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 0 2px;
+}
+.dk-days::-webkit-scrollbar { display: none; }
+.dk-day {
+  flex: none; width: 48px; height: 50px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  -webkit-tap-highlight-color: transparent;
+}
+.dk-day-md { font-size: 15px; font-weight: 800; line-height: 1.1; }
+.dk-day-wd { font-size: 11px; font-weight: 600; color: var(--sub); line-height: 1.1; }
+.dk-day-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); margin-top: 1px; }
+.dk-day-dot.is-off { background: transparent; }
+.dk-day.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dk-day.is-on .dk-day-wd { color: rgba(255,255,255,.78); }
+.dk-day.is-on .dk-day-dot { background: #fff; }
+
+/* ---- §10 ディールの詳細(ボトムシート、2026-09-21) ---- */
+.dk-deal-sheet .sheet-head { align-items: center; }
+.dk-sheet-store { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 16px; font-weight: 800; color: var(--ink); }
+.dk-sheet-headline { font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.4; margin: 4px 0 0; overflow-wrap: anywhere; }
+.dk-sheet-summary { font-size: 16px; line-height: 1.85; color: var(--ink); margin: 14px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dk-sheet-quote {
+  margin: 14px 0 0; padding: 12px 14px; background: var(--band); border-radius: 12px;
+  font-size: 14px; line-height: 1.7; color: var(--sub); overflow-wrap: anywhere;
+}
+.dk-sheet-facts { margin: 16px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.dk-sheet-facts .row { display: flex; gap: 12px; align-items: baseline; }
+.dk-sheet-facts dt { flex: 0 0 74px; font-size: 14px; font-weight: 700; color: var(--sub); margin: 0; }
+.dk-sheet-facts dd { flex: 1 1 auto; min-width: 0; font-size: 15px; color: var(--ink); margin: 0; overflow-wrap: anywhere; }
+.dk-sheet-src { font-size: 14px; color: var(--sub); margin: 14px 0 0; overflow-wrap: anywhere; }
+.dk-sheet-src a { color: var(--pink); font-weight: 700; text-decoration: none; }
+.dk-sheet-note { font-size: 13px; line-height: 1.7; color: var(--dim); margin: 12px 0 0; }
+.dk-sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+.dk-btn {
+  flex: 1 1 auto; min-height: 48px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font-family: inherit; font-size: 15px; font-weight: 800; text-decoration: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dk-btn.primary { background: var(--pink); border-color: var(--pink); color: #fff; }
+.dk-btn.ghost { flex: 0 0 auto; padding: 0 16px; color: var(--sub); font-weight: 700; }
+.dk-btn.is-on { background: var(--pink-soft); border-color: var(--pink); color: var(--pink-ink); }
+.dk-sheet-store-link { display: inline-flex; align-items: center; gap: 2px; margin: 16px 0 4px; font-size: 15px; font-weight: 700; color: var(--pink); text-decoration: none; }
