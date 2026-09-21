@@ -993,8 +993,15 @@
           + row('期間', d.period) + row('地域', d.region) + row('手元メモ', d.personal);
       }
       if (el.src) {
+        // 出どころは名前だけだと読む人に伝わらないので、公式かまとめかを添える
+        // (2026-09-21 の指摘「Living on the Cheap とだけ出ても意味が分からない」)
+        // 名前は **リンク先(url)** から作る。d.sources は「どこで気づいたか」なので、
+        // 公式ページが出どころでもまとめサイトの名前が入っていることがある
+        var site = d.source_site || (d.sources || []).join('・');
+        var where = d.source_kind === 'official' ? ('公式ページ(' + site + ')')
+          : d.source_kind === 'roundup' ? (site + '(非公式のまとめ)') : site;
         var bits = [];
-        if (d.sources && d.sources.length) bits.push('出どころ: ' + d.sources.join('・'));
+        if (site) bits.push('情報元: ' + where);
         if (d.updated) bits.push('確認日: ' + d.updated);
         el.src.innerHTML = esc(bits.join(' ・ '));
       }

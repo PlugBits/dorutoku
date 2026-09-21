@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ドルトク">
+  <rect width="512" height="512" fill="#12345B"/>
+  <circle cx="256" cy="256" r="158" fill="#FFD34E" stroke="#E8B62E" stroke-width="11"/>
+  <text x="256" y="256" fill="#12345B" font-family="Nunito, 'DejaVu Sans', sans-serif" font-weight="800"
+        font-size="154" text-anchor="middle" dominant-baseline="central">$</text>
+</svg>
