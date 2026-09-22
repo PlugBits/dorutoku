@@ -1057,6 +1057,11 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
   white-space: nowrap;
 }
 
+.dk-row-stock {
+
+  align-self: flex-start; margin-top: 3px; font-size: 12px; font-weight: normal; color: var(--sub);
+}
+
 .dk-saved-out { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
 .dk-saved-out-title { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--sub); }
 .dk-saved-out-btns { display: flex; gap: 8px; flex-wrap: wrap; }

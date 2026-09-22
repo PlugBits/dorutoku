@@ -836,6 +836,13 @@
       var st = row.getAttribute('data-start') || '';
       return !!st && st !== '不明' && day < st;
     }
+    // §18(2026-09-22): 店頭で現物をもらう在庫限りの案件は、開始日当日だけ行に注記を出す。
+    // 「もう無いかもしれない」は情報だが、裏が取れていないので断定はしない(「売り切れました」とは書かない)。
+    // デジタル・不明は出さない(迷ったら出さない。出しすぎると注記が効かなくなる)。
+    function stockNote(row, day) {
+      var st = row.getAttribute('data-start') || '';
+      return row.getAttribute('data-stock') === '店頭現物' && !!st && st !== '不明' && st === day;
+    }
     function markSoon(row, day) {
       var body = row.querySelector('.dk-row-body');
       if (!body) return;
@@ -849,6 +856,17 @@
         }
       } else if (tag) {
         tag.remove();
+      }
+      var stockTag = body.querySelector('.dk-row-stock');
+      if (stockNote(row, day)) {
+        if (!stockTag) {
+          stockTag = document.createElement('span');
+          stockTag.className = 'dk-row-stock';
+          stockTag.textContent = '朝のうちに無くなることがあります';
+          body.appendChild(stockTag);
+        }
+      } else if (stockTag) {
+        stockTag.remove();
       }
     }
     function heroIdFor(day) {
