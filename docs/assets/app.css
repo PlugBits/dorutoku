@@ -53,6 +53,10 @@ a { color: var(--accent); }
   max-width: 640px; margin: 0 auto; padding: 8px 16px 4px; min-height: var(--head-h);
   display: flex; align-items: center; gap: 12px;
 }
+
+.dk-head-brand { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.dk-head-logo { flex: none; width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.dk-head-name { font-size: 10px; line-height: 1; font-weight: 800; color: var(--ink); }
 .dk-head-sun { flex: none; width: 34px; height: 34px; color: var(--yellow); display: flex; align-items: center; justify-content: center; }
 .dk-head-sun svg { width: 30px; height: 30px; }
 .dk-head-sun.night { color: var(--ink); }
@@ -865,7 +869,7 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .dk-sec-ico { display: flex; color: var(--ink); }
 .dk-sec-ico svg { width: 16px; height: 16px; }
 .dk-more { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 700; color: var(--pink); text-decoration: none; white-space: nowrap; }
-.dk-more .chev { font-size: 16px; line-height: 1; }
+.chev { font-size: 16px; line-height: 1; }
 
 .dk-more { position: relative; }
 .dk-more::after {
@@ -873,6 +877,10 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
   width: 100%; min-width: 44px; height: 48px;
 }
 .dk-empty { font-size: 15px; color: var(--sub); padding: 10px 2px; }
+
+.dk-mascot-block { text-align: center; padding: 28px 16px 20px; }
+.dk-mascot-block .dk-empty { padding: 0 0 6px; }
+.dk-mascot-img { width: auto; height: 96px; object-fit: contain; display: block; margin: 0 auto 12px; }
 
 .dk-list { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); overflow: hidden; }
 .dk-row {

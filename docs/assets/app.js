@@ -1109,3 +1109,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDealSheet);
   else initDealSheet();
 })();
+
+// ---- /ig/ の帯(§20-3) ----
+(function () {
+  function initIgBand() {
+    var closeBtn = document.getElementById('dk-ig-band-close');
+    var band = document.getElementById('dk-ig-band');
+    if (!closeBtn || !band) return;
+    closeBtn.addEventListener('click', function () {
+      band.hidden = true;
+      try { localStorage.setItem('dk_ig_band_closed', '1'); } catch (e) {}
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initIgBand);
+  else initIgBand();
+})();
