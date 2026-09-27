@@ -1,3 +1,6 @@
+// §22-b 裏付けの印(Lucide の check / circle-help。絵文字は機種で見た目が変わり ❓ は赤く警告に見えるため)
+var DK_ICON_CHECK = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
 // web/app.js — お得(/deals)・カードページの共有クライアントロジック。
 // mode(document.body.dataset.mode)は "public"(公開サイト、fetch無し・データは埋め込み済み)と
 // "local"(手元の非公開モード。web/personal.js が追加の個人機能を足す)の両方で同じこの
@@ -931,6 +934,11 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  // §22(2026-09-26): verified_at(YYYY-MM-DD)を「M/D」に。壊れた値でも空を返すだけで落ちない。
+  function mdLabel(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    return m ? (parseInt(m[2], 10) + '/' + parseInt(m[3], 10)) : '';
+  }
   function savedGet() {
     try { var a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); return Array.isArray(a) ? a : []; }
     catch (e) { return []; }
@@ -956,6 +964,7 @@
       quote: document.getElementById('dk-sheet-quote'),
       facts: document.getElementById('dk-sheet-facts'),
       src: document.getElementById('dk-sheet-src'),
+      verify: document.getElementById('dk-sheet-verify'),
       open: document.getElementById('dk-sheet-open'),
       save: document.getElementById('dk-sheet-save'),
       storelink: document.getElementById('dk-sheet-storelink')
@@ -1038,10 +1047,26 @@
         // 名前は **リンク先(url)** から作る。d.sources は「どこで気づいたか」なので、
         // 公式ページが出どころでもまとめサイトの名前が入っていることがある
         var site = d.source_site || (d.sources || []).join('・');
-        var where = d.source_kind === 'official' ? ('公式ページ(' + site + ')')
-          : d.source_kind === 'roundup' ? (site + '(非公式のまとめ)') : site;
         var bits = [];
-        if (site) bits.push('情報元: ' + where);
+        // §22-b(2026-09-26): 「確かめたか」は情報元の上の1行(el.verify)に出す。情報元の
+        // (公式)/(非公式のまとめ)は「どこの情報か」の別の軸なので url ホストの判定のまま残す。
+        // 未確認(空を含む)は §22-b の文言どおり裏付けの行に情報元まで書くので、ここでは重ねない。
+        var ok = d.verified === '公式';
+        if (ok) {
+          var kind = d.source_kind;
+          var where = kind === 'official' ? ('公式ページ(' + site + ')')
+            : kind === 'roundup' ? (site + '(非公式のまとめ)') : site;
+          if (site) bits.push('情報元: ' + where);
+        }
+        if (el.verify) {
+          var at = mdLabel(d.verified_at);
+          el.verify.className = 'dk-sheet-verify ' + (ok ? 'is-ok' : 'is-un');
+          el.verify.innerHTML = ok
+            ? DK_ICON_CHECK + esc('店の公式ページで確認しました' + (at ? '(' + at + ')' : '') + '。条件は変わることがあります。')
+            : DK_ICON_HELP + esc('店の公式ページではまだ確認できていません' + (at ? '(' + at + ' 時点)' : '') + '。情報元: '
+              + (site ? site + (d.source_kind === 'official' ? '' : '(非公式のまとめ)') : '(非公式のまとめ)')
+              + '。行く前に店のアプリか公式ページで確かめてください。');
+        }
         if (d.updated) bits.push('確認日: ' + d.updated);
         el.src.innerHTML = esc(bits.join(' ・ '));
       }
