@@ -1,17 +1,9 @@
-// §22-b 裏付けの印(Lucide の check / circle-help。絵文字は機種で見た目が変わり ❓ は赤く警告に見えるため)
 var DK_ICON_CHECK = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
-// web/app.js — お得(/deals)・カードページの共有クライアントロジック。
-// mode(document.body.dataset.mode)は "public"(公開サイト、fetch無し・データは埋め込み済み)と
-// "local"(手元の非公開モード。web/personal.js が追加の個人機能を足す)の両方で同じこの
-// ファイルを読む。
-// このファイルには個人データへの参照(fetch /api/... 等)を一切書かない。個人データは
-// window.personalApi(既定はlocalStorageだけの実装。mode=local では personal.js が上書きする)
-// を通してだけ触る。これが「一つの層」(personalApi)を守るための境界線。
+
 (function () {
   'use strict';
 
-  // ---------------- personalApi: 既定は localStorage(公開版のデフォルト実装) ----------------
   window.personalApi = window.personalApi || {
     savedGet: function () {
       try {
@@ -21,14 +13,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       } catch (e) { return []; }
     },
     savedSet: function (ids) {
-      try { localStorage.setItem('pb_deals_saved_v1', JSON.stringify(ids)); } catch (e) { /* ignore */ }
+      try { localStorage.setItem('pb_deals_saved_v1', JSON.stringify(ids)); } catch (e) {  }
     },
-    // 単品特価を既定で畳まず常に表示するか(v2, 2026-09-19)。公開サイトは端末のlocalStorageだけ。
+
     singlesAlwaysGet: function () {
       try { return localStorage.getItem('pb_deals_singles_always_v1') === '1'; } catch (e) { return false; }
     },
     singlesAlwaysSet: function (on) {
-      try { localStorage.setItem('pb_deals_singles_always_v1', on ? '1' : '0'); } catch (e) { /* ignore */ }
+      try { localStorage.setItem('pb_deals_singles_always_v1', on ? '1' : '0'); } catch (e) {  }
     },
   };
 
@@ -42,8 +34,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   ];
 
   function initDealsPage() {
-    // /cards や記事のページには一覧が無いので何もしない。場面別ページ(/scene/*.html)は
-    // タブも日付帯も無いが、カードはあるので郵便番号の絞り込みとハートだけ動かす。
+
     var tabsWrap = document.getElementById('tabs-wrap');
     if (!tabsWrap && !document.querySelector('.card[data-id], .bundle-item[data-id]')) return;
 
@@ -64,13 +55,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return TABS[0];
     }
 
-    // v2(2026-09-19): セクションは時間軸(今日やること/今週/先の予定)なので、絞り込みは
-    // カード単位(.card[data-scene]・.bundle-item[data-scene])で行う。バンドルは中の1件でも
-    // 見えていれば表示し、全部隠れたら畳む。セクションはカードが1件も残らなければ丸ごと隠す
-    // (ただし「今日やることはありません」等の空文言だけの節=.cards が無い節はそのまま触らない)。
-    // ---------- 郵便番号での絞り込み(公開サイト、2026-09-20) ----------
-    // 台帳の地域は州までしか無いので、郵便番号は州を特定する入口として使う。
-    // 表(郵便番号の帯 → 州)は us_zip.py が唯一の置き場で、ページに埋め込まれたものを読む。
     var ZIP_KEY = 'pb_deals_zip_v1';
     var zipTable = readJSON('zip-states') || { ranges: [], labels: {} };
 
@@ -92,7 +76,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       try {
         if (v) localStorage.setItem(ZIP_KEY, JSON.stringify(v));
         else localStorage.removeItem(ZIP_KEY);
-      } catch (e) { /* プライベートウィンドウ等。絞り込み自体はこのまま動く */ }
+      } catch (e) {  }
     }
 
     function regionOk(el) {
@@ -106,8 +90,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       var note = document.getElementById('zip-note');
       var clear = document.getElementById('zip-clear');
       if (!note) return;
-      // 「どこにも送信しない」は絞り込みの前後どちらでも出しておく(読者が一番気にする点なので、
-      // 絞り込んだ瞬間に消えないようにする)
+
       var privacy = ' 入力はこの端末のブラウザにだけ残り、どこにも送信しません。';
       if (state.region) {
         var label = zipTable.labels[state.region] || state.region;
@@ -123,7 +106,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     function setZip(raw, persist) {
       var st = stateOfZip(raw);
       var input = document.getElementById('zip-input');
-      // 5桁そろっていないうちは何も変えない(打っている途中で一覧が消えないように)
+
       if (!/^\s*\d{5}/.test(String(raw || '')) && String(raw || '').trim() !== '') {
         return;
       }
@@ -181,7 +164,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         var sec = document.getElementById(id);
         if (!sec) return;
         var cardsWrap = sec.querySelector('.cards');
-        if (!cardsWrap) return;   // 元々0件で空文言だけの節はそのまま(絞り込みでは触らない)
+        if (!cardsWrap) return;
         var anyVisible = false;
         cardsWrap.querySelectorAll(':scope > .card, :scope > .store-bundle').forEach(function (c) {
           if (!c.hidden) anyVisible = true;
@@ -202,7 +185,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       });
       var chipWrap = document.getElementById('filter-chip-wrap');
       var chip = document.getElementById('filter-chip');
-      if (!chipWrap || !chip) return;                       // 場面別ページには日付帯が無い
+      if (!chipWrap || !chip) return;
       if (!state.activeDate) { chipWrap.hidden = true; return; }
       var btn = document.querySelector('.date-chip[data-date="' + state.activeDate + '"]');
       var md = btn ? btn.querySelector('.md').textContent : state.activeDate;
@@ -255,7 +238,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       });
     }
 
-    // ---------------- 単品特価「次回から常に表示する」設定(v2, 2026-09-19) ----------------
     function applySinglesPref() {
       var det = document.getElementById('section-singles');
       if (!det) return;
@@ -271,10 +253,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       renderDateStrip(); applyFilters();
     }
 
-    // 公式ページを見る、のクリックを「仮想ページビュー」として記録する(実際のリンク遷移は
-    // ブラウザ標準の挙動に任せ、preventDefault はしない)
     function trackOutbound(slug) {
-      try { history.pushState({}, '', (location.pathname.indexOf('/deals') === 0 ? '/deals' : '') + '/out/' + slug + '/'); } catch (e) { /* ignore */ }
+      try { history.pushState({}, '', (location.pathname.indexOf('/deals') === 0 ? '/deals' : '') + '/out/' + slug + '/'); } catch (e) {  }
     }
 
     document.addEventListener('click', function (e) {
@@ -301,9 +281,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (det) det.open = cb.checked;
     });
 
-    // ---------------- 「もっと見る」(公開サイトのみ、2026-09-20) ----------------
-    // index を軽くするため、上位40件より後と単品は同一オリジンの静的 JSON から足す。
-    // 読むのは書き出し時に作った /deals/more.json だけ(API は無い。外部にも出ない)。
     function loadMore(btn) {
       var sec = document.getElementById('more-section');
       var slot = document.getElementById('more-slot');
@@ -334,7 +311,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     applyFilters();
     applySinglesPref();
 
-    // mode=local: personal.js がサーバーから saved を取り直したら呼ぶ再同期フック
     window.tpApp = window.tpApp || {};
     window.tpApp.refreshSaved = function () {
       state.saved = personalApi.savedGet();
@@ -350,10 +326,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   }
 })();
 
-// ================= v3 シェル(2026-09-20, 仕様 §9-1・§2・§9-3) =================
-// ヘッダーのあいさつ/地名/ベル、地域と「期限が近い」の2枚のボトムシート、Deals の
-// タイル8個と検索の絞り込み。公開サイトでも手元モードでも同じこの1つが動く
-// (どちらも実行時に外部へは一切 fetch しない。データはページに焼いてある)。
 (function () {
   'use strict';
   var ZIP_KEY = 'pb_deals_zip_v1';
@@ -375,7 +347,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     try {
       if (v) localStorage.setItem(ZIP_KEY, JSON.stringify(v));
       else localStorage.removeItem(ZIP_KEY);
-    } catch (e) { /* プライベートウィンドウ等。絞り込み自体はこのまま動く */ }
+    } catch (e) {  }
   }
 
   function initV3() {
@@ -384,8 +356,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var zipTable = readJSON('zip-states') || { ranges: [], labels: {} };
     var due = readJSON('dk-due-data') || [];
 
-    // ---- あいさつ(§9-1): 05-10 おはようございます / 10-17 こんにちは / それ以外 こんばんは。
-    // 公開サイトは1日1回しか作られないので、焼いた時刻ではなく読む人の時計で決める。
     var greetEl = document.getElementById('dk-greet'), sunEl = document.getElementById('dk-sun');
     if (greetEl) {
       var h = new Date().getHours();
@@ -398,7 +368,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       }
     }
 
-    // ---- 地名(§9-1)と州の絞り込み(§2) ----
     var locName = document.getElementById('dk-loc-name');
     var state = null;
     var saved = zipLoad();
@@ -421,7 +390,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (clear) clear.hidden = !state;
     }
 
-    // 州限定の行だけを隠す(全米・オンライン・不明は常に出す)
     function regionOk(el) {
       if (!state) return true;
       var attr = el.getAttribute('data-region') || 'unknown';
@@ -429,7 +397,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return attr.split(',').indexOf(state) !== -1;
     }
 
-    // ---- ボトムシート ----
     var backdrop = document.getElementById('dk-sheet-backdrop');
     function openSheet(id) {
       var sheet = document.getElementById(id);
@@ -444,7 +411,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         var el = document.getElementById(id);
         if (el) el.hidden = true;
       });
-      // ディールのシート(§10)は履歴を1つ積んでいるので、専用の閉じ方を呼ぶ
+
       if (typeof window.dkCloseDeal === 'function') window.dkCloseDeal();
       if (window.dkSyncScrollLock) window.dkSyncScrollLock();
     }
@@ -456,7 +423,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheets(); });
 
-    // ---- ベルの一覧(§9-1): 期限3日以内。ページに焼いた一覧をそのまま出す ----
     var dueList = document.getElementById('dk-due-list');
     if (dueList) {
       dueList.innerHTML = due.length ? due.map(function (d) {
@@ -467,14 +433,13 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       }).join('') : '<p class="dk-empty">期限が近いお得はありません</p>';
     }
 
-    // ---- 郵便番号の入力(§2) ----
     var zipInput = document.getElementById('zip-input'), zipNote = document.getElementById('zip-note');
     if (zipInput) {
       if (saved && saved.zip) zipInput.value = saved.zip;
       zipInput.addEventListener('input', function () {
         var raw = zipInput.value;
         if (String(raw || '').trim() === '') { state = null; zipSave(null); renderLoc(); applyFilters(); return; }
-        if (!/^\s*\d{5}/.test(String(raw))) return;   // 打っている途中は変えない
+        if (!/^\s*\d{5}/.test(String(raw))) return;
         var st = stateOfZip(raw);
         if (st === null) {
           if (zipNote) zipNote.textContent = 'その郵便番号から州を判定できませんでした。5桁で入れてみてください。';
@@ -494,7 +459,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       });
     }
 
-    // ---- Deals(§9-3): タイル8個 + 検索で店の一覧を絞る ----
     var tilesWrap = document.getElementById('dk-tiles');
     var storeList = document.getElementById('dk-store-list');
     var storeEmpty = document.getElementById('dk-store-empty');
@@ -515,8 +479,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         });
         if (storeEmpty) storeEmpty.hidden = any;
       }
-      // Home の一覧も州で絞る。日付の帯(§12)が8件の頭打ちを数えるので、ここでは
-      // hidden を直接いじらず印だけ付け、数え直しは日付側に任せる。
+
       document.querySelectorAll('.dk-list .dk-row[data-region]').forEach(function (row) {
         if (storeList && storeList.contains(row)) return;
         row.classList.toggle('is-region-out', !regionOk(row));
@@ -546,7 +509,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   else initV3();
 })();
 
-// ---- Me タブ(§9-5): お住まいの地域の入口と、気になるリスト(端末内) ----
 (function () {
   'use strict';
   function initMe() {
@@ -554,7 +516,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var listEl = document.getElementById('dk-saved-list');
     if (!locBtn && !listEl) return;
 
-    // 地域: ヘッダーの地名と同じボトムシートを開く(§2 入口は2つ、シートは1枚)
     if (locBtn) {
       locBtn.addEventListener('click', function () {
         var head = document.getElementById('dk-loc');
@@ -569,7 +530,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       }
     }
 
-    // 気になるリスト: localStorage の id と、ページに焼いた一覧を突き合わせるだけ
     if (!listEl) return;
     var catalog = {};
     try { catalog = JSON.parse(document.getElementById('dk-saved-catalog').textContent) || {}; } catch (e) { catalog = {}; }
@@ -591,10 +551,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   else initMe();
 })();
 
-// ---- シートを開いているあいだ背景をスクロールさせない(2026-09-21 の指摘) ----
-// iPhone の Safari は body{overflow:hidden} だけでは背面が動くので、position:fixed +
-// top:-<開いた時のスクロール量> で止め、閉じたら元の位置へ戻す。シートの中身(.sheet-body)は
-// overflow-y:auto のままなので縦に動かせる。シートは position:fixed なので body の固定に影響されない。
 (function () {
   'use strict';
   var IDS = ['dk-deal-sheet', 'dk-loc-sheet', 'dk-due-sheet', 'dk-import-sheet'];
@@ -624,21 +580,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     locked = false;
     window.scrollTo(0, y);
   }
-  // 開閉のたびに呼ぶ。どれか1枚でも開いていれば止め、全部閉じたら戻す(何度呼んでもよい)。
+
   window.dkSyncScrollLock = function () { if (anyOpen()) lock(); else unlock(); };
 })();
 
-// ---- 気になるリストの持ち出しと取り込み(2026-09-21) ----
-// ログインも名簿も作らない代わりに、端末内の「気になる」を持ち出せるようにする。
-//  - テキストで写す: 1件1行「店名 / 見出し / 期限 / 元ページのURL」をクリップボードへ
-//  - リンクで持ち運ぶ: いまのページのURLに #saved=<id>,<id>… を付けて共有
-//  - #saved= 付きで開かれたら中身を見せて「この端末のリストに取り込む」(既存に**足す**)
-// **URLに載せるのはお得の番号だけ。** 地域やカードの持ち物、手元メモの類は一切載せない
-// (載せる欄は templates.SAVED_EXPORT_KEYS に限ってある)。公開と手元で同じこの関数が動く。
 (function () {
   'use strict';
   var SAVED_KEY = 'pb_deals_saved_v1';
-  var MAX_SHARE = 50;        // URLが長くなりすぎないように先頭50件まで
+  var MAX_SHARE = 50;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -649,15 +598,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     try { var a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); return Array.isArray(a) ? a : []; }
     catch (e) { return []; }
   }
-  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) { /* ignore */ } }
+  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) {  } }
 
-  // 名前を引く先は2つ: Me に焼いた一覧と、そのページのシート用の一覧。どちらも無ければ番号だけ出す。
   function catalogs() {
     var out = [];
     ['dk-saved-catalog', 'dk-deal-data'].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
-      try { out.push(JSON.parse(el.textContent) || {}); } catch (e) { /* ignore */ }
+      try { out.push(JSON.parse(el.textContent) || {}); } catch (e) {  }
     });
     return out;
   }
@@ -666,7 +614,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     for (var i = 0; i < cs.length; i++) { if (cs[i][id]) return cs[i][id]; }
     return null;
   }
-  // 番号として通す形だけ受け付ける(URL から来た文字をそのまま信じない)
+
   function validIds(list) {
     var seen = {}, out = [];
     (list || []).forEach(function (raw) {
@@ -680,7 +628,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     if (navigator.clipboard && navigator.clipboard.writeText) {
       return navigator.clipboard.writeText(text);
     }
-    return new Promise(function (resolve, reject) {      // 古い端末向けの控え
+    return new Promise(function (resolve, reject) {
       try {
         var ta = document.createElement('textarea');
         ta.value = text; ta.setAttribute('readonly', '');
@@ -693,7 +641,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     });
   }
 
-  // ---- 書き出す(Me のボタン2つ) ----
   function initExport() {
     var box = document.getElementById('dk-saved-out');
     var copyBtn = document.getElementById('dk-saved-copy');
@@ -702,11 +649,11 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var ta = document.getElementById('dk-saved-ta');
     if (!box || !copyBtn || !linkBtn) return;
     var ids = validIds(savedGet());
-    if (!ids.length) return;                 // 1件も無いときはボタンを出さない
+    if (!ids.length) return;
     box.hidden = false;
 
     function say(text) { if (!msg) return; msg.textContent = text; msg.hidden = false; }
-    function showFallback(text) {            // クリップボードが使えない端末では見せて選べるようにする
+    function showFallback(text) {
       if (!ta) return;
       ta.value = text; ta.hidden = false; ta.focus(); ta.select();
     }
@@ -743,7 +690,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     });
   }
 
-  // ---- 取り込む(#saved= 付きで開かれたとき) ----
   function initImport() {
     var m = location.hash.match(/^#saved=(.*)$/);
     if (!m) return;
@@ -780,10 +726,9 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       goBtn.disabled = false;
       goBtn.textContent = 'この端末のリストに取り込む';
       if (msg) { msg.hidden = true; msg.textContent = ''; }
-      // addEventListener ではなく代入にする(#saved= が読み込み無しで変わったときに
-      // もう一度ここを通るので、二重に効かないようにするため)
+
       goBtn.onclick = function () {
-        var now = validIds(savedGet());              // 押した時点のものに足す(上書きしない)
+        var now = validIds(savedGet());
         var added = 0;
         incoming.forEach(function (id) { if (now.indexOf(id) === -1) { now.push(id); added++; } });
         savedSet(now);
@@ -804,15 +749,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   function init() { initExport(); initImport(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
-  // 同じページのまま #saved= が付いたとき(リンクをアドレス欄に貼った・別のタブから戻った)も開く。
-  // ハッシュだけの移動ではページが読み直されないので、これが無いと何も起きない。
+
   window.addEventListener('hashchange', initImport);
 })();
 
-
-// ---- §12 日付の帯(2026-09-21): 選んだ日でヒーローと一覧の両方を絞る ----
-// 日ごとのヒーローはサーバーが全部選んで焼いてあるので、ここは見せ替えるだけ。
-// 行は「その日に使えるか」(start ≤ その日 ≤ end、不明の側は縛らない)で絞り、8件で頭打ちにする。
 (function () {
   'use strict';
   var ROWS_MAX = 8;
@@ -826,22 +766,19 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var rows = Array.prototype.slice.call(list.querySelectorAll('.dk-row'));
 
     function availableOn(row, day) {
-      // §17(2026-09-21): 無料・在庫限りは start の前日から出す。出し始める日は
-      // data-from(サーバーが preview_from() で計算したもの)を見る。無ければ start。
+
       var s = row.getAttribute('data-from') || row.getAttribute('data-start') || '';
       var e = row.getAttribute('data-end') || '';
       if (s && s !== '不明' && s > day) return false;
       if (e && e !== '不明' && e < day) return false;
       return true;
     }
-    // その日にはまだ始まっていない(前日に先出ししている)か
+
     function notYet(row, day) {
       var st = row.getAttribute('data-start') || '';
       return !!st && st !== '不明' && day < st;
     }
-    // §18(2026-09-22): 店頭で現物をもらう在庫限りの案件は、開始日当日だけ行に注記を出す。
-    // 「もう無いかもしれない」は情報だが、裏が取れていないので断定はしない(「売り切れました」とは書かない)。
-    // デジタル・不明は出さない(迷ったら出さない。出しすぎると注記が効かなくなる)。
+
     function stockNote(row, day) {
       var st = row.getAttribute('data-start') || '';
       return row.getAttribute('data-stock') === '店頭現物' && !!st && st !== '不明' && st === day;
@@ -909,7 +846,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         if (first) select(first.getAttribute('data-day'), first.getAttribute('data-label'));
       });
     }
-    // 州の絞り込み(ヘッダーの地名)が行を隠したあとも、8件の頭打ちを数え直す
+
     window.dkReselectDay = function () {
       var on = days.querySelector('.dk-day.is-on') || days.querySelector('.dk-day');
       if (on) select(on.getAttribute('data-day'), on.getAttribute('data-label'));
@@ -921,10 +858,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   else initStrip();
 })();
 
-// ---- §10 ディールの詳細(ボトムシート、2026-09-21) ----
-// 行・ヒーローをタップしてもページを移らない。history.pushState で #d-<id> を積み、
-// 端末の戻る操作(popstate)で閉じる。#d-<id> 付きで直接開かれたら、その状態で開く。
-// 要約(§11)だけは別ファイルから1回だけ読む(無くてもシートは成立する)。
 (function () {
   'use strict';
   var SAVED_KEY = 'pb_deals_saved_v1';
@@ -934,7 +867,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  // §22(2026-09-26): verified_at(YYYY-MM-DD)を「M/D」に。壊れた値でも空を返すだけで落ちない。
+
   function mdLabel(iso) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
     return m ? (parseInt(m[2], 10) + '/' + parseInt(m[3], 10)) : '';
@@ -943,7 +876,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     try { var a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); return Array.isArray(a) ? a : []; }
     catch (e) { return []; }
   }
-  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) { /* ignore */ } }
+  function savedSet(a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a)); } catch (e) {  } }
 
   function initDealSheet() {
     var dataEl = document.getElementById('dk-deal-data');
@@ -974,10 +907,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (!value) return '';
       return '<div class="row"><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>';
     }
-    // 要約の書式(2026-09-21 の指摘「見出しや改行を入れて読みやすく」「太文字も」)。
-    // **先にエスケープしてから** 4つだけを組み立てる: `## 見出し` / 空行での段落 /
-    // `**…**` の太字 / 行頭の `1.` の番号リスト。それ以外のタグは一切通さない。
-    // 書式の入っていない古い要約は、丸ごと1つの段落として読める。
+
     function bold(t) {
       return t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     }
@@ -1024,7 +954,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       fetch(summarySrc, { credentials: 'omit' })
         .then(function (r) { return r.ok ? r.json() : {}; })
         .then(function (j) { summaries = j || {}; renderSummary(id); })
-        .catch(function () { summaries = {}; renderSummary(id); });   // 読めなくてもシートは成立する
+        .catch(function () { summaries = {}; renderSummary(id); });
     }
     function renderSaveBtn(id) {
       if (!el.save) return;
@@ -1037,20 +967,15 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (el.store) el.store.textContent = d.store || '';
       if (el.headline) el.headline.textContent = d.headline || '';
       if (el.facts) {
-        // personal は手元モードにしか入っていない(公開ビルドは deal_detail が落とす)
+
         el.facts.innerHTML = row('条件', d.cond || d.cond_full) + row('対象者', d.who)
           + row('期間', d.period) + row('地域', d.region) + row('手元メモ', d.personal);
       }
       if (el.src) {
-        // 出どころは名前だけだと読む人に伝わらないので、公式かまとめかを添える
-        // (2026-09-21 の指摘「Living on the Cheap とだけ出ても意味が分からない」)
-        // 名前は **リンク先(url)** から作る。d.sources は「どこで気づいたか」なので、
-        // 公式ページが出どころでもまとめサイトの名前が入っていることがある
+
         var site = d.source_site || (d.sources || []).join('・');
         var bits = [];
-        // §22-b(2026-09-26): 「確かめたか」は情報元の上の1行(el.verify)に出す。情報元の
-        // (公式)/(非公式のまとめ)は「どこの情報か」の別の軸なので url ホストの判定のまま残す。
-        // 未確認(空を含む)は §22-b の文言どおり裏付けの行に情報元まで書くので、ここでは重ねない。
+
         var ok = d.verified === '公式';
         if (ok) {
           var kind = d.source_kind;
@@ -1088,7 +1013,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       sheet.hidden = false;
       if (window.dkSyncScrollLock) window.dkSyncScrollLock();
       if (push && location.hash !== '#d-' + id) {
-        try { history.pushState({ deal: id }, '', '#d-' + id); } catch (e) { /* ignore */ }
+        try { history.pushState({ deal: id }, '', '#d-' + id); } catch (e) {  }
       }
       return true;
     }
@@ -1099,7 +1024,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (window.dkSyncScrollLock) window.dkSyncScrollLock();
       current = null;
       if (!pop && location.hash.indexOf('#d-') === 0) {
-        try { history.back(); } catch (e) { /* ignore */ }
+        try { history.back(); } catch (e) {  }
       }
     }
 
@@ -1127,7 +1052,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     window.dkCloseDeal = function () { closeDeal(false); };
 
-    // #d-<id> 付きで直接開かれたとき
     var m0 = location.hash.match(/^#d-(.+)$/);
     if (m0) openDeal(m0[1], false);
   }
@@ -1135,7 +1059,6 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   else initDealSheet();
 })();
 
-// ---- /ig/ の帯(§20-3) ----
 (function () {
   function initIgBand() {
     var closeBtn = document.getElementById('dk-ig-band-close');
