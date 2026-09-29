@@ -1117,6 +1117,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var resultSumEl = document.getElementById('dk-af-result-sum');
     var resultTextEl = document.getElementById('dk-af-result-text');
     var resultNoteEl = document.getElementById('dk-af-result-note');
+    var checkedLineEl = document.getElementById('dk-af-checked-line');
     if (!pickList || !stepPick || !stepBenefits || !stepResult || !benefitListEl || !calcBtn) return;
 
     var currentCard = null;
@@ -1141,19 +1142,34 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return '' +
         '<div class="dk-af-benefit" data-af-idx="' + j + '">' +
           '<label class="dk-af-benefit-check">' +
-            '<input type="checkbox" class="dk-af-use-check">' +
+            '<input type="checkbox" class="dk-af-use-check"' + (b.needs_spend ? '' : ' checked') + '>' +
             '<span class="dk-af-benefit-label">' + esc(b.label_ja) + '</span>' +
           '</label>' +
           '<p class="dk-af-benefit-amount"><strong>' + esc(amt) + '</strong>' +
             (b.provisional ? '<span class="badge badge-check">仮の金額(プレビュー)</span>' : '') +
             (b.period_note ? '<span class="dk-af-benefit-period">' + esc(b.period_note) + '</span>' : '') +
+            (b.ends_label ? '<span class="dk-af-benefit-ends">' + esc(b.ends_label) + '</span>' : '') +
           '</p>' +
           (b.note ? '<p class="dk-af-benefit-note">' + esc(b.note) + '</p>' : '') +
-          '<div class="dk-af-benefit-input" hidden>' +
-            '<label class="dk-af-amount-label">使う額(年額)' +
-              '<input type="number" class="dk-af-amount-input" min="0" max="' + b.annual_usd +
-              '" step="0.01" value="' + b.annual_usd + '">' +
-            '</label>' +
+          '<div class="dk-af-benefit-input"' + (b.needs_spend ? ' hidden' : '') + '>' +
+            (typeof b.step_usd === 'number'
+
+              ? '<div class="dk-af-amount-label">' +
+                  '<span class="dk-af-amount-text">使う額(年額)</span>' +
+                  '<span class="dk-af-stepper">' +
+                    '<button type="button" class="dk-af-step-btn" data-af-step="-1" disabled aria-label="' +
+                      esc(fmtUsd(b.step_usd)) + '減らす">−</button>' +
+                    '<input type="number" class="dk-af-amount-input" aria-label="使う額(年額)" min="0" max="' +
+                      b.annual_usd + '" step="0.01" value="' + b.annual_usd + '">' +
+                    '<button type="button" class="dk-af-step-btn" data-af-step="1" disabled aria-label="' +
+                      esc(fmtUsd(b.step_usd)) + '増やす">+</button>' +
+                  '</span>' +
+                '</div>' +
+                '<p class="dk-af-step-hint">−/+ で1回分(' + esc(fmtUsd(b.step_usd)) + ')ずつ変わります</p>'
+              : '<label class="dk-af-amount-label">使う額(年額)' +
+                  '<input type="number" class="dk-af-amount-input" min="0" max="' + b.annual_usd +
+                  '" step="0.01" value="' + b.annual_usd + '">' +
+                '</label>') +
           '</div>' +
           '<p class="dk-af-benefit-verify">' + verifyMarkHtml(b) + '</p>' +
         '</div>';
@@ -1166,6 +1182,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
             (b.amount ? '<span class="dk-af-unvalued-amount">(' + esc(b.amount) + ')</span>' : '') +
           '</p>' +
           (b.period_note ? '<p class="dk-af-benefit-period">' + esc(b.period_note) + '</p>' : '') +
+          (b.ends_label ? '<p class="dk-af-benefit-ends">' + esc(b.ends_label) + '</p>' : '') +
           (b.note ? '<p class="dk-af-benefit-note">' + esc(b.note) + '</p>' : '') +
           '<p class="dk-af-benefit-verify">' + verifyMarkHtml(b) + '</p>' +
         '</li>';
@@ -1183,6 +1200,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
           '<span class="dk-af-card-pick-ja">' + esc(c.name_ja) + '</span>' +
           '<span class="dk-af-card-pick-en">' + esc(c.name_en) + '</span>' +
           (c.unverified ? '<span class="dk-vmark is-un">' + DK_ICON_HELP + '出どころ未確認(プレビュー)</span>' : '') +
+          (c.unchecked ? '<span class="dk-vmark is-un">' + DK_ICON_HELP + '照合前(プレビュー)</span>' : '') +
           '</button>';
       });
       if (open) html += '</div>';
@@ -1202,7 +1220,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (!currentCard) return;
       state = {};
       (currentCard.benefits_valued || []).forEach(function (b, j) {
-        state[j] = { used: false, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
+
+        state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
       });
       if (cardTitleEl) cardTitleEl.textContent = currentCard.name_ja;
       if (feeLineEl) {
@@ -1211,6 +1230,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
           : ('年会費 ' + fmtUsd(currentCard.annual_fee));
       }
       benefitListEl.innerHTML = (currentCard.benefits_valued || []).map(benefitRowHtml).join('');
+      Array.prototype.forEach.call(benefitListEl.querySelectorAll('.dk-af-benefit'), syncStepButtons);
       var uv = currentCard.benefits_unvalued || [];
       if (unvaluedWrap && unvaluedListEl) {
         if (uv.length) {
@@ -1241,14 +1261,46 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         var wrap = row.querySelector('.dk-af-benefit-input');
         if (wrap) wrap.hidden = !e.target.checked;
       } else if (e.target.classList.contains('dk-af-amount-input')) {
-        var max = parseFloat(e.target.getAttribute('max'));
-        if (isNaN(max)) max = 0;
-        var v = parseFloat(e.target.value);
-        if (isNaN(v) || v < 0) v = 0;
-        if (v > max) v = max;
-        e.target.value = v;
-        state[idx].amount = v;
+        setAmount(row, parseFloat(e.target.value));
       }
+    });
+
+    function setAmount(row, v) {
+      var idx = row.getAttribute('data-af-idx');
+      var input = row.querySelector('.dk-af-amount-input');
+      if (!input) return;
+      if (!state[idx]) state[idx] = { used: false, amount: 0 };
+      var max = parseFloat(input.getAttribute('max'));
+      if (isNaN(max)) max = 0;
+      if (isNaN(v) || v < 0) v = 0;
+      if (v > max) v = max;
+      v = Math.round(v * 100) / 100;
+      input.value = v;
+      state[idx].amount = v;
+      syncStepButtons(row);
+    }
+
+    function syncStepButtons(row) {
+      var input = row.querySelector('.dk-af-amount-input');
+      if (!input) return;
+      var v = parseFloat(input.value) || 0;
+      var max = parseFloat(input.getAttribute('max')) || 0;
+      var minus = row.querySelector('[data-af-step="-1"]');
+      var plus = row.querySelector('[data-af-step="1"]');
+      if (minus) minus.disabled = v <= 0.005;
+      if (plus) plus.disabled = v >= max - 0.005;
+    }
+
+    benefitListEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-af-step]');
+      if (!btn || btn.disabled) return;
+      var row = btn.closest('.dk-af-benefit');
+      if (!row || !currentCard) return;
+      var b = (currentCard.benefits_valued || [])[parseInt(row.getAttribute('data-af-idx'), 10)];
+      if (!b || typeof b.step_usd !== 'number') return;
+      var input = row.querySelector('.dk-af-amount-input');
+      var cur = parseFloat(input && input.value) || 0;
+      setAmount(row, cur + b.step_usd * parseInt(btn.getAttribute('data-af-step'), 10));
     });
 
     calcBtn.addEventListener('click', function () {
@@ -1277,14 +1329,33 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         resultTextEl.textContent = prefix + tail;
       }
       if (resultNoteEl) {
+        var notes = [];
         var uvCount = (currentCard.benefits_unvalued || []).length;
         if (uvCount > 0) {
-          resultNoteEl.hidden = false;
-          resultNoteEl.textContent = 'ほかに金額にしない特典が' + uvCount +
-            '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。';
+          notes.push('ほかに金額にしない特典が' + uvCount +
+            '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。');
+        }
+
+        var spendOff = 0;
+        (currentCard.benefits_valued || []).forEach(function (b, j) {
+          if (b.needs_spend && !(state[j] || {}).used) spendOff++;
+        });
+        if (spendOff > 0) {
+          notes.push('追加の支出が要る特典 ' + spendOff + '件は入れていません(入れる場合は上で選んでください)。');
+        }
+        resultNoteEl.hidden = !notes.length;
+        resultNoteEl.textContent = notes.join('\n');
+      }
+
+      if (checkedLineEl) {
+        var cm = /^(\d{4})-(\d{2})-(\d{2})/.exec(currentCard.benefits_checked_at || '');
+        if (cm) {
+          checkedLineEl.hidden = false;
+          checkedLineEl.textContent = 'このカードの特典は ' + parseInt(cm[2], 10) + '月' +
+            parseInt(cm[3], 10) + '日に公式ページと照合しました';
         } else {
-          resultNoteEl.hidden = true;
-          resultNoteEl.textContent = '';
+          checkedLineEl.hidden = true;
+          checkedLineEl.textContent = '';
         }
       }
       showStep('result');

@@ -1204,9 +1204,18 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-af-benefit-amount { margin: 6px 0 0; font-size: 15px; color: var(--text-sub); }
 .dk-af-benefit-amount strong { font-size: 17px; font-weight: 900; color: var(--ink); margin-right: 6px; }
 .dk-af-benefit-period { display: block; margin-top: 2px; font-size: 13px; color: var(--sub); }
+.dk-af-benefit-ends { display: block; margin-top: 2px; font-size: 13px; color: var(--sub); font-weight: 600; }
 .dk-af-benefit-note { margin: 6px 0 0; font-size: 13px; color: var(--sub); line-height: 1.6; }
 .dk-af-benefit-verify { margin: 8px 0 0; }
 .dk-af-benefit-input { margin: 10px 0 0; }
+.dk-af-stepper { display: inline-flex; align-items: center; gap: 6px; }
+.dk-af-step-btn {
+  min-width: 48px; min-height: 48px; padding: 0; border: 1.5px solid var(--line); border-radius: 11px;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: 22px; font-weight: 800; line-height: 1;
+  cursor: pointer; touch-action: manipulation;
+}
+.dk-af-step-btn:disabled { opacity: .35; cursor: default; }
+.dk-af-step-hint { font-size: 12px; color: var(--sub); margin: 4px 0 0; }
 .dk-af-amount-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text-sub); }
 .dk-af-amount-input {
   font: inherit; font-size: 16px; font-weight: 800; color: var(--ink); width: 110px; padding: 7px 10px;
@@ -1229,4 +1238,5 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-af-result-box { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); padding: 20px 18px; }
 .dk-af-result-sum { font-size: 19px; font-weight: 900; color: var(--pink-ink); margin: 0 0 10px; line-height: 1.5; }
 .dk-af-result-text { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.6; }
-.dk-af-result-note { font-size: 14px; color: var(--sub); margin: 12px 0 0; line-height: 1.6; }
+.dk-af-result-note { font-size: 14px; color: var(--sub); margin: 12px 0 0; line-height: 1.6; white-space: pre-line; }
+.dk-af-checked-line { font-size: 13px; color: var(--sub); margin: 10px 2px 0; line-height: 1.6; }
