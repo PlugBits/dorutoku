@@ -1072,3 +1072,230 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initIgBand);
   else initIgBand();
 })();
+
+(function () {
+  'use strict';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function fmtUsd(n) {
+    n = Math.round((Number(n) || 0) * 100) / 100;
+    if (n === 0) n = 0;
+    var isInt = Math.abs(n - Math.round(n)) < 1e-9;
+    if (isInt) return '$' + Math.round(n).toLocaleString('en-US');
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function mdLabel(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
+    if (!m) return '';
+    return parseInt(m[2], 10) + '/' + parseInt(m[3], 10);
+  }
+
+  function initAnnualFeeTool() {
+    var dataEl = document.getElementById('dk-af-data');
+    var app = document.getElementById('dk-af-app');
+    if (!dataEl || !app) return;
+    var cards = [];
+    try { cards = JSON.parse(dataEl.textContent) || []; } catch (e) { cards = []; }
+    if (!cards.length) return;
+
+    var pickList = document.getElementById('dk-af-pick-list');
+    var stepPick = document.getElementById('dk-af-step-pick');
+    var stepBenefits = document.getElementById('dk-af-step-benefits');
+    var stepResult = document.getElementById('dk-af-step-result');
+    var cardTitleEl = document.getElementById('dk-af-card-title');
+    var feeLineEl = document.getElementById('dk-af-fee-line');
+    var benefitListEl = document.getElementById('dk-af-benefit-list');
+    var unvaluedWrap = document.getElementById('dk-af-unvalued');
+    var unvaluedListEl = document.getElementById('dk-af-unvalued-list');
+    var calcBtn = document.getElementById('dk-af-calc-btn');
+    var resultSumEl = document.getElementById('dk-af-result-sum');
+    var resultTextEl = document.getElementById('dk-af-result-text');
+    var resultNoteEl = document.getElementById('dk-af-result-note');
+    if (!pickList || !stepPick || !stepBenefits || !stepResult || !benefitListEl || !calcBtn) return;
+
+    var currentCard = null;
+
+    var state = {};
+
+    function verifyMarkHtml(b) {
+      if (b.verified) {
+        var label = '公式ページで確認' + (b.as_of ? ('(' + mdLabel(b.as_of) + ')') : '');
+        if (b.source_url) {
+          return '<a class="dk-vmark is-ok" href="' + esc(b.source_url) +
+                 '" target="_blank" rel="noopener">' + DK_ICON_CHECK + esc(label) + '</a>';
+        }
+        return '<span class="dk-vmark is-ok">' + DK_ICON_CHECK + esc(label) + '</span>';
+      }
+
+      return '<span class="dk-vmark is-un">' + DK_ICON_HELP + '出どころ未確認(プレビュー)</span>';
+    }
+
+    function benefitRowHtml(b, j) {
+      var amt = (typeof b.annual_usd === 'number') ? fmtUsd(b.annual_usd) : '';
+      return '' +
+        '<div class="dk-af-benefit" data-af-idx="' + j + '">' +
+          '<label class="dk-af-benefit-check">' +
+            '<input type="checkbox" class="dk-af-use-check">' +
+            '<span class="dk-af-benefit-label">' + esc(b.label_ja) + '</span>' +
+          '</label>' +
+          '<p class="dk-af-benefit-amount"><strong>' + esc(amt) + '</strong>' +
+            (b.provisional ? '<span class="badge badge-check">仮の金額(プレビュー)</span>' : '') +
+            (b.period_note ? '<span class="dk-af-benefit-period">' + esc(b.period_note) + '</span>' : '') +
+          '</p>' +
+          (b.note ? '<p class="dk-af-benefit-note">' + esc(b.note) + '</p>' : '') +
+          '<div class="dk-af-benefit-input" hidden>' +
+            '<label class="dk-af-amount-label">使う額(年額)' +
+              '<input type="number" class="dk-af-amount-input" min="0" max="' + b.annual_usd +
+              '" step="0.01" value="' + b.annual_usd + '">' +
+            '</label>' +
+          '</div>' +
+          '<p class="dk-af-benefit-verify">' + verifyMarkHtml(b) + '</p>' +
+        '</div>';
+    }
+
+    function unvaluedRowHtml(b) {
+      return '' +
+        '<li class="dk-af-unvalued-item">' +
+          '<p class="dk-af-unvalued-label">' + esc(b.label_ja) +
+            (b.amount ? '<span class="dk-af-unvalued-amount">(' + esc(b.amount) + ')</span>' : '') +
+          '</p>' +
+          (b.period_note ? '<p class="dk-af-benefit-period">' + esc(b.period_note) + '</p>' : '') +
+          (b.note ? '<p class="dk-af-benefit-note">' + esc(b.note) + '</p>' : '') +
+          '<p class="dk-af-benefit-verify">' + verifyMarkHtml(b) + '</p>' +
+        '</li>';
+    }
+
+    function issuerGroupsHtml() {
+      var html = '', lastIssuer = null, open = false;
+      cards.forEach(function (c, i) {
+        if (c.issuer !== lastIssuer) {
+          if (open) html += '</div>';
+          html += '<div class="dk-af-issuer-group"><h3 class="dk-af-issuer-name">' + esc(c.issuer) + '</h3>';
+          lastIssuer = c.issuer; open = true;
+        }
+        html += '<button type="button" class="dk-af-card-pick" data-af-pick="' + i + '">' +
+          '<span class="dk-af-card-pick-ja">' + esc(c.name_ja) + '</span>' +
+          '<span class="dk-af-card-pick-en">' + esc(c.name_en) + '</span>' +
+          (c.unverified ? '<span class="dk-vmark is-un">' + DK_ICON_HELP + '出どころ未確認(プレビュー)</span>' : '') +
+          '</button>';
+      });
+      if (open) html += '</div>';
+      return html;
+    }
+    pickList.innerHTML = issuerGroupsHtml();
+
+    function showStep(name) {
+      stepPick.hidden = name !== 'pick';
+      stepBenefits.hidden = name !== 'benefits';
+      stepResult.hidden = name !== 'result';
+      try { window.scrollTo(0, 0); } catch (e) {  }
+    }
+
+    function selectCard(i) {
+      currentCard = cards[i];
+      if (!currentCard) return;
+      state = {};
+      (currentCard.benefits_valued || []).forEach(function (b, j) {
+        state[j] = { used: false, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
+      });
+      if (cardTitleEl) cardTitleEl.textContent = currentCard.name_ja;
+      if (feeLineEl) {
+        feeLineEl.textContent = currentCard.first_year_waived
+          ? ('初年度は無料・2年目から' + fmtUsd(currentCard.annual_fee))
+          : ('年会費 ' + fmtUsd(currentCard.annual_fee));
+      }
+      benefitListEl.innerHTML = (currentCard.benefits_valued || []).map(benefitRowHtml).join('');
+      var uv = currentCard.benefits_unvalued || [];
+      if (unvaluedWrap && unvaluedListEl) {
+        if (uv.length) {
+          unvaluedWrap.hidden = false;
+          unvaluedListEl.innerHTML = uv.map(unvaluedRowHtml).join('');
+        } else {
+          unvaluedWrap.hidden = true;
+          unvaluedListEl.innerHTML = '';
+        }
+      }
+      showStep('benefits');
+    }
+
+    pickList.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-af-pick]');
+      if (!btn) return;
+      var i = parseInt(btn.getAttribute('data-af-pick'), 10);
+      if (!isNaN(i)) selectCard(i);
+    });
+
+    benefitListEl.addEventListener('change', function (e) {
+      var row = e.target.closest('.dk-af-benefit');
+      if (!row) return;
+      var idx = row.getAttribute('data-af-idx');
+      if (!state[idx]) state[idx] = { used: false, amount: 0 };
+      if (e.target.classList.contains('dk-af-use-check')) {
+        state[idx].used = e.target.checked;
+        var wrap = row.querySelector('.dk-af-benefit-input');
+        if (wrap) wrap.hidden = !e.target.checked;
+      } else if (e.target.classList.contains('dk-af-amount-input')) {
+        var max = parseFloat(e.target.getAttribute('max'));
+        if (isNaN(max)) max = 0;
+        var v = parseFloat(e.target.value);
+        if (isNaN(v) || v < 0) v = 0;
+        if (v > max) v = max;
+        e.target.value = v;
+        state[idx].amount = v;
+      }
+    });
+
+    calcBtn.addEventListener('click', function () {
+      if (!currentCard) return;
+      var sum = 0, allMax = true;
+      (currentCard.benefits_valued || []).forEach(function (b, j) {
+        var s = state[j] || {};
+        if (!s.used) return;
+        var cap = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
+        var amt = (typeof s.amount === 'number') ? s.amount : cap;
+        sum += amt;
+        if (amt < cap - 0.005) allMax = false;
+      });
+      var fee = currentCard.annual_fee || 0;
+      var diff = sum - fee;
+      if (resultSumEl) {
+        resultSumEl.textContent = '特典の合計 ' + fmtUsd(sum) + ' − 年会費 ' + fmtUsd(fee) + ' = 年 ' +
+          (diff >= 0 ? '+' : '−') + fmtUsd(Math.abs(diff));
+      }
+      if (resultTextEl) {
+        var prefix = allMax ? '上限いっぱい使った場合、' : 'この使い方なら、';
+        var tail;
+        if (diff > 0.005) tail = '特典の合計は年会費より ' + fmtUsd(diff) + ' 多くなります。';
+        else if (diff < -0.005) tail = '特典の合計は年会費より ' + fmtUsd(Math.abs(diff)) + ' 少なくなります。';
+        else tail = '特典の合計と年会費は同じ額です。';
+        resultTextEl.textContent = prefix + tail;
+      }
+      if (resultNoteEl) {
+        var uvCount = (currentCard.benefits_unvalued || []).length;
+        if (uvCount > 0) {
+          resultNoteEl.hidden = false;
+          resultNoteEl.textContent = 'ほかに金額にしない特典が' + uvCount +
+            '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。';
+        } else {
+          resultNoteEl.hidden = true;
+          resultNoteEl.textContent = '';
+        }
+      }
+      showStep('result');
+    });
+
+    app.addEventListener('click', function (e) {
+      var back = e.target.closest('[data-af-back]');
+      if (!back) return;
+      showStep(back.getAttribute('data-af-back'));
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAnnualFeeTool);
+  else initAnnualFeeTool();
+})();

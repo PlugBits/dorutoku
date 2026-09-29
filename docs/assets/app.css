@@ -1085,7 +1085,7 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-day-fact { display: flex; gap: 10px; align-items: baseline; }
 .dk-day-fact dt { flex: 0 0 84px; font-size: 13px; font-weight: 700; color: var(--sub); margin: 0; white-space: nowrap; }
 
-.dk-vmark { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; white-space: nowrap; vertical-align: middle; }
+.dk-vmark { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; white-space: nowrap; vertical-align: middle; text-decoration: none; }
 .dk-vmark.is-ok { color: var(--green-ink); }
 .dk-vmark.is-un { color: var(--sub); background: var(--band); padding: 2px 8px 2px 6px; border-radius: 999px; }
 .dk-vmark.is-small { margin-left: 4px; }
@@ -1158,3 +1158,75 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 #dk-import-list .dk-row { cursor: default; }
 
 .dk-sheet-store-link { display: inline-flex; align-items: center; gap: 2px; min-height: 48px; margin: 6px 0 0; font-size: 15px; font-weight: 700; color: var(--pink); text-decoration: none; }
+
+.dk-af-entry {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; margin: 4px 0 22px; padding: 14px 18px; border-radius: var(--r);
+  background: var(--pink); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px;
+}
+.dk-af-entry-arrow { font-weight: 900; }
+
+.dk-af-preview-band {
+  margin: 0 0 18px; padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 700;
+  line-height: 1.6; background: var(--busy-bg); color: var(--busy-fg);
+}
+
+.dk-af-step-title { font-size: 18px; font-weight: 800; margin: 0 0 8px; }
+.dk-af-step-lead { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin: 0 0 14px; }
+
+.dk-af-issuer-group { margin: 0 0 18px; }
+.dk-af-issuer-name { font-size: 13px; font-weight: 800; color: var(--sub); margin: 0 0 8px; }
+.dk-af-card-pick {
+  display: block; width: 100%; text-align: left; min-height: 48px; padding: 12px 16px;
+  margin: 0 0 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
+  font-family: inherit; cursor: pointer;
+}
+.dk-af-card-pick-ja { display: block; font-size: 16px; font-weight: 800; color: var(--ink); }
+.dk-af-card-pick-en { display: block; font-size: 12px; color: var(--sub); margin-top: 2px; }
+.dk-af-card-pick .dk-vmark { margin-top: 6px; }
+
+.dk-af-back {
+  display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; margin: 0 0 10px;
+  border: 0; background: none; font-family: inherit; font-size: 15px; font-weight: 700;
+  color: var(--accent); cursor: pointer;
+}
+.dk-af-card-title { font-size: 20px; font-weight: 800; margin: 0 0 4px; }
+.dk-af-fee-line { font-size: 16px; font-weight: 700; color: var(--sub); margin: 0 0 14px; }
+
+.dk-af-benefit-list { display: flex; flex-direction: column; gap: 10px; margin: 0 0 18px; }
+.dk-af-benefit {
+  border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px;
+  background: var(--surface); box-shadow: var(--shadow-soft);
+}
+.dk-af-benefit-check { display: flex; align-items: flex-start; gap: 10px; min-height: 48px; cursor: pointer; }
+.dk-af-benefit-check input[type=checkbox] { width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.dk-af-benefit-label { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.4; }
+.dk-af-benefit-amount { margin: 6px 0 0; font-size: 15px; color: var(--text-sub); }
+.dk-af-benefit-amount strong { font-size: 17px; font-weight: 900; color: var(--ink); margin-right: 6px; }
+.dk-af-benefit-period { display: block; margin-top: 2px; font-size: 13px; color: var(--sub); }
+.dk-af-benefit-note { margin: 6px 0 0; font-size: 13px; color: var(--sub); line-height: 1.6; }
+.dk-af-benefit-verify { margin: 8px 0 0; }
+.dk-af-benefit-input { margin: 10px 0 0; }
+.dk-af-amount-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text-sub); }
+.dk-af-amount-input {
+  font: inherit; font-size: 16px; font-weight: 800; color: var(--ink); width: 110px; padding: 7px 10px;
+  min-height: 48px; border: 1.5px solid var(--line); border-radius: 11px; text-align: right; background: var(--bg);
+}
+
+.dk-af-unvalued { margin: 0 0 18px; padding-top: 6px; border-top: 1px solid var(--border); }
+.dk-af-unvalued-title { font-size: 14px; font-weight: 800; color: var(--sub); margin: 12px 0 4px; }
+.dk-af-unvalued-list { list-style: none; margin: 0; padding: 0; }
+.dk-af-unvalued-item { padding: 10px 2px; border-bottom: 1px solid var(--border); }
+.dk-af-unvalued-item:last-child { border-bottom: 0; }
+.dk-af-unvalued-label { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
+.dk-af-unvalued-amount { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 4px; }
+
+.dk-af-calc {
+  display: block; width: 100%; min-height: 48px; background: var(--accent); color: #fff; border: 0;
+  font: inherit; font-size: 16px; font-weight: 800; padding: 13px; border-radius: 12px; cursor: pointer;
+}
+
+.dk-af-result-box { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); padding: 20px 18px; }
+.dk-af-result-sum { font-size: 19px; font-weight: 900; color: var(--pink-ink); margin: 0 0 10px; line-height: 1.5; }
+.dk-af-result-text { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.6; }
+.dk-af-result-note { font-size: 14px; color: var(--sub); margin: 12px 0 0; line-height: 1.6; }
