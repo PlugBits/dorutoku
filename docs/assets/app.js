@@ -1104,21 +1104,19 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     try { cards = JSON.parse(dataEl.textContent) || []; } catch (e) { cards = []; }
     if (!cards.length) return;
 
-    var pickList = document.getElementById('dk-af-pick-list');
-    var stepPick = document.getElementById('dk-af-step-pick');
-    var stepBenefits = document.getElementById('dk-af-step-benefits');
-    var stepResult = document.getElementById('dk-af-step-result');
+    var cardSelect = document.getElementById('dk-af-card-select');
+    var benefitsWrap = document.getElementById('dk-af-benefits-wrap');
     var cardTitleEl = document.getElementById('dk-af-card-title');
     var feeLineEl = document.getElementById('dk-af-fee-line');
     var benefitListEl = document.getElementById('dk-af-benefit-list');
     var unvaluedWrap = document.getElementById('dk-af-unvalued');
     var unvaluedListEl = document.getElementById('dk-af-unvalued-list');
-    var calcBtn = document.getElementById('dk-af-calc-btn');
-    var resultSumEl = document.getElementById('dk-af-result-sum');
-    var resultTextEl = document.getElementById('dk-af-result-text');
-    var resultNoteEl = document.getElementById('dk-af-result-note');
-    var checkedLineEl = document.getElementById('dk-af-checked-line');
-    if (!pickList || !stepPick || !stepBenefits || !stepResult || !benefitListEl || !calcBtn) return;
+    var bar = document.getElementById('dk-af-bar');
+    var barTextEl = document.getElementById('dk-af-bar-text');
+    var sheet = document.getElementById('dk-af-sheet');
+    var sheetBackdrop = document.getElementById('dk-af-sheet-backdrop');
+    var sheetBody = document.getElementById('dk-af-sheet-body');
+    if (!cardSelect || !benefitsWrap || !benefitListEl || !bar || !barTextEl || !sheet || !sheetBackdrop || !sheetBody) return;
 
     var currentCard = null;
 
@@ -1188,41 +1186,34 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         '</li>';
     }
 
-    function issuerGroupsHtml() {
-      var html = '', lastIssuer = null, open = false;
+    function selectOptionsHtml() {
+      var html = '<option value="" selected disabled>カードを選んでください</option>';
+      var lastIssuer = null, open = false;
       cards.forEach(function (c, i) {
         if (c.issuer !== lastIssuer) {
-          if (open) html += '</div>';
-          html += '<div class="dk-af-issuer-group"><h3 class="dk-af-issuer-name">' + esc(c.issuer) + '</h3>';
+          if (open) html += '</optgroup>';
+          html += '<optgroup label="' + esc(c.issuer) + '">';
           lastIssuer = c.issuer; open = true;
         }
-        html += '<button type="button" class="dk-af-card-pick" data-af-pick="' + i + '">' +
-          '<span class="dk-af-card-pick-ja">' + esc(c.name_ja) + '</span>' +
-          '<span class="dk-af-card-pick-en">' + esc(c.name_en) + '</span>' +
-          (c.unverified ? '<span class="dk-vmark is-un">' + DK_ICON_HELP + '出どころ未確認(プレビュー)</span>' : '') +
-          (c.unchecked ? '<span class="dk-vmark is-un">' + DK_ICON_HELP + '照合前(プレビュー)</span>' : '') +
-          '</button>';
+        var label = c.name_ja;
+        if (c.unverified) label += ' (出どころ未確認・プレビュー)';
+        if (c.unchecked) label += ' (照合前・プレビュー)';
+        html += '<option value="' + i + '">' + esc(label) + '</option>';
       });
-      if (open) html += '</div>';
+      if (open) html += '</optgroup>';
       return html;
     }
-    pickList.innerHTML = issuerGroupsHtml();
+    cardSelect.innerHTML = selectOptionsHtml();
 
-    function showStep(name) {
-      stepPick.hidden = name !== 'pick';
-      stepBenefits.hidden = name !== 'benefits';
-      stepResult.hidden = name !== 'result';
-      try { window.scrollTo(0, 0); } catch (e) {  }
+    function hideBenefits() {
+      currentCard = null;
+      state = {};
+      benefitsWrap.hidden = true;
+      bar.hidden = true;
+      closeSheet();
     }
 
-    function selectCard(i) {
-      currentCard = cards[i];
-      if (!currentCard) return;
-      state = {};
-      (currentCard.benefits_valued || []).forEach(function (b, j) {
-
-        state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
-      });
+    function renderCard() {
       if (cardTitleEl) cardTitleEl.textContent = currentCard.name_ja;
       if (feeLineEl) {
         feeLineEl.textContent = currentCard.first_year_waived
@@ -1241,14 +1232,27 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
           unvaluedListEl.innerHTML = '';
         }
       }
-      showStep('benefits');
+      benefitsWrap.hidden = false;
+      bar.hidden = false;
     }
 
-    pickList.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-af-pick]');
-      if (!btn) return;
-      var i = parseInt(btn.getAttribute('data-af-pick'), 10);
-      if (!isNaN(i)) selectCard(i);
+    function selectCard(i) {
+      currentCard = cards[i];
+      if (!currentCard) { hideBenefits(); return; }
+      state = {};
+      (currentCard.benefits_valued || []).forEach(function (b, j) {
+        state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
+      });
+      closeSheet();
+      renderCard();
+      recalc();
+      try { window.scrollTo(0, 0); } catch (e) {  }
+    }
+
+    cardSelect.addEventListener('change', function () {
+      var i = parseInt(cardSelect.value, 10);
+      if (isNaN(i)) { hideBenefits(); return; }
+      selectCard(i);
     });
 
     benefitListEl.addEventListener('change', function (e) {
@@ -1263,6 +1267,22 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       } else if (e.target.classList.contains('dk-af-amount-input')) {
         setAmount(row, parseFloat(e.target.value));
       }
+      recalc();
+    });
+
+    benefitListEl.addEventListener('input', function (e) {
+      if (!e.target.classList.contains('dk-af-amount-input')) return;
+      var row = e.target.closest('.dk-af-benefit');
+      if (!row) return;
+      var idx = row.getAttribute('data-af-idx');
+      if (!state[idx]) state[idx] = { used: false, amount: 0 };
+      var max = parseFloat(e.target.getAttribute('max'));
+      if (isNaN(max)) max = 0;
+      var v = parseFloat(e.target.value);
+      if (isNaN(v) || v < 0) v = 0;
+      if (v > max) v = max;
+      state[idx].amount = Math.round(v * 100) / 100;
+      recalc();
     });
 
     function setAmount(row, v) {
@@ -1301,11 +1321,13 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       var input = row.querySelector('.dk-af-amount-input');
       var cur = parseFloat(input && input.value) || 0;
       setAmount(row, cur + b.step_usd * parseInt(btn.getAttribute('data-af-step'), 10));
+      recalc();
     });
 
-    calcBtn.addEventListener('click', function () {
+    function recalc() {
       if (!currentCard) return;
       var sum = 0, allMax = true;
+      var usedRows = [];
       (currentCard.benefits_valued || []).forEach(function (b, j) {
         var s = state[j] || {};
         if (!s.used) return;
@@ -1313,59 +1335,98 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         var amt = (typeof s.amount === 'number') ? s.amount : cap;
         sum += amt;
         if (amt < cap - 0.005) allMax = false;
+        usedRows.push({ label: b.label_ja, amount: amt });
       });
       var fee = currentCard.annual_fee || 0;
       var diff = sum - fee;
-      if (resultSumEl) {
-        resultSumEl.textContent = '特典の合計 ' + fmtUsd(sum) + ' − 年会費 ' + fmtUsd(fee) + ' = 年 ' +
+
+      if (barTextEl) {
+        barTextEl.textContent = '特典 ' + fmtUsd(sum) + ' − 年会費 ' + fmtUsd(fee) + ' = 年 ' +
           (diff >= 0 ? '+' : '−') + fmtUsd(Math.abs(diff));
       }
-      if (resultTextEl) {
-        var prefix = allMax ? '上限いっぱい使った場合、' : 'この使い方なら、';
-        var tail;
-        if (diff > 0.005) tail = '特典の合計は年会費より ' + fmtUsd(diff) + ' 多くなります。';
-        else if (diff < -0.005) tail = '特典の合計は年会費より ' + fmtUsd(Math.abs(diff)) + ' 少なくなります。';
-        else tail = '特典の合計と年会費は同じ額です。';
-        resultTextEl.textContent = prefix + tail;
-      }
-      if (resultNoteEl) {
-        var notes = [];
-        var uvCount = (currentCard.benefits_unvalued || []).length;
-        if (uvCount > 0) {
-          notes.push('ほかに金額にしない特典が' + uvCount +
-            '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。');
-        }
 
-        var spendOff = 0;
-        (currentCard.benefits_valued || []).forEach(function (b, j) {
-          if (b.needs_spend && !(state[j] || {}).used) spendOff++;
-        });
-        if (spendOff > 0) {
-          notes.push('追加の支出が要る特典 ' + spendOff + '件は入れていません(入れる場合は上で選んでください)。');
-        }
-        resultNoteEl.hidden = !notes.length;
-        resultNoteEl.textContent = notes.join('\n');
+      if (sheetBody) sheetBody.innerHTML = sheetBodyHtml(sum, fee, diff, allMax, usedRows);
+    }
+
+    function sheetBodyHtml(sum, fee, diff, allMax, usedRows) {
+      var html = '';
+      html += '<h3 class="dk-af-sheet-title">使うにした特典ごとの額</h3>';
+      if (usedRows.length) {
+        html += '<ul class="dk-af-sheet-list">' + usedRows.map(function (r) {
+          return '<li class="dk-af-sheet-row"><span>' + esc(r.label) + '</span><span>' + fmtUsd(r.amount) + '</span></li>';
+        }).join('') + '</ul>';
+      } else {
+        html += '<p class="dk-af-sheet-empty">使うにした特典はありません</p>';
+      }
+      html += '<p class="dk-af-sheet-total">特典の合計 ' + fmtUsd(sum) + ' / 年会費 ' + fmtUsd(fee) +
+        ' / 差額 年 ' + (diff >= 0 ? '+' : '−') + fmtUsd(Math.abs(diff)) + '</p>';
+
+      var prefix = allMax ? '上限いっぱい使った場合、' : 'この使い方なら、';
+      var tail;
+      if (diff > 0.005) tail = '特典の合計は年会費より ' + fmtUsd(diff) + ' 多くなります。';
+      else if (diff < -0.005) tail = '特典の合計は年会費より ' + fmtUsd(Math.abs(diff)) + ' 少なくなります。';
+      else tail = '特典の合計と年会費は同じ額です。';
+      html += '<p class="dk-af-sheet-text">' + prefix + tail + '</p>';
+
+      var uvCount = (currentCard.benefits_unvalued || []).length;
+      if (uvCount > 0) {
+        html += '<p class="dk-af-sheet-note">ほかに金額にしない特典が' + uvCount +
+          '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。</p>';
       }
 
-      if (checkedLineEl) {
-        var cm = /^(\d{4})-(\d{2})-(\d{2})/.exec(currentCard.benefits_checked_at || '');
-        if (cm) {
-          checkedLineEl.hidden = false;
-          checkedLineEl.textContent = 'このカードの特典は ' + parseInt(cm[2], 10) + '月' +
-            parseInt(cm[3], 10) + '日に公式ページと照合しました';
-        } else {
-          checkedLineEl.hidden = true;
-          checkedLineEl.textContent = '';
-        }
+      var spendOff = 0;
+      (currentCard.benefits_valued || []).forEach(function (b, j) {
+        if (b.needs_spend && !(state[j] || {}).used) spendOff++;
+      });
+      if (spendOff > 0) {
+        html += '<p class="dk-af-sheet-note">追加の支出が要る特典 ' + spendOff +
+          '件は入れていません(入れる場合は上で選んでください)。</p>';
       }
-      showStep('result');
+
+      var cm = /^(\d{4})-(\d{2})-(\d{2})/.exec(currentCard.benefits_checked_at || '');
+      if (cm) {
+        html += '<p class="dk-af-sheet-checked">このカードの特典は ' + parseInt(cm[2], 10) + '月' +
+          parseInt(cm[3], 10) + '日に公式ページと照合しました</p>';
+      }
+      return html;
+    }
+
+    var sheetOpen = false;
+    function openSheet() {
+      if (!currentCard) return;
+      sheet.hidden = false;
+      sheetBackdrop.hidden = false;
+      sheetOpen = true;
+      bar.setAttribute('aria-expanded', 'true');
+    }
+    function closeSheet() {
+      sheet.hidden = true;
+      sheetBackdrop.hidden = true;
+      sheetOpen = false;
+      bar.setAttribute('aria-expanded', 'false');
+    }
+    bar.addEventListener('click', function () {
+      if (!currentCard) return;
+      if (sheetOpen) closeSheet(); else openSheet();
     });
-
-    app.addEventListener('click', function (e) {
-      var back = e.target.closest('[data-af-back]');
-      if (!back) return;
-      showStep(back.getAttribute('data-af-back'));
+    sheetBackdrop.addEventListener('click', closeSheet);
+    var closeHandle = document.getElementById('dk-af-sheet-close');
+    if (closeHandle) closeHandle.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sheetOpen) closeSheet();
     });
+    var touchStartY = null;
+    sheet.addEventListener('touchstart', function (e) {
+      touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+    }, { passive: true });
+    sheet.addEventListener('touchend', function (e) {
+      if (touchStartY == null) return;
+      var endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : touchStartY;
+      if (endY - touchStartY > 60) closeSheet();
+      touchStartY = null;
+    }, { passive: true });
+
+    hideBenefits();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAnnualFeeTool);
   else initAnnualFeeTool();

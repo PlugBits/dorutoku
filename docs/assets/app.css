@@ -1174,22 +1174,16 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-af-step-title { font-size: 18px; font-weight: 800; margin: 0 0 8px; }
 .dk-af-step-lead { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin: 0 0 14px; }
 
-.dk-af-issuer-group { margin: 0 0 18px; }
-.dk-af-issuer-name { font-size: 13px; font-weight: 800; color: var(--sub); margin: 0 0 8px; }
-.dk-af-card-pick {
-  display: block; width: 100%; text-align: left; min-height: 48px; padding: 12px 16px;
-  margin: 0 0 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
-  font-family: inherit; cursor: pointer;
+.dk-af-select-wrap { margin: 0 0 20px; }
+.dk-af-select-label { display: block; font-size: 14px; font-weight: 800; color: var(--sub); margin: 0 0 6px; }
+.dk-af-select {
+  display: block; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; font-size: 16px;
+  font-weight: 700; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: 14px;
 }
-.dk-af-card-pick-ja { display: block; font-size: 16px; font-weight: 800; color: var(--ink); }
-.dk-af-card-pick-en { display: block; font-size: 12px; color: var(--sub); margin-top: 2px; }
-.dk-af-card-pick .dk-vmark { margin-top: 6px; }
 
-.dk-af-back {
-  display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; margin: 0 0 10px;
-  border: 0; background: none; font-family: inherit; font-size: 15px; font-weight: 700;
-  color: var(--accent); cursor: pointer;
-}
+.dk-af-app { padding-bottom: calc(var(--tabbar-h) + 64px + env(safe-area-inset-bottom)); }
+
 .dk-af-card-title { font-size: 20px; font-weight: 800; margin: 0 0 4px; }
 .dk-af-fee-line { font-size: 16px; font-weight: 700; color: var(--sub); margin: 0 0 14px; }
 
@@ -1230,13 +1224,47 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-af-unvalued-label { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
 .dk-af-unvalued-amount { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 4px; }
 
-.dk-af-calc {
-  display: block; width: 100%; min-height: 48px; background: var(--accent); color: #fff; border: 0;
-  font: inherit; font-size: 16px; font-weight: 800; padding: 13px; border-radius: 12px; cursor: pointer;
+.dk-af-bar {
+  position: fixed; left: 0; right: 0; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  z-index: 14; display: flex; align-items: center; width: 100%; height: var(--af-bar-h, 52px); margin: 0;
+  padding: 0 16px; border: 0; border-top: 1px solid var(--line); background: var(--surface);
+  font: inherit; cursor: pointer; box-shadow: 0 -2px 10px rgba(18,35,63,.06);
+}
+.dk-af-bar[hidden] { display: none; }
+.dk-af-bar-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  max-width: 640px; width: 100%; margin: 0 auto; pointer-events: none;
 }
 
-.dk-af-result-box { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-soft); padding: 20px 18px; }
-.dk-af-result-sum { font-size: 19px; font-weight: 900; color: var(--pink-ink); margin: 0 0 10px; line-height: 1.5; }
-.dk-af-result-text { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.6; }
-.dk-af-result-note { font-size: 14px; color: var(--sub); margin: 12px 0 0; line-height: 1.6; white-space: pre-line; }
-.dk-af-checked-line { font-size: 13px; color: var(--sub); margin: 10px 2px 0; line-height: 1.6; }
+.dk-af-bar-text { font-size: 14px; font-weight: 900; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.dk-af-bar-hint { flex: none; font-size: 12px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+
+.dk-af-sheet-backdrop {
+  position: fixed; inset: 0; background: var(--overlay); z-index: 13;
+}
+.dk-af-sheet-backdrop[hidden] { display: none; }
+
+.dk-af-sheet {
+  position: fixed; left: 0; right: 0; bottom: calc(var(--tabbar-h) + var(--af-bar-h, 52px) + env(safe-area-inset-bottom));
+  z-index: 16; max-width: 640px; margin: 0 auto; max-height: 70vh; overflow-y: auto;
+  background: var(--surface); border-radius: 20px 20px 0 0; box-shadow: 0 -8px 24px rgba(18,35,63,.16);
+  padding: 6px 18px calc(18px + env(safe-area-inset-bottom));
+}
+.dk-af-sheet[hidden] { display: none; }
+.dk-af-sheet-close {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 32px;
+  padding: 10px 0; margin: 0 0 4px; border: 0; background: none; cursor: pointer; touch-action: none;
+}
+.dk-af-sheet-handle { width: 40px; height: 5px; border-radius: 999px; background: var(--border); }
+.dk-af-sheet-title { font-size: 15px; font-weight: 800; color: var(--sub); margin: 4px 0 8px; }
+.dk-af-sheet-list { list-style: none; margin: 0 0 10px; padding: 0; }
+.dk-af-sheet-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding: 8px 2px; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--ink);
+}
+.dk-af-sheet-row:last-child { border-bottom: 0; }
+.dk-af-sheet-empty { font-size: 14px; color: var(--sub); margin: 0 0 10px; }
+.dk-af-sheet-total { font-size: 15px; font-weight: 800; color: var(--ink); margin: 0 0 12px; line-height: 1.6; }
+.dk-af-sheet-text { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0 0 10px; line-height: 1.6; }
+.dk-af-sheet-note { font-size: 14px; color: var(--sub); margin: 0 0 10px; line-height: 1.6; }
+.dk-af-sheet-checked { font-size: 13px; color: var(--sub); margin: 10px 0 0; line-height: 1.6; }
