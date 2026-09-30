@@ -961,8 +961,9 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-hero-pill {
   margin: 12px 0 0; background: var(--pink); color: #fff; font-size: 19px; font-weight: 800;
   height: 30px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center;
+  white-space: nowrap; max-width: 100%; box-sizing: border-box;
 }
-.dk-hero-pill.is-empty { background: none; padding: 0; }
+.dk-hero-pill-unknown { background: rgba(255, 255, 255, .18); }
 .dk-hero-foot {
   display: flex; align-items: center; gap: 12px; min-height: 59px; padding: 0 20px;
   background: var(--surface);
