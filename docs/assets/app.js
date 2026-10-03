@@ -1153,6 +1153,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       var periodText = (typeof b.rate === 'number') ? '' : b.period_note;
       var amountLine = esc(b.amount) + (periodText ? ' ・ ' + esc(periodText) : '');
       return '' +
+
+        (b.no_amount_reason ? '<p class="dk-af-detail-reason">' + esc(b.no_amount_reason) + '</p>' : '') +
         '<p class="dk-af-detail-amount">' + amountLine +
           (b.provisional ? ' <span class="badge badge-check">仮の金額(プレビュー)</span>' : '') +
         '</p>' +
@@ -1162,6 +1164,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
           ? '<p class="dk-af-step-hint">使う額は −/+ で' + esc(fmtUsd(b.spend_step || 50)) + 'ずつ。' +
               esc(pctText(b.rate)) + 'なので、' + esc(fmtUsd(b.annual_usd / b.rate)) + '使うと上限の' +
               esc(fmtUsd(b.annual_usd)) + 'に届きます</p>'
+          : countMax(b)
+          ? '<p class="dk-af-step-hint">−/+ で使う回数を変えます(年' + countMax(b) + '回まで。0回は使わない)</p>'
           : typeof b.step_usd === 'number'
           ? '<p class="dk-af-step-hint">' + (b.step_tenth
               ? '−/+ で' + esc(fmtUsd(b.step_usd)) + 'ずつ(使った額に合わせて直せます)'
@@ -1195,6 +1199,38 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (plus) plus.disabled = amt >= cap - 0.005;
     }
 
+    function countMax(b) {
+      if (typeof b.rate === 'number' || b.step_tenth || b.needs_spend) return 0;
+      if (typeof b.step_usd !== 'number' || !(b.step_usd > 0) || typeof b.annual_usd !== 'number') return 0;
+      return Math.round(b.annual_usd / b.step_usd);
+    }
+
+    function countLineHtml(b, n) {
+      return '<span class="dk-af-count-per">' + esc(fmtUsd(b.step_usd)) + '</span> × ' +
+        '<strong class="dk-af-count-n">' + n + '</strong>回 = ' +
+        '<strong class="dk-af-count-out">' + esc(fmtUsd(Math.round(b.step_usd * n * 100) / 100)) + '</strong>';
+    }
+
+    function setCount(row, n) {
+      var idx = row.getAttribute('data-af-idx');
+      var b = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
+      var max = b ? countMax(b) : 0;
+      if (!max) return;
+      n = Math.max(0, Math.min(max, n | 0));
+      if (!state[idx]) state[idx] = { used: false, amount: 0 };
+      state[idx].count = n;
+      state[idx].amount = Math.round(b.step_usd * n * 100) / 100;
+      state[idx].used = n > 0;
+      var check = row.querySelector('.dk-af-use-check');
+      if (check) check.checked = n > 0;
+      var line = row.querySelector('.dk-af-count-line');
+      if (line) line.innerHTML = countLineHtml(b, n);
+      var minus = row.querySelector('[data-af-cnt="-1"]');
+      var plus = row.querySelector('[data-af-cnt="1"]');
+      if (minus) minus.disabled = n <= 0;
+      if (plus) plus.disabled = n >= max;
+    }
+
     function benefitRowHtml(b, j) {
       var cap = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
       var checked = !b.needs_spend;
@@ -1226,6 +1262,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
                   '</span>' +
                   '<span class="dk-af-rate-eq">× ' + esc(pctText(b.rate)) + ' = <strong class="dk-af-rate-out">$0</strong>' +
                     '<span class="dk-af-rate-cap">(年' + esc(fmtUsd(cap)) + 'まで)</span></span>'
+              : countMax(b)
+                ? '<button type="button" class="dk-af-step-btn" data-af-cnt="-1" aria-label="回数を1回減らす">−</button>' +
+                  '<span class="dk-af-count-line">' + countLineHtml(b, countMax(b)) + '</span>' +
+                  '<button type="button" class="dk-af-step-btn" data-af-cnt="1" disabled aria-label="回数を1回増やす">+</button>'
               : typeof b.step_usd === 'number'
 
                 ? '<button type="button" class="dk-af-step-btn" data-af-step="-1" disabled aria-label="' +
@@ -1281,6 +1321,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     cardSelect.innerHTML = selectOptionsHtml();
 
     function hideBenefits() {
+      var guideEl = document.getElementById('dk-af-guide');
+      if (guideEl) guideEl.hidden = false;
       currentCard = null;
       state = {};
       benefitsWrap.hidden = true;
@@ -1320,11 +1362,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     function selectCard(i) {
       currentCard = cards[i];
+      var guideEl = document.getElementById('dk-af-guide');
+      if (guideEl) guideEl.hidden = !!currentCard;
       if (!currentCard) { if (feeEl) feeEl.hidden = true; hideBenefits(); return; }
       state = {};
       (currentCard.benefits_valued || []).forEach(function (b, j) {
         state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
         if (typeof b.rate === 'number') { state[j].amount = 0; state[j].spend = 0; }
+        if (countMax(b)) state[j].count = countMax(b);
       });
       closeSheet();
       renderCard();
@@ -1345,6 +1390,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (!state[idx]) state[idx] = { used: false, amount: 0 };
       if (e.target.classList.contains('dk-af-use-check')) {
         state[idx].used = e.target.checked;
+        if (e.target.checked && row.querySelector('.dk-af-count-line') && !state[idx].count) {
+          var cb = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
+          if (cb) setCount(row, countMax(cb));
+        }
         var wrap = row.querySelector('.dk-af-benefit-input');
         var cap = row.querySelector('.dk-af-benefit-cap');
         if (wrap) wrap.hidden = !e.target.checked;
@@ -1407,6 +1456,17 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
       var detailBtn = e.target.closest('.dk-af-detail-btn');
       if (detailBtn) { toggleDetail(detailBtn); return; }
+      var cbtn = e.target.closest('[data-af-cnt]');
+      if (cbtn) {
+        if (cbtn.disabled) return;
+        var crow = cbtn.closest('.dk-af-benefit');
+        if (!crow) return;
+        var cidx = crow.getAttribute('data-af-idx');
+        var ccur = (state[cidx] && typeof state[cidx].count === 'number') ? state[cidx].count : 0;
+        setCount(crow, ccur + parseInt(cbtn.getAttribute('data-af-cnt'), 10));
+        recalc();
+        return;
+      }
       var sbtn = e.target.closest('[data-af-spend]');
       if (sbtn) {
         if (sbtn.disabled) return;
@@ -1487,7 +1547,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
       var uvCount = (currentCard.benefits_unvalued || []).length;
       if (uvCount > 0) {
-        html += '<p class="dk-af-sheet-note">ほかに金額にしない特典が' + uvCount +
+        html += '<p class="dk-af-sheet-note">ほかに計算に入れていない特典が' + uvCount +
           '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。</p>';
       }
 

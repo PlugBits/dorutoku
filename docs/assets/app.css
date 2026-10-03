@@ -1181,6 +1181,16 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-af-fee strong { font-size: 26px; font-weight: 900; color: var(--ink); }
 .dk-af-fee-note { font-size: 13px; font-weight: 700; color: var(--green-ink); }
 .dk-af-select-wrap { margin: 0 0 20px; }
+
+.dk-af-guide { display: flex; align-items: center; gap: 10px; margin: 4px 2px 16px; }
+.dk-af-guide[hidden] { display: none; }
+.dk-af-guide-img { flex: none; width: auto; height: 72px; object-fit: contain; }
+.dk-af-guide-bubble { position: relative; flex: 1; margin: 0; padding: 12px 14px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; font-size: 15px; line-height: 1.55; font-weight: 600; color: var(--ink); white-space: pre-line; }
+.dk-af-guide-bubble::before { content: ""; position: absolute; left: -8px; top: 50%; margin-top: -7px; width: 12px; height: 12px; background: var(--surface); border-left: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line); transform: rotate(45deg); }
+
+.dk-af-count-line { font-size: 15px; color: var(--sub); white-space: nowrap; }
+.dk-af-count-line strong { color: var(--ink); font-weight: 800; }
+.dk-af-count-out { font-size: 17px; }
 .dk-af-select-label { display: block; font-size: 13px; font-weight: 700; color: var(--sub); margin: 0 0 4px; }
 .dk-af-select {
   display: block; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; font-size: 16px;
@@ -1236,6 +1246,9 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 
 .dk-af-unvalued { margin: 0 0 18px; padding-top: 6px; border-top: 1px solid var(--border); }
 .dk-af-unvalued-title { font-size: 14px; font-weight: 800; color: var(--sub); margin: 12px 0 4px; }
+
+.dk-af-unvalued-sub { margin: 0 0 8px; font-size: 13px; line-height: 1.6; color: var(--sub); }
+.dk-af-detail-reason { margin: 0 0 8px; font-size: 14px; line-height: 1.65; color: var(--ink); }
 .dk-af-unvalued-list { list-style: none; margin: 0; padding: 0; }
 .dk-af-unvalued-item { padding: 10px 2px; border-bottom: 1px solid var(--border); }
 .dk-af-unvalued-item:last-child { border-bottom: 0; }
