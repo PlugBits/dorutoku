@@ -2048,6 +2048,17 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     }).join(' / ');
   }
 
+  function redeemLabelLine(cashbackLabel, bonusLabel) {
+    cashbackLabel = (cashbackLabel || '').trim();
+    bonusLabel = (bonusLabel || '').trim();
+    if (!cashbackLabel && !bonusLabel) return '';
+    if (cashbackLabel && bonusLabel && cashbackLabel === bonusLabel) return cashbackLabel;
+    var parts = [];
+    if (cashbackLabel) parts.push('キャッシュバック: ' + cashbackLabel);
+    if (bonusLabel) parts.push('ボーナス: ' + bonusLabel);
+    return parts.join(' / ');
+  }
+
   function axisAngle(i) { return (-90 + i * 120) * Math.PI / 180; }
   function axisPoint(ratio, i) {
     var rr = R * Math.max(0, Math.min(ratio, 1));
@@ -2091,8 +2102,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (!card) { rowEl.hidden = true; return; }
       var nameEl = rowEl.querySelector('.dk-card-radar-legend-name');
       var numsEl = rowEl.querySelector('.dk-card-radar-legend-nums');
+      var redeemEl = rowEl.querySelector('.dk-card-radar-legend-redeem');
       if (nameEl) nameEl.textContent = card.name_ja;
       if (numsEl) numsEl.textContent = compactNumbers(card);
+      if (redeemEl) {
+        var line = redeemLabelLine(card.cashback_redeem_label, card.bonus_redeem_label);
+        redeemEl.textContent = line;
+        redeemEl.hidden = !line;
+      }
       rowEl.hidden = false;
     }
 

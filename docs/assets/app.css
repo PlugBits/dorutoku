@@ -1551,6 +1551,8 @@ body.has-af-bar { padding-bottom: calc(var(--tabbar-h) + 88px + 16px + env(safe-
 .dk-card-radar-legend-row[hidden] { display: none; }
 .dk-card-radar-legend-name { grid-column: 2; font-weight: 800; color: var(--ink); }
 .dk-card-radar-legend-nums { grid-column: 2; color: var(--sub); }
+.dk-card-radar-legend-redeem { grid-column: 2; font-size: 12px; color: var(--dim); }
+.dk-card-radar-legend-redeem[hidden] { display: none; }
 
 .dk-card-radar-overlay { margin: 10px 0 20px; }
 .dk-card-radar-vs-label { display: block; font-size: 13px; font-weight: 700; color: var(--sub); margin: 0 0 8px; }
