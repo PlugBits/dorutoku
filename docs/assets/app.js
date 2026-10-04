@@ -2044,7 +2044,9 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
   function compactNumbers(values) {
     return AXIS_ORDER.map(function (key) {
-      return AXIS_LABELS[key] + ' ' + fmtUsd(values[key]);
+      var amt = fmtUsd(values[key]);
+      if (key === 'bonus' && values.bonus_up_to) amt = '最大 ' + amt;
+      return AXIS_LABELS[key] + ' ' + amt;
     }).join(' / ');
   }
 
