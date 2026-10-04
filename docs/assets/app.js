@@ -1100,6 +1100,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var dataEl = document.getElementById('dk-af-data');
     var app = document.getElementById('dk-af-app');
     if (!dataEl || !app) return;
+    if (document.getElementById('dk-af-bar')) document.body.classList.add('has-af-bar');
     var cards = [];
     try { cards = JSON.parse(dataEl.textContent) || []; } catch (e) { cards = []; }
     if (!cards.length) return;
@@ -1178,110 +1179,126 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return (Math.abs(p - Math.round(p)) < 1e-9 ? String(Math.round(p)) : String(p)) + '%';
     }
 
-    function setSpend(row, v, rewrite) {
-      var idx = row.getAttribute('data-af-idx');
-      var b = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
-      if (!b || typeof b.rate !== 'number') return;
-      var cap = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
-      if (isNaN(v) || v < 0) v = 0;
-      v = Math.round(v * 100) / 100;
-      var amt = Math.min(Math.round(v * b.rate * 100) / 100, cap);
-      if (!state[idx]) state[idx] = { used: false, amount: 0 };
-      state[idx].spend = v;
-      state[idx].amount = amt;
-      var input = row.querySelector('.dk-af-spend-input');
-      if (input && rewrite) input.value = v;
-      var out = row.querySelector('.dk-af-rate-out');
-      if (out) out.textContent = fmtUsd(amt);
-      var minus = row.querySelector('[data-af-spend="-1"]');
-      var plus = row.querySelector('[data-af-spend="1"]');
-      if (minus) minus.disabled = v <= 0.005;
-      if (plus) plus.disabled = amt >= cap - 0.005;
-    }
-
     function countMax(b) {
       if (typeof b.rate === 'number' || b.step_tenth || b.needs_spend) return 0;
       if (typeof b.step_usd !== 'number' || !(b.step_usd > 0) || typeof b.annual_usd !== 'number') return 0;
-      return Math.round(b.annual_usd / b.step_usd);
+
+      var n = Math.round(b.annual_usd / b.step_usd);
+      return n > 1 ? n : 0;
     }
 
-    function countLineHtml(b, n) {
-      return '<span class="dk-af-count-per">' + esc(fmtUsd(b.step_usd)) + '</span> × ' +
-        '<strong class="dk-af-count-n">' + n + '</strong>回 = ' +
-        '<strong class="dk-af-count-out">' + esc(fmtUsd(Math.round(b.step_usd * n * 100) / 100)) + '</strong>';
+    function rowMode(b) {
+      if (countMax(b)) return 'count';
+      if (typeof b.rate === 'number') return 'rate';
+      if (b.step_tenth && typeof b.step_usd === 'number') return 'tenth';
+      return 'binary';
     }
 
-    function setCount(row, n) {
+    function stepperShellHtml(minusAttrs, minusLabel, plusAttrs, plusLabel) {
+      return '<div class="dk-af-stepper">' +
+        '<button type="button" class="dk-af-stepper-btn" ' + minusAttrs + ' aria-label="' + esc(minusLabel) + '">−</button>' +
+        '<span class="dk-af-stepper-mid" data-af-mid></span>' +
+        '<button type="button" class="dk-af-stepper-btn" ' + plusAttrs + ' aria-label="' + esc(plusLabel) + '">+</button>' +
+      '</div>';
+    }
+
+    function stepperHtmlForMode(b, mode) {
+      if (mode === 'count') {
+        return stepperShellHtml('data-af-cnt="-1"', '回数を1回減らす', 'data-af-cnt="1"', '回数を1回増やす');
+      }
+      if (mode === 'rate') {
+        var spendStep = b.spend_step || 50;
+        return stepperShellHtml('data-af-spend="-1"', '使う額を' + fmtUsd(spendStep) + '減らす',
+          'data-af-spend="1"', '使う額を' + fmtUsd(spendStep) + '増やす');
+      }
+      if (mode === 'tenth') {
+        return stepperShellHtml('data-af-step="-1"', fmtUsd(b.step_usd) + '減らす',
+          'data-af-step="1"', fmtUsd(b.step_usd) + '増やす');
+      }
+      return '';
+    }
+
+    function updateRowView(row) {
       var idx = row.getAttribute('data-af-idx');
+      var mode = row.getAttribute('data-af-mode');
       var b = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
-      var max = b ? countMax(b) : 0;
-      if (!max) return;
-      n = Math.max(0, Math.min(max, n | 0));
+      if (!b) return;
       if (!state[idx]) state[idx] = { used: false, amount: 0 };
-      state[idx].count = n;
-      state[idx].amount = Math.round(b.step_usd * n * 100) / 100;
-      state[idx].used = n > 0;
-      var check = row.querySelector('.dk-af-use-check');
-      if (check) check.checked = n > 0;
-      var line = row.querySelector('.dk-af-count-line');
-      if (line) line.innerHTML = countLineHtml(b, n);
-      var minus = row.querySelector('[data-af-cnt="-1"]');
-      var plus = row.querySelector('[data-af-cnt="1"]');
-      if (minus) minus.disabled = n <= 0;
-      if (plus) plus.disabled = n >= max;
+      var s = state[idx];
+      var used = !!s.used;
+      var cap = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
+      var midText = '', basisText = '', amount = 0;
+      var minusBtn = row.querySelector('[data-af-cnt="-1"],[data-af-spend="-1"],[data-af-step="-1"]');
+      var plusBtn = row.querySelector('[data-af-cnt="1"],[data-af-spend="1"],[data-af-step="1"]');
+
+      if (mode === 'count') {
+        var max = countMax(b);
+        var n = (typeof s.count === 'number') ? s.count : max;
+        midText = n + '回';
+        amount = used ? Math.round(b.step_usd * n * 100) / 100 : 0;
+        basisText = fmtUsd(b.step_usd) + ' × ' + n + '回';
+        if (minusBtn) minusBtn.disabled = n <= 0;
+        if (plusBtn) plusBtn.disabled = n >= max;
+      } else if (mode === 'rate') {
+        var spend = (typeof s.spend === 'number') ? s.spend : 0;
+        var amt = Math.min(Math.round(spend * b.rate * 100) / 100, cap);
+        midText = fmtUsd(spend);
+        amount = used ? amt : 0;
+        basisText = fmtUsd(spend) + ' × ' + pctText(b.rate);
+        if (minusBtn) minusBtn.disabled = spend <= 0.005;
+        if (plusBtn) plusBtn.disabled = amt >= cap - 0.005;
+      } else if (mode === 'tenth') {
+        var v = (typeof s.spend === 'number') ? s.spend : 0;
+        midText = fmtUsd(v);
+        amount = used ? v : 0;
+        basisText = '年' + fmtUsd(cap) + 'まで';
+        if (minusBtn) minusBtn.disabled = v <= 0.005;
+        if (plusBtn) plusBtn.disabled = v >= cap - 0.005;
+      } else {
+
+        amount = used ? cap : 0;
+
+        basisText = (typeof b.step_usd === 'number' && b.step_usd > 0 && typeof b.annual_usd === 'number')
+          ? fmtUsd(b.step_usd) + ' × 年' + Math.round(b.annual_usd / b.step_usd) + '回' : '';
+      }
+
+      s.amount = amount;
+
+      var midEl = row.querySelector('[data-af-mid]');
+      var amountEl = row.querySelector('[data-af-amount]');
+      var basisEl = row.querySelector('[data-af-basis]');
+      if (midEl) midEl.textContent = midText;
+      if (amountEl) amountEl.textContent = fmtUsd(amount);
+      if (basisEl) basisEl.textContent = basisText;
+
+      var checkEl = row.querySelector('.dk-af-use-check');
+      if (checkEl) checkEl.checked = used;
+
+      row.classList.toggle('is-off', !used);
     }
 
     function benefitRowHtml(b, j) {
-      var cap = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
-      var checked = !b.needs_spend;
+      var mode = rowMode(b);
       var detailId = 'dk-af-detail-' + j;
       return '' +
-        '<div class="dk-af-benefit" data-af-idx="' + j + '">' +
+        '<div class="dk-af-benefit" data-af-idx="' + j + '" data-af-mode="' + mode + '">' +
           '<div class="dk-af-benefit-row1">' +
             '<label class="dk-af-benefit-check">' +
-              '<input type="checkbox" class="dk-af-use-check"' + (checked ? ' checked' : '') + '>' +
-              '<span class="dk-af-benefit-label">' + esc(b.label_ja) + '</span>' +
+              '<input type="checkbox" class="dk-af-use-check">' +
+              '<span class="dk-af-benefit-namecol">' +
+                '<span class="dk-af-benefit-label">' + esc(b.label_ja) + '</span>' +
+                (b.tag ? '<span class="dk-af-benefit-tag">' + esc(b.tag) + '</span>' : '') +
+              '</span>' +
             '</label>' +
-            (b.tag ? '<span class="dk-af-benefit-tag">' + esc(b.tag) + '</span>' : '') +
             '<button type="button" class="dk-af-detail-btn" aria-expanded="false" aria-controls="' +
               detailId + '">詳しく</button>' +
           '</div>' +
           '<div class="dk-af-benefit-row2">' +
-            '<div class="dk-af-benefit-input' + (typeof b.rate === 'number' ? ' dk-af-rate' : '') + '"' +
-              (checked ? '' : ' hidden') + '>' +
-              (typeof b.rate === 'number'
-
-                ? '<span class="dk-af-rate-line">' +
-                    '<span class="dk-af-rate-label">使う額</span>' +
-                    '<button type="button" class="dk-af-step-btn" data-af-spend="-1" disabled aria-label="使う額を' +
-                      esc(fmtUsd(b.spend_step)) + '減らす">−</button>' +
-                    '<span class="dk-af-amount-prefix" aria-hidden="true">$</span>' +
-                    '<input type="number" class="dk-af-spend-input" aria-label="使う額(年)" min="0" step="1" value="0">' +
-                    '<button type="button" class="dk-af-step-btn" data-af-spend="1" aria-label="使う額を' +
-                      esc(fmtUsd(b.spend_step)) + '増やす">+</button>' +
-                  '</span>' +
-                  '<span class="dk-af-rate-eq">× ' + esc(pctText(b.rate)) + ' = <strong class="dk-af-rate-out">$0</strong>' +
-                    '<span class="dk-af-rate-cap">(年' + esc(fmtUsd(cap)) + 'まで)</span></span>'
-              : countMax(b)
-                ? '<button type="button" class="dk-af-step-btn" data-af-cnt="-1" aria-label="回数を1回減らす">−</button>' +
-                  '<span class="dk-af-count-line">' + countLineHtml(b, countMax(b)) + '</span>' +
-                  '<button type="button" class="dk-af-step-btn" data-af-cnt="1" disabled aria-label="回数を1回増やす">+</button>'
-              : typeof b.step_usd === 'number'
-
-                ? '<button type="button" class="dk-af-step-btn" data-af-step="-1" disabled aria-label="' +
-                    esc(fmtUsd(b.step_usd)) + '減らす">−</button>' +
-                  '<span class="dk-af-amount-prefix" aria-hidden="true">$</span>' +
-                  '<input type="number" class="dk-af-amount-input" aria-label="使う額(年額)" min="0" max="' +
-                    cap + '" step="0.01" value="' + cap + '">' +
-                  '<span class="dk-af-amount-suffix">/年</span>' +
-                  '<button type="button" class="dk-af-step-btn" data-af-step="1" disabled aria-label="' +
-                    esc(fmtUsd(b.step_usd)) + '増やす">+</button>'
-                : '<span class="dk-af-amount-prefix" aria-hidden="true">$</span>' +
-                  '<input type="number" class="dk-af-amount-input" aria-label="使う額(年額)" min="0" max="' +
-                    cap + '" step="0.01" value="' + cap + '">' +
-                  '<span class="dk-af-amount-suffix">/年</span>') +
+            stepperHtmlForMode(b, mode) +
+            '<div class="dk-af-row2-right">' +
+              '<div class="dk-af-amount" data-af-amount></div>' +
+              '<div class="dk-af-row2-basis" data-af-basis></div>' +
             '</div>' +
-            '<p class="dk-af-benefit-cap"' + (checked ? ' hidden' : '') + '>' + esc(fmtUsd(cap)) + ' /年</p>' +
           '</div>' +
           '<div class="dk-af-benefit-detail" id="' + detailId + '" hidden>' + detailBodyHtml(b) + '</div>' +
         '</div>';
@@ -1292,8 +1309,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return '' +
         '<li class="dk-af-unvalued-item" data-af-uv-idx="' + k + '">' +
           '<div class="dk-af-unvalued-row">' +
-            '<span class="dk-af-unvalued-label">' + esc(b.label_ja) + '</span>' +
-            (b.tag ? '<span class="dk-af-benefit-tag">' + esc(b.tag) + '</span>' : '') +
+            '<span class="dk-af-unvalued-namecol">' +
+              '<span class="dk-af-unvalued-label">' + esc(b.label_ja) + '</span>' +
+              (b.tag ? '<span class="dk-af-benefit-tag">' + esc(b.tag) + '</span>' : '') +
+            '</span>' +
             '<button type="button" class="dk-af-detail-btn" aria-expanded="false" aria-controls="' +
               detailId + '">詳しく</button>' +
           '</div>' +
@@ -1341,7 +1360,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         feeEl.hidden = false;
       }
       benefitListEl.innerHTML = (currentCard.benefits_valued || []).map(benefitRowHtml).join('');
-      Array.prototype.forEach.call(benefitListEl.querySelectorAll('.dk-af-benefit'), syncStepButtons);
+      Array.prototype.forEach.call(benefitListEl.querySelectorAll('.dk-af-benefit'), updateRowView);
       var uv = currentCard.benefits_unvalued || [];
       if (unvaluedWrap && unvaluedListEl) {
         if (uv.length) {
@@ -1368,7 +1387,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       state = {};
       (currentCard.benefits_valued || []).forEach(function (b, j) {
         state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
-        if (typeof b.rate === 'number') { state[j].amount = 0; state[j].spend = 0; }
+
+        if (typeof b.rate === 'number' || (b.step_tenth && typeof b.step_usd === 'number')) {
+          state[j].amount = 0; state[j].spend = 0;
+        }
         if (countMax(b)) state[j].count = countMax(b);
       });
       closeSheet();
@@ -1384,110 +1406,60 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     });
 
     benefitListEl.addEventListener('change', function (e) {
+      if (!e.target.classList.contains('dk-af-use-check')) return;
       var row = e.target.closest('.dk-af-benefit');
       if (!row) return;
       var idx = row.getAttribute('data-af-idx');
       if (!state[idx]) state[idx] = { used: false, amount: 0 };
-      if (e.target.classList.contains('dk-af-use-check')) {
-        state[idx].used = e.target.checked;
-        if (e.target.checked && row.querySelector('.dk-af-count-line') && !state[idx].count) {
-          var cb = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
-          if (cb) setCount(row, countMax(cb));
-        }
-        var wrap = row.querySelector('.dk-af-benefit-input');
-        var cap = row.querySelector('.dk-af-benefit-cap');
-        if (wrap) wrap.hidden = !e.target.checked;
-        if (cap) cap.hidden = e.target.checked;
-      } else if (e.target.classList.contains('dk-af-amount-input')) {
-        setAmount(row, parseFloat(e.target.value));
-      } else if (e.target.classList.contains('dk-af-spend-input')) {
-        setSpend(row, parseFloat(e.target.value), true);
+      var mode = row.getAttribute('data-af-mode');
+      if (e.target.checked && mode === 'count' && !state[idx].count) {
+        var cb = currentCard && (currentCard.benefits_valued || [])[parseInt(idx, 10)];
+        if (cb) state[idx].count = countMax(cb);
       }
+      state[idx].used = e.target.checked;
+      updateRowView(row);
       recalc();
     });
-
-    benefitListEl.addEventListener('input', function (e) {
-      if (e.target.classList.contains('dk-af-spend-input')) {
-        var srow = e.target.closest('.dk-af-benefit');
-        if (srow) { setSpend(srow, parseFloat(e.target.value), false); recalc(); }
-        return;
-      }
-      if (!e.target.classList.contains('dk-af-amount-input')) return;
-      var row = e.target.closest('.dk-af-benefit');
-      if (!row) return;
-      var idx = row.getAttribute('data-af-idx');
-      if (!state[idx]) state[idx] = { used: false, amount: 0 };
-      var max = parseFloat(e.target.getAttribute('max'));
-      if (isNaN(max)) max = 0;
-      var v = parseFloat(e.target.value);
-      if (isNaN(v) || v < 0) v = 0;
-      if (v > max) v = max;
-      state[idx].amount = Math.round(v * 100) / 100;
-      recalc();
-    });
-
-    function setAmount(row, v) {
-      var idx = row.getAttribute('data-af-idx');
-      var input = row.querySelector('.dk-af-amount-input');
-      if (!input) return;
-      if (!state[idx]) state[idx] = { used: false, amount: 0 };
-      var max = parseFloat(input.getAttribute('max'));
-      if (isNaN(max)) max = 0;
-      if (isNaN(v) || v < 0) v = 0;
-      if (v > max) v = max;
-      v = Math.round(v * 100) / 100;
-      input.value = v;
-      state[idx].amount = v;
-      syncStepButtons(row);
-    }
-
-    function syncStepButtons(row) {
-      var input = row.querySelector('.dk-af-amount-input');
-      if (!input) return;
-      var v = parseFloat(input.value) || 0;
-      var max = parseFloat(input.getAttribute('max')) || 0;
-      var minus = row.querySelector('[data-af-step="-1"]');
-      var plus = row.querySelector('[data-af-step="1"]');
-      if (minus) minus.disabled = v <= 0.005;
-      if (plus) plus.disabled = v >= max - 0.005;
-    }
 
     benefitListEl.addEventListener('click', function (e) {
 
       var detailBtn = e.target.closest('.dk-af-detail-btn');
       if (detailBtn) { toggleDetail(detailBtn); return; }
-      var cbtn = e.target.closest('[data-af-cnt]');
-      if (cbtn) {
-        if (cbtn.disabled) return;
-        var crow = cbtn.closest('.dk-af-benefit');
-        if (!crow) return;
-        var cidx = crow.getAttribute('data-af-idx');
-        var ccur = (state[cidx] && typeof state[cidx].count === 'number') ? state[cidx].count : 0;
-        setCount(crow, ccur + parseInt(cbtn.getAttribute('data-af-cnt'), 10));
-        recalc();
-        return;
-      }
-      var sbtn = e.target.closest('[data-af-spend]');
-      if (sbtn) {
-        if (sbtn.disabled) return;
-        var srow = sbtn.closest('.dk-af-benefit');
-        var sb = srow && currentCard && (currentCard.benefits_valued || [])[parseInt(srow.getAttribute('data-af-idx'), 10)];
-        if (!sb) return;
-        var sinput = srow.querySelector('.dk-af-spend-input');
-        var scur = parseFloat(sinput && sinput.value) || 0;
-        setSpend(srow, scur + (sb.spend_step || 50) * parseInt(sbtn.getAttribute('data-af-spend'), 10), true);
-        recalc();
-        return;
-      }
-      var btn = e.target.closest('[data-af-step]');
+
+      var btn = e.target.closest('.dk-af-stepper-btn');
       if (!btn || btn.disabled) return;
       var row = btn.closest('.dk-af-benefit');
       if (!row || !currentCard) return;
-      var b = (currentCard.benefits_valued || [])[parseInt(row.getAttribute('data-af-idx'), 10)];
-      if (!b || typeof b.step_usd !== 'number') return;
-      var input = row.querySelector('.dk-af-amount-input');
-      var cur = parseFloat(input && input.value) || 0;
-      setAmount(row, cur + b.step_usd * parseInt(btn.getAttribute('data-af-step'), 10));
+      var idx = row.getAttribute('data-af-idx');
+      var mode = row.getAttribute('data-af-mode');
+      var b = (currentCard.benefits_valued || [])[parseInt(idx, 10)];
+      if (!b) return;
+      if (!state[idx]) state[idx] = { used: false, amount: 0 };
+      var s = state[idx];
+
+      if (mode === 'count') {
+        var max = countMax(b);
+        var cur = (typeof s.count === 'number') ? s.count : max;
+        var n = Math.max(0, Math.min(max, cur + parseInt(btn.getAttribute('data-af-cnt'), 10)));
+        s.count = n;
+        s.used = n > 0;
+      } else if (mode === 'rate') {
+        var cur2 = (typeof s.spend === 'number') ? s.spend : 0;
+        var v2 = Math.max(0, cur2 + (b.spend_step || 50) * parseInt(btn.getAttribute('data-af-spend'), 10));
+        v2 = Math.round(v2 * 100) / 100;
+        s.spend = v2;
+        s.used = v2 > 0.005;
+      } else if (mode === 'tenth') {
+        var cap2 = (typeof b.annual_usd === 'number') ? b.annual_usd : 0;
+        var cur3 = (typeof s.spend === 'number') ? s.spend : 0;
+        var v3 = Math.max(0, Math.min(cap2, cur3 + b.step_usd * parseInt(btn.getAttribute('data-af-step'), 10)));
+        v3 = Math.round(v3 * 100) / 100;
+        s.spend = v3;
+        s.used = v3 > 0.005;
+      } else {
+        return;
+      }
+      updateRowView(row);
       recalc();
     });
 
