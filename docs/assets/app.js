@@ -1116,16 +1116,19 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var barNumEl = document.getElementById('dk-af-bar-num');
     var barFormulaEl = document.getElementById('dk-af-bar-formula');
     var barPhraseEl = document.getElementById('dk-af-bar-phrase');
+    var barNeutralEl = document.getElementById('dk-af-bar-neutral');
     var sheet = document.getElementById('dk-af-sheet');
     var sheetBackdrop = document.getElementById('dk-af-sheet-backdrop');
     var sheetBody = document.getElementById('dk-af-sheet-body');
     var disclaimerSrcEl = document.getElementById('dk-af-disclaimer-src');
     if (!cardSelect || !benefitsWrap || !benefitListEl || !bar || !barPlaceholderEl || !barInnerEl ||
-        !barNumEl || !barFormulaEl || !barPhraseEl || !sheet || !sheetBackdrop || !sheetBody) return;
+        !barNumEl || !barFormulaEl || !barPhraseEl || !barNeutralEl || !sheet || !sheetBackdrop || !sheetBody) return;
 
     var currentCard = null;
 
     var state = {};
+
+    var touchedState = false;
 
     function verifyMarkHtml(b) {
       if (b.verified) {
@@ -1385,8 +1388,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (guideEl) guideEl.hidden = !!currentCard;
       if (!currentCard) { if (feeEl) feeEl.hidden = true; hideBenefits(); return; }
       state = {};
+      touchedState = false;
       (currentCard.benefits_valued || []).forEach(function (b, j) {
-        state[j] = { used: !b.needs_spend, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
+
+        state[j] = { used: !b.needs_spend && !b.from_year, amount: (typeof b.annual_usd === 'number') ? b.annual_usd : 0 };
 
         if (typeof b.rate === 'number' || (b.step_tenth && typeof b.step_usd === 'number')) {
           state[j].amount = 0; state[j].spend = 0;
@@ -1417,6 +1422,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         if (cb) state[idx].count = countMax(cb);
       }
       state[idx].used = e.target.checked;
+      touchedState = true;
       updateRowView(row);
       recalc();
     });
@@ -1459,6 +1465,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       } else {
         return;
       }
+      touchedState = true;
       updateRowView(row);
       recalc();
     });
@@ -1486,13 +1493,22 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       var fee = currentCard.annual_fee || 0;
       var diff = sum - fee;
 
-      var numText = diff > 0.005 ? ('+' + fmtUsd(diff))
-        : (diff < -0.005 ? ('−' + fmtUsd(Math.abs(diff))) : '$0');
-      barNumEl.innerHTML = esc(numText) + '<span class="dk-af-bar-unit">/年</span>';
-      barFormulaEl.textContent = '特典 ' + fmtUsd(sum) + ' − 年会費 ' + fmtUsd(fee);
-      barPhraseEl.textContent = diff > 0.005 ? '特典が年会費より多い'
-        : (diff < -0.005 ? '特典が年会費より少ない' : '特典と年会費が同じ');
-      bar.classList.toggle('is-positive', diff > 0.005);
+      var untouchedZero = !touchedState && usedRows.length === 0;
+      bar.classList.toggle('is-positive', !untouchedZero && diff > 0.005);
+      if (untouchedZero) {
+        barInnerEl.hidden = true;
+        barNeutralEl.hidden = false;
+      } else {
+        barInnerEl.hidden = false;
+        barNeutralEl.hidden = true;
+
+        var numText = diff > 0.005 ? ('+' + fmtUsd(diff))
+          : (diff < -0.005 ? ('−' + fmtUsd(Math.abs(diff))) : '$0');
+        barNumEl.innerHTML = esc(numText) + '<span class="dk-af-bar-unit">/年</span>';
+        barFormulaEl.textContent = '特典 ' + fmtUsd(sum) + ' − 年会費 ' + fmtUsd(fee);
+        barPhraseEl.textContent = diff > 0.005 ? '特典が年会費より多い'
+          : (diff < -0.005 ? '特典が年会費より少ない' : '特典と年会費が同じ');
+      }
 
       if (sheetBody) sheetBody.innerHTML = sheetBodyHtml(sum, fee, diff, allMax, usedRows);
     }
@@ -1523,13 +1539,20 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
           '件あります(マイル・無料宿泊など)。使う人は、上の差額より実際は多くなります。</p>';
       }
 
-      var spendOff = 0;
+      var spendOffCount = 0, hasNeedsSpendOff = false, hasFromYearOff = false;
       (currentCard.benefits_valued || []).forEach(function (b, j) {
-        if (b.needs_spend && !(state[j] || {}).used) spendOff++;
+        if ((state[j] || {}).used) return;
+        if (!b.needs_spend && !b.from_year) return;
+        spendOffCount++;
+        if (b.needs_spend) hasNeedsSpendOff = true;
+        if (b.from_year) hasFromYearOff = true;
       });
-      if (spendOff > 0) {
-        html += '<p class="dk-af-sheet-note">追加の支出が要る特典 ' + spendOff +
-          '件は入れていません(入れる場合は上で選んでください)。</p>';
+      if (spendOffCount > 0) {
+        var offKinds = [];
+        if (hasNeedsSpendOff) offKinds.push('追加の支出が要る');
+        if (hasFromYearOff) offKinds.push('2年目から');
+        html += '<p class="dk-af-sheet-note">入れていない特典 ' + spendOffCount +
+          '件(' + offKinds.join('・') + ')。</p>';
       }
 
       var cm = /^(\d{4})-(\d{2})-(\d{2})/.exec(currentCard.benefits_checked_at || '');
@@ -1654,4 +1677,466 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBonusTool);
   else initBonusTool();
+})();
+
+(function () {
+  'use strict';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtUsd(n) {
+    var v = Math.round(n * 100) / 100;
+    var sign = v < 0 ? '-' : '';
+    v = Math.abs(v);
+    var s = (v === Math.floor(v)) ? String(v) : v.toFixed(2);
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return sign + '$' + parts.join('.');
+  }
+  function fmtNum(n) {
+    var v = Math.round(n);
+    return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function normText(s) {
+    s = String(s == null ? '' : s);
+    try { s = s.normalize('NFKC'); } catch (e) {  }
+    return s.toLowerCase();
+  }
+  var UNUSABLE_SHORT = '使えません';
+
+  function initPayTool() {
+    var app = document.getElementById('dk-pay-app');
+    var dataEl = document.getElementById('dk-pay-data');
+    if (!app || !dataEl) return;
+    var cards = [];
+    try { cards = JSON.parse(dataEl.textContent) || []; } catch (e) { cards = []; }
+    if (!cards.length) return;
+
+    var groupsEl = document.getElementById('dk-pay-card-groups');
+    var pillsEl = document.getElementById('dk-pay-scene-pills');
+    var guideEl = document.getElementById('dk-pay-guide');
+    var resultEl = document.getElementById('dk-pay-result');
+    var pickerPanel = document.getElementById('dk-pay-picker-panel');
+    var reopenBtn = document.getElementById('dk-pay-reopen-btn');
+    var doneBtn = document.getElementById('dk-pay-done-btn');
+    var searchInput = document.getElementById('dk-pay-search');
+    var issuerChipsEl = document.getElementById('dk-pay-issuer-chips');
+    var noMatchEl = document.getElementById('dk-pay-no-match');
+    var chipsEl = document.getElementById('dk-pay-selected-chips');
+    var countEl = document.getElementById('dk-pay-selected-count');
+    if (!groupsEl || !pillsEl || !resultEl || !pickerPanel) return;
+
+    var warehouseData = null;
+    var whEl = document.getElementById('dk-pay-warehouse-data');
+    if (whEl) { try { warehouseData = JSON.parse(whEl.textContent); } catch (e) { warehouseData = null; } }
+
+    var bySlug = {};
+    cards.forEach(function (c) { bySlug[c.slug] = c; });
+    var selectedScene = null;
+    var issuerFilter = '';
+
+    function selectedSlugs() {
+      var out = [];
+      Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input:checked'), function (cb) {
+        out.push(cb.getAttribute('data-slug'));
+      });
+      return out;
+    }
+    function syncHash() {
+      var slugs = selectedSlugs();
+      var url = location.pathname + location.search + (slugs.length ? '#cards=' + slugs.join(',') : '');
+      try { history.replaceState(null, '', url); } catch (e) {  }
+    }
+    function restoreFromHash() {
+      var m = /^#cards=(.*)$/.exec(location.hash || '');
+      if (!m) return 0;
+      var want = {};
+      decodeURIComponent(m[1]).split(',').forEach(function (s) { if (s) want[s] = true; });
+      var n = 0;
+      Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input'), function (cb) {
+        if (want[cb.getAttribute('data-slug')]) { cb.checked = true; n++; }
+      });
+      return n;
+    }
+
+    function collapsePicker() {
+      pickerPanel.hidden = true;
+      if (reopenBtn) reopenBtn.hidden = false;
+    }
+    function expandPicker() {
+      pickerPanel.hidden = false;
+      if (reopenBtn) reopenBtn.hidden = true;
+    }
+    if (reopenBtn) reopenBtn.addEventListener('click', expandPicker);
+    if (doneBtn) doneBtn.addEventListener('click', collapsePicker);
+
+    function renderSelectedChips() {
+      var checked = Array.prototype.filter.call(groupsEl.querySelectorAll('.dk-pay-card-input'),
+        function (cb) { return cb.checked; });
+      if (countEl) countEl.textContent = String(checked.length);
+      if (!chipsEl) return;
+      if (!checked.length) {
+        chipsEl.innerHTML = '<span class="dk-pay-selected-empty">まだありません</span>';
+        return;
+      }
+      chipsEl.innerHTML = checked.map(function (cb) {
+        var slug = cb.getAttribute('data-slug');
+        var name = cb.getAttribute('data-name') || slug;
+        return '<span class="dk-pay-selected-chip"><span class="dk-pay-selected-chip-name">' + esc(name) + '</span>' +
+          '<button type="button" class="dk-pay-selected-chip-x" data-remove-slug="' + esc(slug) + '" ' +
+          'aria-label="' + esc(name) + 'を外す">&times;</button></span>';
+      }).join('');
+    }
+    if (chipsEl) {
+      chipsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('.dk-pay-selected-chip-x');
+        if (!btn) return;
+        var slug = btn.getAttribute('data-remove-slug');
+        Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input'), function (cb) {
+          if (cb.getAttribute('data-slug') === slug) cb.checked = false;
+        });
+        syncHash();
+        renderSelectedChips();
+        recalc();
+      });
+    }
+
+    function applyPickerFilter() {
+      var q = searchInput ? normText(searchInput.value).trim() : '';
+      var active = !!q || !!issuerFilter;
+      var anyVisible = false;
+      Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-issuer-group'), function (group) {
+        var groupIssuer = group.getAttribute('data-issuer');
+        var issuerOk = !issuerFilter || issuerFilter === groupIssuer;
+        var cardsWrap = group.querySelector('.dk-pay-issuer-cards');
+        var toggle = group.querySelector('.dk-pay-issuer-toggle');
+        var groupHasMatch = false;
+        Array.prototype.forEach.call(group.querySelectorAll('.dk-pay-card-check'), function (label) {
+          var hay = normText(label.getAttribute('data-search'));
+          var match = issuerOk && (!q || hay.indexOf(q) !== -1);
+          label.hidden = !match;
+          if (match) groupHasMatch = true;
+        });
+        group.hidden = !issuerOk;
+        if (issuerOk) anyVisible = anyVisible || (!q || groupHasMatch);
+        if (cardsWrap && toggle) {
+          if (active) {
+
+            if (groupHasMatch || (issuerOk && !q)) {
+              cardsWrap.hidden = false; toggle.setAttribute('aria-expanded', 'true');
+            } else {
+              cardsWrap.hidden = true; toggle.setAttribute('aria-expanded', 'false');
+            }
+          } else {
+            cardsWrap.hidden = true; toggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+      if (noMatchEl) noMatchEl.hidden = !q || anyVisible;
+    }
+    if (searchInput) searchInput.addEventListener('input', applyPickerFilter);
+    if (issuerChipsEl) {
+      issuerChipsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('.dk-pay-issuer-chip');
+        if (!btn) return;
+        issuerFilter = btn.getAttribute('data-issuer') || '';
+        Array.prototype.forEach.call(issuerChipsEl.querySelectorAll('.dk-pay-issuer-chip'), function (b) {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        applyPickerFilter();
+      });
+    }
+    groupsEl.addEventListener('click', function (e) {
+      var toggle = e.target.closest('.dk-pay-issuer-toggle');
+      if (!toggle) return;
+      var cardsWrap = toggle.parentElement.querySelector('.dk-pay-issuer-cards');
+      if (!cardsWrap) return;
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      cardsWrap.hidden = open;
+    });
+
+    pillsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.dk-pay-scene-pill');
+      if (!btn) return;
+      Array.prototype.forEach.call(pillsEl.querySelectorAll('.dk-pay-scene-pill'), function (b) {
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+      });
+      selectedScene = btn.getAttribute('data-scene');
+
+      if (!pickerPanel.hidden) collapsePicker();
+      recalc();
+    });
+
+    groupsEl.addEventListener('change', function (e) {
+      if (!e.target.classList.contains('dk-pay-card-input')) return;
+      syncHash();
+      renderSelectedChips();
+      recalc();
+    });
+
+    function sceneLabel(key) {
+      var btn = pillsEl.querySelector('.dk-pay-scene-pill[data-scene="' + key + '"]');
+      return btn ? btn.textContent : key;
+    }
+
+    function onlineLineText(cell) { return cell.online_note || ''; }
+    function merchantLineText(cell) { return cell.merchant_note || ''; }
+
+    function nonComparableRowHtml(name, cell) {
+      if (cell.unusable && cell.note === UNUSABLE_SHORT) {
+        return '<div class="dk-pay-rest-row"><div class="dk-pay-row1">' +
+          '<span class="dk-pay-name">' + esc(name) + '</span>' +
+          '<span class="dk-pay-unusable-amount">' + esc(UNUSABLE_SHORT) + '</span></div></div>';
+      }
+      var lines = [];
+      if (cell.variable_label) {
+        lines.push(cell.variable_label);
+      } else {
+        if (cell.mark) lines.push(cell.mark);
+        if (cell.note) lines.push(cell.note);
+      }
+      var onlineText = onlineLineText(cell);
+      if (onlineText) lines.push(onlineText);
+      var merchantText = merchantLineText(cell);
+      if (merchantText) lines.push(merchantText);
+      var valueHtml = (typeof cell.points_per_100 === 'number' && cell.unit_word)
+        ? '<span class="dk-pay-points-amount">' + fmtNum(cell.points_per_100) + ' ' + esc(cell.unit_word) + ' / $100</span>'
+        : '';
+      var headHtml = '<div class="dk-pay-rest-row-head"><span class="dk-pay-name">' + esc(name) + '</span>' +
+        '<span>' + valueHtml + '<span class="dk-pay-neutral-chip">比較対象外</span></span></div>';
+      var bodyHtml = lines.map(function (l) { return '<div class="dk-pay-row2">' + esc(l) + '</div>'; }).join('');
+      return '<div class="dk-pay-rest-row">' + headHtml + bodyHtml + '</div>';
+    }
+
+    function recalc() {
+      var selected = [];
+      Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input:checked'), function (cb) {
+        var c = bySlug[cb.getAttribute('data-slug')];
+        if (c) selected.push(c);
+      });
+      if (!selectedScene || !selected.length) {
+        resultEl.hidden = true;
+        resultEl.innerHTML = '';
+        if (guideEl) guideEl.hidden = false;
+        return;
+      }
+      if (guideEl) guideEl.hidden = true;
+
+      var sceneKey = selectedScene.replace(/-/g, '_');
+      var comparable = [];
+      var others = [];
+      selected.forEach(function (c) {
+        var cell = (c.scenes || {})[sceneKey];
+        if (!cell) return;
+        if (cell.comparable) {
+          comparable.push({
+            name: c.name_ja, amount: cell.amount_usd, label_ja: cell.label_ja,
+            mark: cell.mark, excludesNote: cell.excludes_note || '', onlineNote: onlineLineText(cell),
+            merchantNote: merchantLineText(cell), merchantCondTag: cell.merchant_cond_tag || '',
+            merchantNoteJa: cell.merchant_note_ja || '',
+          });
+        } else {
+          others.push({ name: c.name_ja, cell: cell });
+        }
+      });
+      comparable.sort(function (a, b) { return b.amount - a.amount || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0); });
+      others.sort(function (a, b) { return a.name < b.name ? -1 : a.name > b.name ? 1 : 0; });
+
+      var html = '<p class="dk-pay-result-heading">' + esc(sceneLabel(selectedScene)) + ' で $100 払うと</p>';
+
+      if (sceneKey === 'warehouse' && warehouseData && warehouseData.source_url) {
+        html += '<p class="dk-pay-warehouse-note">Costco の店頭は Visa のみです' +
+          '<a href="' + esc(warehouseData.source_url) + '" target="_blank" rel="noopener">(Costco の会員規約)</a></p>';
+      }
+      if (comparable.length) {
+        var topAmount = comparable[0].amount;
+        var top = comparable.filter(function (r) { return Math.abs(r.amount - topAmount) < 0.005; });
+        var rest = comparable.filter(function (r) { return Math.abs(r.amount - topAmount) >= 0.005; });
+        rest.sort(function (a, b) { return a.name < b.name ? -1 : a.name > b.name ? 1 : 0; });
+
+        function comparableRowHtml(r) {
+
+          var lines = [];
+          if (r.label_ja) lines.push(r.label_ja);
+          if (r.mark) lines.push(r.mark);
+
+          if (r.merchantCondTag) lines.push(r.merchantCondTag);
+          var sub = lines.map(function (l) { return '<div class="dk-pay-row2">' + esc(l) + '</div>'; }).join('');
+
+          var noteJa = r.merchantNoteJa ? '<div class="dk-pay-excludes-note">' + esc(r.merchantNoteJa) + '</div>' : '';
+          var excl = r.excludesNote ? '<div class="dk-pay-excludes-note">' + esc(r.excludesNote) + '</div>' : '';
+          var onl = r.onlineNote ? '<div class="dk-pay-excludes-note">' + esc(r.onlineNote) + '</div>' : '';
+          var mer = r.merchantNote ? '<div class="dk-pay-excludes-note">' + esc(r.merchantNote) + '</div>' : '';
+          return sub + noteJa + excl + onl + mer;
+        }
+
+        html += '<div class="dk-pay-top-list">' + top.map(function (r) {
+          var sameBadge = top.length > 1 ? '<span class="dk-pay-top-same">同じ</span>' : '';
+          return '<div class="dk-pay-top-row"><div class="dk-pay-row1">' +
+            '<span class="dk-pay-name">' + esc(r.name) + sameBadge + '</span>' +
+            '<span class="dk-pay-amount">' + fmtUsd(r.amount) + '</span></div>' +
+            comparableRowHtml(r) + '</div>';
+        }).join('') + '</div>';
+
+        if (rest.length || others.length) {
+          html += '<div class="dk-pay-rest-list">' + rest.map(function (r) {
+            return '<div class="dk-pay-rest-row"><div class="dk-pay-row1">' +
+              '<span class="dk-pay-name">' + esc(r.name) + '</span>' +
+              '<span class="dk-pay-amount">' + fmtUsd(r.amount) + '</span></div>' +
+              comparableRowHtml(r) + '</div>';
+          }).join('') + others.map(function (r) {
+            return nonComparableRowHtml(r.name, r.cell);
+          }).join('') + '</div>';
+        }
+      } else {
+
+        html += '<div class="dk-pay-rest-list">' + others.map(function (r) {
+          return nonComparableRowHtml(r.name, r.cell);
+        }).join('') + '</div>';
+      }
+      resultEl.innerHTML = html;
+      resultEl.hidden = false;
+    }
+
+    var restoredCount = restoreFromHash();
+    renderSelectedChips();
+    applyPickerFilter();
+
+    if (restoredCount > 0) collapsePicker();
+    recalc();
+    window.addEventListener('hashchange', function () {
+      restoreFromHash();
+      renderSelectedChips();
+      recalc();
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPayTool);
+  else initPayTool();
+})();
+
+(function () {
+  'use strict';
+
+  var CX = 180, CY = 160, R = 95;
+  var AXIS_ORDER = ['cashback', 'benefits', 'bonus'];
+  var AXIS_LABELS = { cashback: 'キャッシュバック', benefits: '特典', bonus: '初回ボーナス' };
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtUsd(n) {
+    var v = Math.round((Number(n) || 0) * 100) / 100;
+    var sign = v < 0 ? '-' : '';
+    v = Math.abs(v);
+    var s = (v === Math.floor(v)) ? String(v) : v.toFixed(2);
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return sign + '$' + parts.join('.');
+  }
+
+  function compactNumbers(values) {
+    return AXIS_ORDER.map(function (key) {
+      return AXIS_LABELS[key] + ' ' + fmtUsd(values[key]);
+    }).join(' / ');
+  }
+
+  function axisAngle(i) { return (-90 + i * 120) * Math.PI / 180; }
+  function axisPoint(ratio, i) {
+    var rr = R * Math.max(0, Math.min(ratio, 1));
+    var a = axisAngle(i);
+    return (CX + rr * Math.cos(a)).toFixed(1) + ',' + (CY + rr * Math.sin(a)).toFixed(1);
+  }
+  function polygonPoints(values, axisMax) {
+    return AXIS_ORDER.map(function (key, i) {
+      var v = Number(values[key]) || 0;
+      var max = Number(axisMax[key]) || 1;
+      return axisPoint(v / max, i);
+    }).join(' ');
+  }
+
+  function initCardRadar() {
+    var svg = document.getElementById('dk-card-radar-svg');
+    if (!svg) return;
+    var optionsEl = document.getElementById('dk-card-radar-options');
+    var axisMaxEl = document.getElementById('dk-card-radar-axis-max');
+    var sel1 = document.getElementById('dk-card-radar-vs1');
+    var sel2 = document.getElementById('dk-card-radar-vs2');
+    var legendOv1 = document.getElementById('dk-card-radar-legend-ov1');
+    var legendOv2 = document.getElementById('dk-card-radar-legend-ov2');
+    if (!optionsEl || !axisMaxEl || !sel1 || !sel2) return;
+
+    var chartOptions = [];
+    var axisMax = {};
+    try { chartOptions = JSON.parse(optionsEl.textContent) || []; } catch (e) { chartOptions = []; }
+    try { axisMax = JSON.parse(axisMaxEl.textContent) || {}; } catch (e) { axisMax = {}; }
+    var bySlug = {};
+    chartOptions.forEach(function (c) { bySlug[c.slug] = c; });
+
+    function clearOverlays() {
+      Array.prototype.forEach.call(svg.querySelectorAll('.dk-card-radar-ov1, .dk-card-radar-ov2'), function (el) {
+        el.parentNode.removeChild(el);
+      });
+    }
+
+    function updateLegendRow(rowEl, card) {
+      if (!rowEl) return;
+      if (!card) { rowEl.hidden = true; return; }
+      var nameEl = rowEl.querySelector('.dk-card-radar-legend-name');
+      var numsEl = rowEl.querySelector('.dk-card-radar-legend-nums');
+      if (nameEl) nameEl.textContent = card.name_ja;
+      if (numsEl) numsEl.textContent = compactNumbers(card);
+      rowEl.hidden = false;
+    }
+
+    function drawOverlays() {
+      clearOverlays();
+      var slug1 = sel1.value, slug2 = sel2.value;
+      var c1 = slug1 ? bySlug[slug1] : null;
+      var c2 = (slug2 && slug2 !== slug1) ? bySlug[slug2] : null;
+      if (c1) {
+        var poly1 = document.createElementNS(SVG_NS, 'polygon');
+        poly1.setAttribute('points', polygonPoints(c1, axisMax));
+        poly1.setAttribute('class', 'dk-card-radar-ov1');
+        svg.appendChild(poly1);
+      }
+      if (c2) {
+        var poly2 = document.createElementNS(SVG_NS, 'polygon');
+        poly2.setAttribute('points', polygonPoints(c2, axisMax));
+        poly2.setAttribute('class', 'dk-card-radar-ov2');
+        svg.appendChild(poly2);
+      }
+      updateLegendRow(legendOv1, c1);
+      updateLegendRow(legendOv2, c2);
+    }
+
+    function syncHash() {
+      var slugs = [sel1.value, sel2.value].filter(function (s) { return s; });
+      var url = location.pathname + location.search + (slugs.length ? '#vs=' + slugs.join(',') : '');
+      history.replaceState(null, '', url);
+    }
+    function restoreFromHash() {
+      var m = /^#vs=(.*)$/.exec(location.hash || '');
+      if (!m) return;
+      var slugs = decodeURIComponent(m[1]).split(',').filter(function (s) { return s && bySlug[s]; });
+      if (slugs[0]) sel1.value = slugs[0];
+      if (slugs[1]) sel2.value = slugs[1];
+    }
+
+    sel1.addEventListener('change', function () { syncHash(); drawOverlays(); });
+    sel2.addEventListener('change', function () { syncHash(); drawOverlays(); });
+    window.addEventListener('hashchange', function () { restoreFromHash(); drawOverlays(); });
+
+    restoreFromHash();
+    drawOverlays();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCardRadar);
+  else initCardRadar();
 })();
