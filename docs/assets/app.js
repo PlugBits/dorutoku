@@ -1583,7 +1583,75 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     }, { passive: true });
 
     hideBenefits();
+
+    function slugFromNameEn(s) {
+      return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    try {
+      var hash = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+      if (hash) {
+        for (var hi = 0; hi < cards.length; hi++) {
+          if (slugFromNameEn(cards[hi].name_en) === hash) {
+            cardSelect.value = String(hi);
+            selectCard(hi);
+            break;
+          }
+        }
+      }
+    } catch (e) {  }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAnnualFeeTool);
   else initAnnualFeeTool();
+})();
+
+(function () {
+  function initBonusTool() {
+    var list = document.getElementById('dk-bn-list');
+    if (!list) return;
+
+    list.addEventListener('click', function (e) {
+      var btn = e.target.closest('.dk-bn-detail-btn');
+      if (!btn) return;
+      var id = btn.getAttribute('aria-controls');
+      var panel = id && document.getElementById(id);
+      if (!panel) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      panel.hidden = open;
+    });
+
+    var pillFee0 = document.getElementById('dk-bn-pill-fee0');
+    var pillCash = document.getElementById('dk-bn-pill-cash');
+    var CASH_ONLY_LABEL = '現金だけ';
+    var SHOW_ALL_LABEL = 'ポイント・マイルも出す';
+
+    function applyFilters() {
+      var fee0On = !!pillFee0 && pillFee0.getAttribute('aria-pressed') === 'true';
+      var cashOn = !!pillCash && pillCash.getAttribute('aria-pressed') === 'true';
+      Array.prototype.forEach.call(list.querySelectorAll('.dk-bn-row'), function (row) {
+        var hide = (fee0On && row.getAttribute('data-bn-fee0') !== '1') ||
+          (cashOn && row.getAttribute('data-bn-cash') !== '1');
+        row.hidden = hide;
+      });
+    }
+
+    if (pillFee0) {
+      pillFee0.addEventListener('click', function () {
+        var on = pillFee0.getAttribute('aria-pressed') === 'true';
+        pillFee0.setAttribute('aria-pressed', on ? 'false' : 'true');
+        applyFilters();
+      });
+    }
+
+    if (pillCash) {
+      pillCash.addEventListener('click', function () {
+        var next = pillCash.getAttribute('aria-pressed') !== 'true';
+        pillCash.setAttribute('aria-pressed', next ? 'true' : 'false');
+        pillCash.textContent = next ? SHOW_ALL_LABEL : CASH_ONLY_LABEL;
+        applyFilters();
+      });
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBonusTool);
+  else initBonusTool();
 })();
