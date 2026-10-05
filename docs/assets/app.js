@@ -1,6 +1,71 @@
 var DK_ICON_CHECK = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
 var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>';
 
+window.dkCardsFromHash = function (hash) {
+  var m = /(?:^|&)cards=([^&]*)/.exec((hash || '').replace(/^#/, ''));
+  if (!m) return [];
+  try { return decodeURIComponent(m[1]).split(',').filter(Boolean); } catch (e) { return []; }
+};
+
+window.dkMergeCardsIntoHref = function (href, cards) {
+  if (!href || !cards || !cards.length) return href;
+  var hashIdx = href.indexOf('#');
+  if (hashIdx === -1) return href + '#cards=' + cards.join(',');
+  var base = href.slice(0, hashIdx);
+  var hash = href.slice(hashIdx + 1);
+  var m = /(?:^|&)cards=([^&]*)/.exec(hash);
+  if (!m) return base + '#' + hash + (hash ? '&' : '') + 'cards=' + cards.join(',');
+  var existing = [];
+  try { existing = decodeURIComponent(m[1]).split(',').filter(Boolean); } catch (e) { existing = []; }
+  var merged = existing.slice();
+  cards.forEach(function (s) { if (merged.indexOf(s) === -1) merged.push(s); });
+  var at = hash.indexOf(m[0]);
+  var replaced = m[0].slice(0, m[0].length - m[1].length) + merged.join(',');
+  hash = hash.slice(0, at) + replaced + hash.slice(at + m[0].length);
+  return base + '#' + hash;
+};
+
+(function () {
+  'use strict';
+
+  function isCardsCarryTarget(href) {
+    if (!href) return false;
+    if (href.charAt(0) === '#') return false;
+    if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0 ||
+        href.indexOf('javascript:') === 0) return false;
+    var path = href;
+    if (href.indexOf('https://dorutoku.com/') === 0) {
+      path = href.slice('https://dorutoku.com'.length);
+
+    } else if (href.charAt(0) !== '/') {
+      return false;
+    }
+    if (/\.(css|js|mjs|png|jpe?g|gif|svg|webp|ico|json|xml|txt|webmanifest|pdf)(\?|#|$)/i.test(path)) {
+      return false;
+    }
+    return true;
+  }
+
+  function applyCardsCarry() {
+    var cards = window.dkCardsFromHash(location.hash);
+    if (!cards.length) return;
+    Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+      var href = a.getAttribute('href');
+      if (!isCardsCarryTarget(href)) return;
+      var next = window.dkMergeCardsIntoHref(href, cards);
+      if (next !== href) a.setAttribute('href', next);
+    });
+  }
+
+  window.dkApplyCardsCarry = applyCardsCarry;
+
+  function run() { applyCardsCarry(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+
+  window.addEventListener('hashchange', run);
+})();
+
 (function () {
   'use strict';
 
@@ -674,7 +739,10 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     linkBtn.addEventListener('click', function () {
       var use = limited();
-      var url = location.origin + location.pathname + '#saved=' + use.join(',');
+
+      var carriedCards = (window.dkCardsFromHash ? window.dkCardsFromHash(location.hash) : []);
+      var url = location.origin + location.pathname + '#saved=' + use.join(',')
+        + (carriedCards.length ? '&cards=' + carriedCards.join(',') : '');
       var note = use.length < ids.length
         ? ('50件まで持ち出せます(' + ids.length + '件のうち先頭' + use.length + '件のリンクを作りました)。')
         : (use.length + '件のリンクを作りました。');
@@ -691,7 +759,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   }
 
   function initImport() {
-    var m = location.hash.match(/^#saved=(.*)$/);
+
+    var m = /(?:^|&)saved=([^&]*)/.exec((location.hash || '').replace(/^#/, ''));
     if (!m) return;
     var incoming = validIds(decodeURIComponent(m[1]).split(','));
     var sheet = document.getElementById('dk-import-sheet');
@@ -1012,8 +1081,14 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (backdrop) backdrop.hidden = false;
       sheet.hidden = false;
       if (window.dkSyncScrollLock) window.dkSyncScrollLock();
-      if (push && location.hash !== '#d-' + id) {
-        try { history.pushState({ deal: id }, '', '#d-' + id); } catch (e) {  }
+      if (push) {
+
+        var carriedCards = (window.dkCardsFromHash ? window.dkCardsFromHash(location.hash) : []);
+        var newHash = '#d-' + id + (carriedCards.length ? '&cards=' + carriedCards.join(',') : '');
+        if (location.hash !== newHash) {
+          try { history.pushState({ deal: id }, '', newHash); } catch (e) {  }
+          if (window.dkApplyCardsCarry) window.dkApplyCardsCarry();
+        }
       }
       return true;
     }
@@ -1043,8 +1118,9 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       }
       if (!sheet.hidden && e.target.closest('[data-dk-close]')) { closeDeal(false); return; }
     }, true);
+
     window.addEventListener('popstate', function () {
-      var m = location.hash.match(/^#d-(.+)$/);
+      var m = /^#d-([^&]+)/.exec(location.hash || '');
       if (m && deals[m[1]]) openDeal(m[1], false);
       else closeDeal(true);
     });
@@ -1052,7 +1128,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     window.dkCloseDeal = function () { closeDeal(false); };
 
-    var m0 = location.hash.match(/^#d-(.+)$/);
+    var m0 = /^#d-([^&]+)/.exec(location.hash || '');
     if (m0) openDeal(m0[1], false);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDealSheet);
@@ -1851,6 +1927,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       var url = location.pathname + location.search + (parts.length ? '#' + parts.join('&') : '');
       try { history.replaceState(null, '', url); } catch (e) {  }
       renderFromLink();
+
+      if (window.dkApplyCardsCarry) window.dkApplyCardsCarry();
     }
     function restoreFromHash() {
       var raw = hashParam('cards');
@@ -2267,10 +2345,12 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var emptyLinkA = emptyEl.querySelector('a');
     if (emptyLinkA) {
       var baseHref = emptyLinkA.getAttribute('href') || '';
-      var hashIdx = baseHref.indexOf('#');
-      var moreHref = hashIdx === -1
-        ? baseHref + '#cards=' + currentHeldSlugsCsv
-        : baseHref.slice(0, hashIdx + 1) + 'cards=' + currentHeldSlugsCsv + '&' + baseHref.slice(hashIdx + 1);
+      var heldSlugs = currentHeldSlugsCsv ? currentHeldSlugsCsv.split(',').filter(Boolean) : [];
+      var moreHref = window.dkMergeCardsIntoHref
+        ? window.dkMergeCardsIntoHref(baseHref, heldSlugs)
+        : (baseHref.indexOf('#') === -1
+            ? baseHref + '#cards=' + currentHeldSlugsCsv
+            : baseHref.slice(0, baseHref.indexOf('#') + 1) + 'cards=' + currentHeldSlugsCsv + '&' + baseHref.slice(baseHref.indexOf('#') + 1));
       html += '<p class="dk-store-pay-more"><a href="' + esc(moreHref) + '">持っているカードを選び直す</a></p>';
     }
 
@@ -2401,11 +2481,16 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     function syncHash() {
       var slugs = [sel1.value, sel2.value].filter(function (s) { return s; });
-      var url = location.pathname + location.search + (slugs.length ? '#vs=' + slugs.join(',') : '');
+      var carried = (window.dkCardsFromHash ? window.dkCardsFromHash(location.hash) : []);
+      var parts = [];
+      if (slugs.length) parts.push('vs=' + slugs.join(','));
+      if (carried.length) parts.push('cards=' + carried.join(','));
+      var url = location.pathname + location.search + (parts.length ? '#' + parts.join('&') : '');
       history.replaceState(null, '', url);
+      if (window.dkApplyCardsCarry) window.dkApplyCardsCarry();
     }
     function restoreFromHash() {
-      var m = /^#vs=(.*)$/.exec(location.hash || '');
+      var m = /(?:^|&)vs=([^&]*)/.exec((location.hash || '').replace(/^#/, ''));
       if (!m) return;
       var slugs = decodeURIComponent(m[1]).split(',').filter(function (s) { return s && bySlug[s]; });
       if (slugs[0]) sel1.value = slugs[0];
@@ -2421,22 +2506,4 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCardRadar);
   else initCardRadar();
-})();
-
-(function () {
-  'use strict';
-  var m = /^#cards=(.*)$/.exec(location.hash || '');
-  if (!m) return;
-  var carried = [];
-  try { carried = decodeURIComponent(m[1]).split(',').filter(Boolean); } catch (e) { carried = []; }
-  if (!carried.length) return;
-  Array.prototype.forEach.call(document.querySelectorAll('a[data-cardtool-link]'), function (a) {
-    var href = a.getAttribute('href') || '';
-    var idx = href.indexOf('#cards=');
-    if (idx === -1) return;
-    var afterEq = href.slice(idx + 7);
-    var merged = afterEq.split(',').filter(Boolean);
-    carried.forEach(function (s) { if (merged.indexOf(s) === -1) merged.push(s); });
-    a.setAttribute('href', href.slice(0, idx) + '#cards=' + merged.join(','));
-  });
 })();
