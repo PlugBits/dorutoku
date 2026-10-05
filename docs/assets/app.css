@@ -1012,6 +1012,14 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-deal-src a { color: var(--pink); font-weight: 700; text-decoration: none; }
 .dk-who { font-size: 13px; font-weight: 700; color: var(--sub); background: var(--band); border-radius: 8px; padding: 3px 9px; }
 
+.dk-store-pay { margin: 22px 0 0; }
+.dk-store-pay-empty-text { font-size: 15px; color: var(--sub); line-height: 1.55; margin: 10px 0 0; }
+.dk-store-pay-empty-link { font-size: 14px; margin: 8px 0 0; }
+.dk-store-pay-empty-link a { color: var(--ink); font-weight: 700; }
+.dk-store-pay-scene-note { font-size: 12px; color: var(--dim); margin: 2px 0 10px; }
+.dk-store-pay-more { font-size: 13px; margin: 10px 0 0; }
+.dk-store-pay-more a { color: var(--ink); font-weight: 700; }
+
 .dk-due-list { display: flex; flex-direction: column; }
 .dk-due-list .dk-row + .dk-row { border-top: 1px solid var(--line); }
 .dk-region-note { font-size: 13px; font-weight: 700; color: var(--sub); margin: 10px 0 0; }
@@ -1449,6 +1457,10 @@ body.has-af-bar { padding-bottom: calc(var(--tabbar-h) + 88px + 16px + env(safe-
 
 .dk-pay-picker-panel[hidden] { display: none; }
 .dk-pay-reopen-btn[hidden] { display: none; }
+
+.dk-pay-from-link[hidden] { display: none; }
+.dk-pay-from-link { font-size: 14px; margin: 0 0 14px; }
+.dk-pay-from-link a { color: var(--ink); font-weight: 700; }
 .dk-pay-reopen-btn {
   display: block; width: 100%; min-height: 48px; margin: 0 0 14px; padding: 10px 16px;
   border: 1.5px solid var(--line); border-radius: var(--r); background: var(--surface);

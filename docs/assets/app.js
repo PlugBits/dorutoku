@@ -1817,6 +1817,15 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     var selectedScene = null;
     var issuerFilter = '';
 
+    function hashParam(name) {
+      var re = new RegExp('(?:^|&)' + name + '=([^&]*)');
+      var m = re.exec((location.hash || '').replace(/^#/, ''));
+      if (!m) return '';
+      try { return decodeURIComponent(m[1]); } catch (e) { return ''; }
+    }
+    var fromPath = hashParam('from');
+    var fromLabel = hashParam('from_label');
+
     function selectedSlugs() {
       var out = [];
       Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input:checked'), function (cb) {
@@ -1824,16 +1833,30 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       });
       return out;
     }
+    function renderFromLink() {
+      var el = document.getElementById('dk-pay-from-link');
+      if (!el) return;
+      if (!fromPath || !fromLabel) { el.hidden = true; return; }
+      var slugs = selectedSlugs();
+      var href = fromPath + (slugs.length ? '#cards=' + slugs.join(',') : '');
+      el.innerHTML = '<a href="' + esc(href) + '">' + esc(fromLabel) + ' に戻る</a>';
+      el.hidden = false;
+    }
     function syncHash() {
       var slugs = selectedSlugs();
-      var url = location.pathname + location.search + (slugs.length ? '#cards=' + slugs.join(',') : '');
+      var parts = [];
+      if (slugs.length) parts.push('cards=' + slugs.join(','));
+      if (fromPath) parts.push('from=' + encodeURIComponent(fromPath));
+      if (fromLabel) parts.push('from_label=' + encodeURIComponent(fromLabel));
+      var url = location.pathname + location.search + (parts.length ? '#' + parts.join('&') : '');
       try { history.replaceState(null, '', url); } catch (e) {  }
+      renderFromLink();
     }
     function restoreFromHash() {
-      var m = /^#cards=(.*)$/.exec(location.hash || '');
-      if (!m) return 0;
+      var raw = hashParam('cards');
+      if (!raw) return 0;
       var want = {};
-      decodeURIComponent(m[1]).split(',').forEach(function (s) { if (s) want[s] = true; });
+      raw.split(',').forEach(function (s) { if (s) want[s] = true; });
       var n = 0;
       Array.prototype.forEach.call(groupsEl.querySelectorAll('.dk-pay-card-input'), function (cb) {
         if (want[cb.getAttribute('data-slug')]) { cb.checked = true; n++; }
@@ -2083,6 +2106,7 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     var restoredCount = restoreFromHash();
     renderSelectedChips();
+    renderFromLink();
     applyPickerFilter();
 
     if (restoredCount > 0) collapsePicker();
@@ -2090,11 +2114,172 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
     window.addEventListener('hashchange', function () {
       restoreFromHash();
       renderSelectedChips();
+      renderFromLink();
       recalc();
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPayTool);
   else initPayTool();
+})();
+
+(function () {
+  'use strict';
+  var section = document.getElementById('dk-store-pay');
+  if (!section) return;
+  var dataEl = document.getElementById('dk-store-pay-data');
+  var emptyEl = document.getElementById('dk-store-pay-empty');
+  var resultEl = document.getElementById('dk-store-pay-result');
+  if (!dataEl || !emptyEl || !resultEl) return;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtUsd(n) {
+    var v = Math.round((Number(n) || 0) * 100) / 100;
+    var sign = v < 0 ? '-' : '';
+    v = Math.abs(v);
+    var s = (v === Math.floor(v)) ? String(v) : v.toFixed(2);
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return sign + '$' + parts.join('.');
+  }
+  var UNUSABLE_SHORT = '使えません';
+
+  var cards = [];
+  try { cards = JSON.parse(dataEl.textContent) || []; } catch (e) { cards = []; }
+  var bySlug = {};
+  cards.forEach(function (c) { bySlug[c.slug] = c; });
+
+  var warehouseData = null;
+  var whEl = document.getElementById('dk-store-pay-warehouse');
+  if (whEl) { try { warehouseData = JSON.parse(whEl.textContent); } catch (e) { warehouseData = null; } }
+
+  function heldCards() {
+    var raw = (location.hash || '').replace(/^#/, '');
+    var m = /(?:^|&)cards=([^&]*)/.exec(raw);
+    if (!m) return [];
+    var slugs = [];
+    try { slugs = decodeURIComponent(m[1]).split(',').filter(Boolean); } catch (e) { slugs = []; }
+
+    var out = [];
+    slugs.forEach(function (s) { if (bySlug[s] && out.indexOf(bySlug[s]) === -1) out.push(bySlug[s]); });
+    return out;
+  }
+
+  var currentHeldSlugsCsv = '';
+  function nameHtml(c) {
+    if (!c.card_page_href) return esc(c.name_ja);
+    var href = c.card_page_href + (currentHeldSlugsCsv ? '#cards=' + currentHeldSlugsCsv : '');
+    return '<a href="' + esc(href) + '">' + esc(c.name_ja) + '</a>';
+  }
+
+  function rowSubHtml(r) {
+    var lines = [];
+    if (r.label_ja) lines.push(r.label_ja);
+    if (r.mark) lines.push(r.mark);
+    if (r.merchant_cond_tag) lines.push(r.merchant_cond_tag);
+    var sub = lines.map(function (l) { return '<div class="dk-pay-row2">' + esc(l) + '</div>'; }).join('');
+    var noteJa = r.merchant_note_ja ? '<div class="dk-pay-excludes-note">' + esc(r.merchant_note_ja) + '</div>' : '';
+    var excl = r.excludes_note ? '<div class="dk-pay-excludes-note">' + esc(r.excludes_note) + '</div>' : '';
+    var onl = r.online_note ? '<div class="dk-pay-excludes-note">' + esc(r.online_note) + '</div>' : '';
+    var mer = r.merchant_note ? '<div class="dk-pay-excludes-note">' + esc(r.merchant_note) + '</div>' : '';
+    return sub + noteJa + excl + onl + mer;
+  }
+  function nonComparableRowHtml(c) {
+    if (c.unusable && c.note === UNUSABLE_SHORT) {
+      return '<div class="dk-pay-rest-row"><div class="dk-pay-row1">' +
+        '<span class="dk-pay-name">' + nameHtml(c) + '</span>' +
+        '<span class="dk-pay-unusable-amount">' + esc(UNUSABLE_SHORT) + '</span></div></div>';
+    }
+    var lines = [];
+    if (c.variable_label) {
+      lines.push(c.variable_label);
+    } else {
+      if (c.mark) lines.push(c.mark);
+      if (c.note) lines.push(c.note);
+    }
+    if (c.online_note) lines.push(c.online_note);
+    if (c.merchant_note) lines.push(c.merchant_note);
+    var valueHtml = (typeof c.points_per_100 === 'number' && c.unit_word)
+      ? '<span class="dk-pay-points-amount">' + esc(String(Math.round(c.points_per_100))) + ' ' + esc(c.unit_word) + ' / $100</span>'
+      : '';
+    var headHtml = '<div class="dk-pay-rest-row-head"><span class="dk-pay-name">' + nameHtml(c) + '</span>' +
+      '<span>' + valueHtml + '<span class="dk-pay-neutral-chip">比較対象外</span></span></div>';
+    var bodyHtml = lines.map(function (l) { return '<div class="dk-pay-row2">' + esc(l) + '</div>'; }).join('');
+    return '<div class="dk-pay-rest-row">' + headHtml + bodyHtml + '</div>';
+  }
+
+  function render() {
+    var held = heldCards();
+    currentHeldSlugsCsv = held.map(function (c) { return c.slug; }).join(',');
+    if (!held.length) {
+      emptyEl.hidden = false;
+      resultEl.hidden = true;
+      resultEl.innerHTML = '';
+      return;
+    }
+    emptyEl.hidden = true;
+
+    var comparable = held.filter(function (c) { return c.comparable; });
+    var others = held.filter(function (c) { return !c.comparable; });
+    comparable.sort(function (a, b) {
+      return b.amount_usd - a.amount_usd || (a.name_ja < b.name_ja ? -1 : a.name_ja > b.name_ja ? 1 : 0);
+    });
+    others.sort(function (a, b) { return a.name_ja < b.name_ja ? -1 : a.name_ja > b.name_ja ? 1 : 0; });
+
+    var sceneLabel = section.getAttribute('data-scene-label') || '';
+    var html = '<p class="dk-pay-result-heading">この店で $100 払うと</p>' +
+      '<p class="dk-store-pay-scene-note">この店は「' + esc(sceneLabel) + '」として計算しています</p>';
+    if (section.getAttribute('data-scene') === 'warehouse' && warehouseData && warehouseData.source_url) {
+      html += '<p class="dk-pay-warehouse-note">Costco の店頭は Visa のみです' +
+        '<a href="' + esc(warehouseData.source_url) + '" target="_blank" rel="noopener">(Costco の会員規約)</a></p>';
+    }
+
+    if (comparable.length) {
+      var topAmount = comparable[0].amount_usd;
+      var top = comparable.filter(function (r) { return Math.abs(r.amount_usd - topAmount) < 0.005; });
+      var rest = comparable.filter(function (r) { return Math.abs(r.amount_usd - topAmount) >= 0.005; });
+      rest.sort(function (a, b) { return a.name_ja < b.name_ja ? -1 : a.name_ja > b.name_ja ? 1 : 0; });
+
+      html += '<div class="dk-pay-top-list">' + top.map(function (r) {
+        var sameBadge = top.length > 1 ? '<span class="dk-pay-top-same">同じ</span>' : '';
+        return '<div class="dk-pay-top-row"><div class="dk-pay-row1">' +
+          '<span class="dk-pay-name">' + nameHtml(r) + sameBadge + '</span>' +
+          '<span class="dk-pay-amount">' + fmtUsd(r.amount_usd) + '</span></div>' +
+          rowSubHtml(r) + '</div>';
+      }).join('') + '</div>';
+
+      if (rest.length || others.length) {
+        html += '<div class="dk-pay-rest-list">' + rest.map(function (r) {
+          return '<div class="dk-pay-rest-row"><div class="dk-pay-row1">' +
+            '<span class="dk-pay-name">' + nameHtml(r) + '</span>' +
+            '<span class="dk-pay-amount">' + fmtUsd(r.amount_usd) + '</span></div>' +
+            rowSubHtml(r) + '</div>';
+        }).join('') + others.map(nonComparableRowHtml).join('') + '</div>';
+      }
+    } else {
+
+      html += '<div class="dk-pay-rest-list">' + others.map(nonComparableRowHtml).join('') + '</div>';
+    }
+
+    var emptyLinkA = emptyEl.querySelector('a');
+    if (emptyLinkA) {
+      var baseHref = emptyLinkA.getAttribute('href') || '';
+      var hashIdx = baseHref.indexOf('#');
+      var moreHref = hashIdx === -1
+        ? baseHref + '#cards=' + currentHeldSlugsCsv
+        : baseHref.slice(0, hashIdx + 1) + 'cards=' + currentHeldSlugsCsv + '&' + baseHref.slice(hashIdx + 1);
+      html += '<p class="dk-store-pay-more"><a href="' + esc(moreHref) + '">持っているカードを選び直す</a></p>';
+    }
+
+    resultEl.innerHTML = html;
+    resultEl.hidden = false;
+  }
+
+  render();
+  window.addEventListener('hashchange', render);
 })();
 
 (function () {
