@@ -1126,6 +1126,8 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
 
     var currentCard = null;
 
+    var carriedCards = [];
+
     var state = {};
 
     var touchedState = false;
@@ -1567,6 +1569,26 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       if (disclaimerSrcEl) {
         html += '<p class="dk-af-sheet-disclaimer">' + esc(disclaimerSrcEl.textContent) + '</p>';
       }
+
+      var toolLinks = [];
+      if (currentCard.card_page_href) {
+        var cph = currentCard.card_page_href;
+        if (carriedCards.length) cph += (cph.indexOf('#') === -1 ? '#' : '&') + 'cards=' + carriedCards.join(',');
+        toolLinks.push('<a data-cardtool-link href="' + esc(cph) + '">このカードのページを見る</a>');
+      }
+      if (currentCard.pay_tool_href) {
+        var pth = currentCard.pay_tool_href;
+        var pidx = pth.indexOf('#cards=');
+        if (carriedCards.length && pidx !== -1) {
+          var merged = pth.slice(pidx + 7).split(',').filter(Boolean);
+          carriedCards.forEach(function (s) { if (merged.indexOf(s) === -1) merged.push(s); });
+          pth = pth.slice(0, pidx) + '#cards=' + merged.join(',');
+        }
+        toolLinks.push('<a data-cardtool-link href="' + esc(pth) + '">どのカードで払う?</a>');
+      }
+      if (toolLinks.length) {
+        html += '<nav class="dk-af-sheet-links">' + toolLinks.map(function (l) { return '<p>' + l + '</p>'; }).join('') + '</nav>';
+      }
       return html;
     }
 
@@ -1611,7 +1633,18 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
       return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
     try {
-      var hash = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+      var raw = (location.hash || '').replace(/^#/, '');
+      var slugPart = raw, cardsPart = '';
+      var amp = raw.indexOf('&cards=');
+      if (amp !== -1) {
+        slugPart = raw.slice(0, amp);
+        cardsPart = raw.slice(amp + 7);
+      } else if (raw.indexOf('cards=') === 0) {
+        slugPart = '';
+        cardsPart = raw.slice(6);
+      }
+      try { carriedCards = decodeURIComponent(cardsPart).split(',').filter(Boolean); } catch (e2) { carriedCards = []; }
+      var hash = decodeURIComponent(slugPart);
       if (hash) {
         for (var hi = 0; hi < cards.length; hi++) {
           if (slugFromNameEn(cards[hi].name_en) === hash) {
@@ -1674,6 +1707,51 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
         applyFilters();
       });
     }
+
+    (function () {
+      var raw = (location.hash || '').replace(/^#/, '');
+      if (!raw || raw.indexOf('d-') === 0) return;
+      var slugPart = raw, cardsPart = '';
+      var amp = raw.indexOf('&cards=');
+      if (amp !== -1) {
+        slugPart = raw.slice(0, amp);
+        cardsPart = raw.slice(amp + 7);
+      } else if (raw.indexOf('cards=') === 0) {
+        slugPart = '';
+        cardsPart = raw.slice(6);
+      } else if (raw.indexOf('=') !== -1) {
+        return;
+      }
+
+      if (slugPart) {
+        var row = document.getElementById('dk-bn-row-' + slugPart);
+        if (row) {
+          var btn = row.querySelector('.dk-bn-detail-btn');
+          var panelId = btn && btn.getAttribute('aria-controls');
+          var panel = panelId && document.getElementById(panelId);
+          if (btn && panel) {
+            btn.setAttribute('aria-expanded', 'true');
+            panel.hidden = false;
+          }
+          row.scrollIntoView({ block: 'start' });
+        }
+      }
+
+      var carried = [];
+      try { carried = decodeURIComponent(cardsPart).split(',').filter(Boolean); } catch (e) { carried = []; }
+      if (!carried.length) return;
+      Array.prototype.forEach.call(document.querySelectorAll('a[data-cardtool-link]'), function (a) {
+        var href = a.getAttribute('href') || '';
+        var idx = href.indexOf('#cards=');
+        if (idx !== -1) {
+          var merged = href.slice(idx + 7).split(',').filter(Boolean);
+          carried.forEach(function (s) { if (merged.indexOf(s) === -1) merged.push(s); });
+          a.setAttribute('href', href.slice(0, idx) + '#cards=' + merged.join(','));
+        } else {
+          a.setAttribute('href', href + '#cards=' + carried.join(','));
+        }
+      });
+    })();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBonusTool);
   else initBonusTool();
@@ -2158,4 +2236,22 @@ var DK_ICON_HELP = '<svg class="dk-vicon" viewBox="0 0 24 24" width="14" height=
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCardRadar);
   else initCardRadar();
+})();
+
+(function () {
+  'use strict';
+  var m = /^#cards=(.*)$/.exec(location.hash || '');
+  if (!m) return;
+  var carried = [];
+  try { carried = decodeURIComponent(m[1]).split(',').filter(Boolean); } catch (e) { carried = []; }
+  if (!carried.length) return;
+  Array.prototype.forEach.call(document.querySelectorAll('a[data-cardtool-link]'), function (a) {
+    var href = a.getAttribute('href') || '';
+    var idx = href.indexOf('#cards=');
+    if (idx === -1) return;
+    var afterEq = href.slice(idx + 7);
+    var merged = afterEq.split(',').filter(Boolean);
+    carried.forEach(function (s) { if (merged.indexOf(s) === -1) merged.push(s); });
+    a.setAttribute('href', href.slice(0, idx) + '#cards=' + merged.join(','));
+  });
 })();
