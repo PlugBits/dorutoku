@@ -799,6 +799,15 @@ details[open] > .card-tile-summary .wallet-chevron::before { transform: rotate(-
 .pb-article-rel ul { margin: 0; padding-left: 1.2em; }
 .pb-article-rel li { margin: 0 0 6px; }
 .pb-article-rel a { color: var(--accent-ink); }
+
+.pb-article-related-tools { margin: 30px 0 0; }
+.pb-article-related-tools h2 { font-size: 16px; margin: 0 0 10px; color: var(--text-sub); }
+.pb-article-related-tools .dk-af-entry,
+.pb-article-related-tools .dk-bn-entry,
+.pb-article-related-tools .dk-pay-entry { margin: 0 0 10px; }
+.pb-article-related-cards { margin: 10px 0 0; padding-left: 1.2em; }
+.pb-article-related-cards li { margin: 0 0 6px; }
+.pb-article-related-cards a { color: var(--accent-ink); }
 .pb-article-back { margin: 26px 0 0; }
 .pb-article-cta { display: inline-block; background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; padding: 12px 22px; border-radius: 999px; }
 
