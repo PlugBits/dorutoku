@@ -939,6 +939,17 @@ button.dk-row { width: 100%; text-align: left; background: none; border: 0; font
 .dk-pill.dk-pill-2 { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.25; border-radius: 12px; }
 .dk-pill-sub { display: block; font-size: .82em; font-weight: 500; opacity: .85; }
 
+.dk-row-cardmark {
+  display: flex; width: 100%; justify-content: flex-end; align-items: baseline;
+  flex-wrap: wrap; gap: 3px; margin-top: 2px;
+  font-size: 12px; font-weight: 700; color: var(--ink); text-align: right;
+}
+.dk-row-cardmark-ico { width: 13px; height: 13px; flex: none; align-self: center; }
+
+.dk-row-cardmark-name { overflow-wrap: break-word; white-space: normal; }
+.dk-row-cardmark-amt { flex: none; white-space: nowrap; }
+.dk-row-cardmark[hidden] { display: none; }
+
 .dk-count {
   display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; padding: 14px 16px;
   border-radius: var(--r); background: var(--pink-soft); text-decoration: none; color: var(--ink);
@@ -1146,6 +1157,13 @@ a.dk-card-row.dk-card-row-link { text-decoration: none; color: inherit; -webkit-
 .dk-sheet-src { font-size: 14px; color: var(--sub); margin: 14px 0 0; overflow-wrap: anywhere; }
 .dk-sheet-src a { color: var(--pink); font-weight: 700; text-decoration: none; }
 .dk-sheet-note { font-size: 13px; line-height: 1.7; color: var(--dim); margin: 12px 0 0; }
+
+.dk-sheet-paycards { margin: 16px 0 0; padding: 12px; background: var(--band); border-radius: 12px; }
+.dk-sheet-paycards-head { font-size: 13px; font-weight: 800; color: var(--sub); margin: 0 0 6px; }
+.dk-sheet-paycards-line { font-size: 14px; color: var(--ink); line-height: 1.5; margin: 0 0 8px; }
+.dk-sheet-paycards-result .dk-pay-result-heading { font-size: 13px; font-weight: 700; color: var(--sub); margin: 0 0 2px; }
+.dk-sheet-paycards-pay { margin: 10px 0 0; }
+.dk-sheet-paycards-pay a { color: var(--pink); font-weight: 700; text-decoration: none; }
 .dk-sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
 .dk-btn {
   flex: 1 1 auto; min-height: 48px; display: inline-flex; align-items: center; justify-content: center;

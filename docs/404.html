@@ -63,6 +63,14 @@
     <p class="dk-sheet-verify" id="dk-sheet-verify"></p>
     <p class="dk-sheet-src" id="dk-sheet-src"></p>
     <p class="dk-sheet-note">掲載している条件は変わることがあります。申し込み・利用の前に、情報元のページで最新の条件をご確認ください。この内容は情報提供であって、金融助言ではありません。</p>
+    <!-- §25-8(2026-10-05): 「持っているカードで」。#cards= が無いときはこの節ごと JS が隠す
+         (出す/出さないの判断はぜんぶ JS 側。サーバーは空の枠だけ用意する)。 -->
+    <div class="dk-sheet-paycards" id="dk-sheet-paycards" hidden>
+      <p class="dk-sheet-paycards-head">持っているカードで</p>
+      <p class="dk-sheet-paycards-line" id="dk-sheet-paycards-line"></p>
+      <div class="dk-sheet-paycards-result" id="dk-sheet-paycards-result"></div>
+      <p class="dk-sheet-paycards-pay" id="dk-sheet-paycards-pay"></p>
+    </div>
     <div class="dk-sheet-actions">
       <a class="dk-btn primary" id="dk-sheet-open" href="#" target="_blank" rel="noopener">情報元を見る</a>
       <button class="dk-btn" type="button" id="dk-sheet-save">気になる</button>
