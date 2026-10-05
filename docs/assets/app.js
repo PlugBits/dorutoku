@@ -496,6 +496,8 @@ window.dkMergeCardsIntoHref = function (href, cards) {
           '<span class="dk-row-deal">' + esc(d.headline) + '</span></span>' +
           (d.pill ? '<span class="dk-pill soon">' + esc(d.pill) + '</span>' : '') + '</a>';
       }).join('') : '<p class="dk-empty">期限が近いお得はありません</p>';
+
+      if (window.dkApplyCardsCarry) window.dkApplyCardsCarry();
     }
 
     var zipInput = document.getElementById('zip-input'), zipNote = document.getElementById('zip-note');
