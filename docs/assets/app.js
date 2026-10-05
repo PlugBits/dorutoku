@@ -1070,7 +1070,8 @@ window.dkMergeCardsIntoHref = function (href, cards) {
         el.open.href = d.url || '#';
         el.open.hidden = !d.url;
       }
-      if (el.storelink) el.storelink.href = d.href || '#';
+
+      if (el.storelink) { el.storelink.href = d.href || '#'; el.storelink.hidden = !d.href; }
       renderSaveBtn(d.id);
       renderSummary(d.id);
       loadSummaries(d.id);
